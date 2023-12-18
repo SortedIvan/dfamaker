@@ -16,12 +16,23 @@ class DfaState {
 		sf::CircleShape stateCircle;
 		//circle.setOrigin(circle.getRadius(), circle.getRadius());
 	public:
-		DfaState(std::string label, sf::Vector2f statePosition, sf::CircleShape stateCircle, bool isStarting);
+		DfaState(std::string label, sf::Vector2f statePosition);
+
+		// Setters
 		void SetIsAccepting(bool isAccepting);
-		bool AddStateTransition(char transitionChar, int toState);
-		void RemoveStateTransition(char transitionChar);
 		void SetStateColor(sf::Color color);
 	    void SetIsStarting(bool isStarting);
 		void SetStateLabel(std::string label);
+
+		// Getters
+		std::string GetStateLabel();
+		std::map<char, int> GetStateTransitions();
+		bool GetIsAccepting();
+		bool GetIsStarting();
+		sf::Vector2f GetStatePosition();
+		sf::CircleShape GetStateCircle();
+
 		void ChangeStateTransition(char oldTransitionChar, char newTransitionChar);
+		bool AddStateTransition(char transitionChar, int toState);
+		void RemoveStateTransition(char transitionChar);
 };

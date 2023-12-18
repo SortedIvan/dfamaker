@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dfa.cpp" />
     <ClCompile Include="dfa_state.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

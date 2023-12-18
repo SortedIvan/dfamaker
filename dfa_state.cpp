@@ -1,10 +1,15 @@
 #include "dfa_state.hpp"
 
-DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::CircleShape stateCircle, bool isStarting) {
+const int DEFAULT_STATE_RADIUS = 20;
+const sf::Color DEFAULT_STATE_COLOR = sf::Color::White;
+
+DfaState::DfaState(std::string label, sf::Vector2f statePosition) {
 	this->label = label;
 	this->statePosition = statePosition;
-	this->stateCircle = stateCircle;
-	this->isStarting = isStarting;
+	this->stateCircle.setRadius(DEFAULT_STATE_RADIUS);
+	this->stateCircle.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS, DEFAULT_STATE_RADIUS));
+	this->stateCircle.setPosition(statePosition);
+	this->stateCircle.setFillColor(DEFAULT_STATE_COLOR);
 }
 
 bool DfaState::AddStateTransition(char transitionChar, int toState) {
@@ -52,4 +57,28 @@ void DfaState::ChangeStateTransition(char oldTransitionChar, char newTransitionC
 		RemoveStateTransition(oldTransitionChar);
 		AddStateTransition(newTransitionChar, oldTransitionValue);
 	}
+}
+
+std::string DfaState::GetStateLabel() {
+	return this->label;
+}
+
+std::map<char, int> DfaState::GetStateTransitions() {
+	return this->transitions;
+}
+
+bool DfaState::GetIsAccepting() {
+	return this->isAccepting;
+}
+
+bool DfaState::GetIsStarting() {
+	return this->isStarting;
+}
+
+sf::Vector2f DfaState::GetStatePosition() {
+	return this->statePosition;
+}
+
+sf::CircleShape DfaState::GetStateCircle() {
+	return this->stateCircle;
 }

@@ -21,6 +21,9 @@
     <ClCompile Include="dfa_state.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="dfa.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dfa.hpp">
