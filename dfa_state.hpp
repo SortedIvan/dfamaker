@@ -18,9 +18,10 @@ class DfaState {
 	public:
 		DfaState(std::string label, sf::Vector2f statePosition, sf::CircleShape stateCircle, bool isStarting);
 		void SetIsAccepting(bool isAccepting);
-		void AddStateTransition(char transitionChar, int toState);
+		bool AddStateTransition(char transitionChar, int toState);
 		void RemoveStateTransition(char transitionChar);
 		void SetStateColor(sf::Color color);
-		void SetIsStarting(bool isStarting);
+	    void SetIsStarting(bool isStarting);
 		void SetStateLabel(std::string label);
+		void ChangeStateTransition(char oldTransitionChar, char newTransitionChar);
 };
