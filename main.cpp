@@ -6,7 +6,8 @@
 
 sf::Vector2i GetMousePosition(sf::RenderWindow& window);
 void DrawStateOnScreen(sf::RenderWindow& window);
-
+void TryLoadFont(sf::Font& font, std::string path);
+void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState);
 static const sf::Color default_bg_color(0x00, 0x01, 0x33);
 
 // Method for spawning arrows
@@ -26,9 +27,12 @@ int main() {
 	DFA dfa;
 	// Define DFA logic here (to be moved onto somewhere else than main.cpp
 
-		
-	sf::CircleShape shape(50.f);
-	shape.setPosition(100, 100);
+	sf::Font font;
+	TryLoadFont(font, "./testfont.ttf");
+
+	int selectedState = 0;
+	bool stateIsSelected = false;
+
 
 	while (window.isOpen()) {
 		while (window.pollEvent(e)) {
@@ -36,9 +40,25 @@ int main() {
 				window.close();
 			}
 
+			if (e.type == sf::Event::TextEntered)
+			{
+				if (stateIsSelected) {
+					HandleStateLabelInput(e, dfa, selectedState);
+				}
+			}
+
 			// On Mouse Click Release
 			if (e.type == sf::Event::MouseButtonReleased) {
-				dfa.AddNewState("test", (sf::Vector2f)GetMousePosition(window));
+				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
+
+				if (dfa.CheckIfStateSelected(mousePos)) {
+					selectedState = dfa.GetSelectedStateIndex(mousePos);
+					stateIsSelected = true;
+				}
+				else {
+					dfa.AddNewState("test", (sf::Vector2f)GetMousePosition(window), font);
+					stateIsSelected = false;
+				}
 			}
 
 		}
@@ -79,3 +99,14 @@ void DrawStateOnScreen(sf::RenderWindow& window) {
 }
 
 
+void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState) {
+	if (e.text.unicode != '\b' && e.text.unicode != '\r' &&
+		e.key.code != sf::Keyboard::Left && e.key.code != sf::Keyboard::Right && e.text.unicode != 36
+		&& e.key.code != sf::Keyboard::Escape)
+	{
+		dfa.ChangeStateLabelText(e, selectedState);
+	}
+	else if (e.text.unicode == '\b') {
+		dfa.DeleteStateLabelCharacter(selectedState);
+	}
+}

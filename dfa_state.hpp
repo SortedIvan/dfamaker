@@ -14,10 +14,11 @@ class DfaState {
 		// ------- graphics related vars
 		sf::Vector2f statePosition;
 		sf::CircleShape stateCircle;
-		//circle.setOrigin(circle.getRadius(), circle.getRadius());
-	public:
-		DfaState(std::string label, sf::Vector2f statePosition);
+		sf::Text textLabel;
 
+	public:
+		DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font);
+		DfaState();
 		// Setters
 		void SetIsAccepting(bool isAccepting);
 		void SetStateColor(sf::Color color);
@@ -35,4 +36,8 @@ class DfaState {
 		void ChangeStateTransition(char oldTransitionChar, char newTransitionChar);
 		bool AddStateTransition(char transitionChar, int toState);
 		void RemoveStateTransition(char transitionChar);
+
+		sf::Text& GetTextLabelRef();
+
+		void Draw(sf::RenderWindow& window);
 };

@@ -1,16 +1,33 @@
 #include "dfa_state.hpp"
 
-const int DEFAULT_STATE_RADIUS = 20;
+const int DEFAULT_STATE_RADIUS = 40;
 const sf::Color DEFAULT_STATE_COLOR = sf::Color::White;
 
-DfaState::DfaState(std::string label, sf::Vector2f statePosition) {
+DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font) {
 	this->label = label;
 	this->statePosition = statePosition;
 	this->stateCircle.setRadius(DEFAULT_STATE_RADIUS);
 	this->stateCircle.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS, DEFAULT_STATE_RADIUS));
 	this->stateCircle.setPosition(statePosition);
 	this->stateCircle.setFillColor(DEFAULT_STATE_COLOR);
+
+	this->textLabel.setFont(font);
+	this->textLabel.setString(label);
+	this->textLabel.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS / 2 - 5, DEFAULT_STATE_RADIUS / 2)); // Center it in the circle
+	this->textLabel.setPosition(statePosition);
+	this->textLabel.setCharacterSize(20);
+	this->textLabel.setFillColor(sf::Color::Black);
 }
+
+DfaState::DfaState() {
+
+}
+
+void DfaState::Draw(sf::RenderWindow& window) {
+	window.draw(stateCircle); // draw the state first
+	window.draw(textLabel); // draw the state label
+}
+
 
 bool DfaState::AddStateTransition(char transitionChar, int toState) {
 	std::pair<char, int> transition;
@@ -43,6 +60,7 @@ void DfaState::SetIsStarting(bool isStarting) {
 
 void DfaState::SetStateLabel(std::string label) {
 	this->label = label;
+	this->textLabel.setString(label);
 }
 
 void DfaState::ChangeStateTransition(char oldTransitionChar, char newTransitionChar) {
@@ -81,4 +99,8 @@ sf::Vector2f DfaState::GetStatePosition() {
 
 sf::CircleShape DfaState::GetStateCircle() {
 	return this->stateCircle;
+}
+
+sf::Text& DfaState::GetTextLabelRef() {
+	return textLabel;
 }
