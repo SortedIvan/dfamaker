@@ -9,6 +9,7 @@ void DrawStateOnScreen(sf::RenderWindow& window);
 void TryLoadFont(sf::Font& font, std::string path);
 void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState);
 static const sf::Color default_bg_color(0x00, 0x01, 0x33);
+void RotateRectangle(sf::ConvexShape& rect, float angle);
 
 // Method for spawning arrows
 // 1) Click on the shape
@@ -29,10 +30,23 @@ int main() {
 
 	sf::Font font;
 	TryLoadFont(font, "./testfont.ttf");
+	
+	sf::CircleShape triangle(40, 3);
+	triangle.setFillColor(sf::Color::Yellow);
+	triangle.setPosition(100, 100);
 
-	int selectedState = 0;
+
+	sf::RectangleShape rectangle(sf::Vector2f(100, 5));
+	rectangle.setPosition(300, 300);
+	rectangle.setFillColor(sf::Color::White);
+
+
+	//rectangle.getTransform().transformPoint()
+
+	int selectedState = -1;
+	int transitionCounter = 0;
 	bool stateIsSelected = false;
-
+	
 
 	while (window.isOpen()) {
 		while (window.pollEvent(e)) {
@@ -52,12 +66,38 @@ int main() {
 				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
 
 				if (dfa.CheckIfStateSelected(mousePos)) {
-					selectedState = dfa.GetSelectedStateIndex(mousePos);
-					stateIsSelected = true;
+
+					int tempSelected = dfa.GetSelectedStateIndex(mousePos);
+					if (tempSelected != -2 && stateIsSelected && tempSelected != selectedState && selectedState != -1) { // if a different state was selected
+
+						sf::Vector2f directionVector = dfa.GetStates()[selectedState].GetStatePosition() - dfa.GetStates()[tempSelected].GetStatePosition();
+						float vectorLength = std::sqrt(directionVector.x * directionVector.x + directionVector.y * directionVector.y);
+						directionVector.x = directionVector.x / vectorLength;
+						directionVector.y = directionVector.y / vectorLength;
+
+						std::cout << directionVector.x << std::endl;
+						std::cout << directionVector.y;
+
+						sf::Vector2f center = dfa.GetStates()[selectedState].GetStateCircle().getPosition()
+							+ sf::Vector2f(dfa.GetStates()[selectedState].GetStateCircle().getRadius(),
+							dfa.GetStates()[selectedState].GetStateCircle().getRadius());
+
+						sf::Vector2f outgoingPoint = directionVector * dfa.GetStates()[selectedState].GetStateCircle().getRadius() + center;
+						triangle.setPosition(outgoingPoint);
+
+					}
+					else if (tempSelected != -2 && stateIsSelected && tempSelected == selectedState) { // self-loop
+
+					}
+					else { // First time selecting state
+						selectedState = tempSelected;
+						stateIsSelected = true;
+					}
 				}
 				else {
-					dfa.AddNewState("test", (sf::Vector2f)GetMousePosition(window), font);
+					dfa.AddNewState("", (sf::Vector2f)GetMousePosition(window), font);
 					stateIsSelected = false;
+					selectedState = -1;
 				}
 			}
 
@@ -69,7 +109,8 @@ int main() {
 
 		// --------- draw on the screen ---------	
 		dfa.DrawAllStates(window);
-
+		window.draw(triangle);
+		window.draw(rectangle);
 
 		// --------- display on the screen --------
 		window.display();
@@ -109,4 +150,33 @@ void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState) {
 	else if (e.text.unicode == '\b') {
 		dfa.DeleteStateLabelCharacter(selectedState);
 	}
+}
+
+void AddStateTransitionBetweenStates() {
+
+}
+
+void RotateRectangle(sf::ConvexShape& rect, float angle) {
+
+	// Works by rotating the corners of the given shape by working
+	// around the center of the shape. Thus it rotates itself around its center
+	for (int i = 0; i < rect.getPointCount(); i++) {
+		float pointX = rect.getPoint(i).x;
+		float pointY = rect.getPoint(i).y;
+
+		// Get the origin by substracting corners with center
+		float xToOrigin = pointX - rect.getLocalBounds().height / 2;
+		float yToOrigin = pointX - rect.getLocalBounds().width / 2;
+
+		// apply rotation
+		// now apply rotation
+		float rotatedX = xToOrigin * std::cos(angle) - yToOrigin * std::sin(angle);
+		float rotatedY = xToOrigin * std::sin(angle) + yToOrigin * std::cos(angle);
+
+		rect.setPoint(i, sf::Vector2f(rotatedX, rotatedY));
+	}
+
+
+
+
 }

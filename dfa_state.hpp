@@ -2,12 +2,15 @@
 #include <string>
 #include <map>
 #include "SFML/Graphics.hpp"
+#include <vector>
 
 class DfaState {
 	private:
 		// ------- state related vars
 		std::string label;
 		std::map<char, int> transitions;
+		std::vector<sf::RectangleShape> transitionLines;
+		std::vector<sf::CircleShape> transitionArrows; // sf::CircleShape triangle(20, 3);
 		bool isAccepting = false;
 		bool isStarting;
 

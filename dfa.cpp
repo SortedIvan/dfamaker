@@ -49,6 +49,7 @@ int DFA::GetSelectedStateIndex(sf::Vector2f positionClicked) {
 			return i;
 		}
 	}
+	return -2;
 }
 
 void DFA::ChangeStateLabelText(sf::Event& event, int selectedState) {
@@ -62,4 +63,13 @@ void DFA::DeleteStateLabelCharacter(int selectedState) {
 		currentLabel.resize(currentLabel.size() - 1);
 		states[selectedState].SetStateLabel(currentLabel);
 	}
+}
+
+bool DFA::AddNewTransition(int stateA, int stateB) {
+	sf::Vector2f fromPosition = states[stateA].GetStatePosition();
+	sf::Vector2f toPosition = states[stateA].GetStatePosition();
+
+	sf::Vector2f directionVector = fromPosition - toPosition;
+
+	return false;
 }
