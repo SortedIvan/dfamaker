@@ -28,9 +28,17 @@ void SetAlphabet(std::vector<char> alphabet) {
 
 }
 
+// If the state is marked as selected, draw its outlining
+// otherwise => draw it normally
 void DFA::DrawAllStates(sf::RenderWindow& window) {
 	for (int i = 0; i < states.size(); i++) {
-		states[i].Draw(window);
+
+		if (selectedState == i) {
+			states[i].Draw(window, true);
+		}
+		else {
+			states[i].Draw(window, false);
+		}
 	}
 }
 
@@ -72,4 +80,8 @@ bool DFA::AddNewTransition(int stateA, int stateB) {
 	sf::Vector2f directionVector = fromPosition - toPosition;
 
 	return false;
+}
+
+void DFA::SetSelectedState(int selectedState) {
+	this->selectedState = selectedState;
 }

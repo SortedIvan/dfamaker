@@ -1,6 +1,8 @@
 #include "dfa_state.hpp"
 
 const int DEFAULT_STATE_RADIUS = 40;
+const int DEFAULT_STATE_SELECTED_RADIUS = 35;
+
 const sf::Color DEFAULT_STATE_COLOR = sf::Color::White;
 
 DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font) {
@@ -10,6 +12,15 @@ DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font
 	this->stateCircle.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS, DEFAULT_STATE_RADIUS));
 	this->stateCircle.setPosition(statePosition);
 	this->stateCircle.setFillColor(DEFAULT_STATE_COLOR);
+
+	this->outlining.setPosition(statePosition);
+	this->outlining.setRadius(DEFAULT_STATE_SELECTED_RADIUS);
+	this->outlining.setOrigin(sf::Vector2f(DEFAULT_STATE_SELECTED_RADIUS, DEFAULT_STATE_SELECTED_RADIUS));
+	this->outlining.setOutlineThickness(2.0f);
+	this->outlining.setOutlineColor(sf::Color::Red);
+	this->outlining.setFillColor(sf::Color::Transparent);
+
+
 
 	this->textLabel.setFont(font);
 	this->textLabel.setString(label);
@@ -23,9 +34,14 @@ DfaState::DfaState() {
 
 }
 
-void DfaState::Draw(sf::RenderWindow& window) {
+void DfaState::Draw(sf::RenderWindow& window, bool isSelected) {
 	window.draw(stateCircle); // draw the state first
 	window.draw(textLabel); // draw the state label
+
+	if (isSelected) {
+		window.draw(outlining);
+	}
+
 }
 
 

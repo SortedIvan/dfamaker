@@ -17,6 +17,7 @@ class DfaState {
 		// ------- graphics related vars
 		sf::Vector2f statePosition;
 		sf::CircleShape stateCircle;
+		sf::CircleShape outlining;
 		sf::Text textLabel;
 
 	public:
@@ -42,5 +43,5 @@ class DfaState {
 
 		sf::Text& GetTextLabelRef();
 
-		void Draw(sf::RenderWindow& window);
+		void Draw(sf::RenderWindow& window, bool is_selected);
 };
