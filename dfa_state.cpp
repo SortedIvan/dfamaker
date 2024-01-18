@@ -20,14 +20,16 @@ DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font
 	this->outlining.setOutlineColor(sf::Color::Red);
 	this->outlining.setFillColor(sf::Color::Transparent);
 
-
-
 	this->textLabel.setFont(font);
 	this->textLabel.setString(label);
 	this->textLabel.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS / 2 - 5, DEFAULT_STATE_RADIUS / 2)); // Center it in the circle
 	this->textLabel.setPosition(statePosition);
 	this->textLabel.setCharacterSize(20);
 	this->textLabel.setFillColor(sf::Color::Black);
+
+	this->stateCenter = statePosition;
+
+
 }
 
 DfaState::DfaState() {
@@ -119,4 +121,8 @@ sf::CircleShape DfaState::GetStateCircle() {
 
 sf::Text& DfaState::GetTextLabelRef() {
 	return textLabel;
+}
+
+sf::Vector2f DfaState::GetStateCenter() {
+	return stateCenter;
 }

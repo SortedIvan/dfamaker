@@ -3,6 +3,7 @@
 #include "SFML/Graphics.hpp"
 #include <iostream>
 #include "dfa.hpp"
+#include "Line.cpp"
 
 # define M_PI  3.14159265358979323846  /* pi */
 
@@ -38,12 +39,14 @@ int main() {
 	triangle.setPosition(100, 100);
 
 
-	sf::RectangleShape rectangle(sf::Vector2f(100, 5));
+	sf::RectangleShape rectangle(sf::Vector2f(5, 5));
 	rectangle.setPosition(300, 300);
-	rectangle.setFillColor(sf::Color::White);
+	rectangle.setFillColor(sf::Color::Black);
 
+	sfLine line(sf::Vector2f(100, 100), sf::Vector2f(200, 200));
 
-	//rectangle.getTransform().transformPoint()
+	sfLine arrowLineOne(sf::Vector2f(100, 100), sf::Vector2f(200, 200));
+	sfLine arrowLineTwo(sf::Vector2f(100, 100), sf::Vector2f(200, 200));
 
 	int selectedState = -1;
 	int transitionCounter = 0;
@@ -86,8 +89,12 @@ int main() {
 
 							std::vector<DfaState> states = dfa.GetStates();
 
-							sf::Vector2f stateFrom = states[selectedState].GetStatePosition();
-							sf::Vector2f stateTo = states[tempSelected].GetStatePosition();
+							DfaState stateFromObj = states[selectedState];
+							DfaState stateToObj = states[tempSelected];
+
+
+							sf::Vector2f stateFrom = stateFromObj.GetStatePosition();
+							sf::Vector2f stateTo = stateToObj.GetStatePosition();
 							sf::Vector2f dirVector = stateTo - stateFrom;
 
 							float vectorLength = std::roundf(std::sqrt(dirVector.x * dirVector.x + dirVector.y * dirVector.y));
@@ -100,14 +107,32 @@ int main() {
 							// 1) Calculate the rotation between the states
 							float rotationRadians = std::atan2(dirVectorNormalized.y, dirVectorNormalized.x);
 							float rotationDegrees = rotationRadians * (180 / M_PI); // Normalize to degrees
-							std::cout << rotationDegrees << std::endl;
-							rectangle.setRotation(rotationDegrees);
 							// 2) Calculate the distance between the states
-
 							float distance = std::sqrt(std::pow((stateTo.x - stateFrom.x), 2)
 								+ std::pow((stateTo.y - stateFrom.y), 2));
 
-							std::cout << distance;
+							// 3) Calculate the out/in point
+							sf::Vector2f outgoingPoint = (dirVectorNormalized * stateFromObj.GetStateCircle().getRadius()) + stateFrom;
+							sf::Vector2f toPoint = (-dirVectorNormalized * stateToObj.GetStateCircle().getRadius()) + stateTo;
+							line.setLinePoints(outgoingPoint, toPoint);
+
+							// 4) 
+							sf::Transform rotationTransform;
+							rotationTransform.rotate(45.f);
+
+							// Rotate the vector left (counter-clockwise)
+							sf::Vector2f rotatedLeft = rotationTransform.transformPoint(-dirVectorNormalized);
+
+							// Reset the rotation matrix
+							rotationTransform = sf::Transform();
+
+							// Rotate the vector right (clockwise)
+							rotationTransform.rotate(-45.f); // negative angle for clockwise rotation
+							sf::Vector2f rotatedRight = rotationTransform.transformPoint(-dirVectorNormalized);
+
+							arrowLineOne.setLinePoints(toPoint, rotatedLeft * 15.f + toPoint);
+							arrowLineTwo.setLinePoints(toPoint, rotatedRight * 15.f + toPoint);
+
 						}
 						else {
 							selectedState = tempSelected;
@@ -144,10 +169,15 @@ int main() {
 		// --------- clear the screen ----------
 		window.clear(default_bg_color);
 
+
 		// --------- draw on the screen ---------	
+		window.draw(rectangle);
 		dfa.DrawAllStates(window);
 		window.draw(triangle);
-		window.draw(rectangle);
+		window.draw(line);
+		window.draw(arrowLineOne);
+		window.draw(arrowLineTwo);
+
 
 		// --------- display on the screen --------
 		window.display();

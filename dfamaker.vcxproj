@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClCompile Include="dfa.cpp" />
     <ClCompile Include="dfa_state.cpp" />
+    <ClCompile Include="Line.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>

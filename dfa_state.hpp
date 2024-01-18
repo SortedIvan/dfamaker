@@ -16,6 +16,7 @@ class DfaState {
 
 		// ------- graphics related vars
 		sf::Vector2f statePosition;
+		sf::Vector2f stateCenter;
 		sf::CircleShape stateCircle;
 		sf::CircleShape outlining;
 		sf::Text textLabel;
@@ -36,6 +37,7 @@ class DfaState {
 		bool GetIsStarting();
 		sf::Vector2f GetStatePosition();
 		sf::CircleShape GetStateCircle();
+		sf::Vector2f GetStateCenter();
 
 		void ChangeStateTransition(char oldTransitionChar, char newTransitionChar);
 		bool AddStateTransition(char transitionChar, int toState);
