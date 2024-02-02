@@ -35,9 +35,11 @@ void DFA::DrawAllStates(sf::RenderWindow& window) {
 
 		if (selectedState == i) {
 			states[i].Draw(window, true);
+			states[i].DrawStateArrows(window);
 		}
 		else {
 			states[i].Draw(window, false);
+			states[i].DrawStateArrows(window);
 		}
 	}
 }

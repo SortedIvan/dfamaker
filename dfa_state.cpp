@@ -46,20 +46,6 @@ void DfaState::Draw(sf::RenderWindow& window, bool isSelected) {
 
 }
 
-
-bool DfaState::AddStateTransition(char transitionChar, int toState) {
-	std::pair<char, int> transition;
-	transition.first = transitionChar;
-	transition.second = toState;
-
-	if (transitions.count(transitionChar)) { // transition already exists with this char
-		return false;
-	}
-
-	this->transitions.insert(transition);
-	return true;
-}
-
 void DfaState::SetIsAccepting(bool isAccepting) {
 	this->isAccepting = isAccepting;
 }
@@ -89,9 +75,9 @@ void DfaState::ChangeStateTransition(char oldTransitionChar, char newTransitionC
 	auto oldTransition = transitions.find(oldTransitionChar);
 
 	if (oldTransition != transitions.end()) { // The transition exists
-		int oldTransitionValue = transitions.at(oldTransitionChar);
+		StateTransition oldTransitionValue = transitions.at(oldTransitionChar);
 		RemoveStateTransition(oldTransitionChar);
-		AddStateTransition(newTransitionChar, oldTransitionValue);
+		//AddStateTransition(newTransitionChar, oldTransitionValue); TO DO
 	}
 }
 
@@ -99,7 +85,7 @@ std::string DfaState::GetStateLabel() {
 	return this->label;
 }
 
-std::map<char, int> DfaState::GetStateTransitions() {
+std::map<char, StateTransition> DfaState::GetStateTransitions() {
 	return this->transitions;
 }
 
@@ -125,4 +111,26 @@ sf::Text& DfaState::GetTextLabelRef() {
 
 sf::Vector2f DfaState::GetStateCenter() {
 	return stateCenter;
+}
+
+void DfaState::DrawStateArrows(sf::RenderWindow& window) {
+	for (int i = 0; i < transitions.size(); i++) {
+		transitions.at(i).Draw(window);
+	}
+}
+
+bool DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue) {
+	//StateTransition transition(stateFromObj, stateToObj, toState);
+	//
+	//if (transitions.count(transitionChar)) {
+	//	return false; // transition already exists with this char
+	//}
+
+	//transitions.insert({ transitionChar, transition });
+
+	StateTransition transition;
+
+	transition.SetUpStateTransition(stateFrom, stateTo, stateFromRadius, stateToRadius, stateToValue);
+
+	return true;
 }

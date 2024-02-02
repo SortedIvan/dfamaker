@@ -3,14 +3,15 @@
 #include <map>
 #include "SFML/Graphics.hpp"
 #include <vector>
+#include "line.hpp"
+#include "dfa_state_transition.hpp"
 
 class DfaState {
 	private:
 		// ------- state related vars
 		std::string label;
-		std::map<char, int> transitions;
-		std::vector<sf::RectangleShape> transitionLines;
-		std::vector<sf::CircleShape> transitionArrows; // sf::CircleShape triangle(20, 3);
+		std::vector<StateTransition> transitionObjects;
+		std::map<char, StateTransition> transitions;
 		bool isAccepting = false;
 		bool isStarting;
 
@@ -32,7 +33,7 @@ class DfaState {
 
 		// Getters
 		std::string GetStateLabel();
-		std::map<char, int> GetStateTransitions();
+		std::map<char, StateTransition> GetStateTransitions();
 		bool GetIsAccepting();
 		bool GetIsStarting();
 		sf::Vector2f GetStatePosition();
@@ -40,10 +41,16 @@ class DfaState {
 		sf::Vector2f GetStateCenter();
 
 		void ChangeStateTransition(char oldTransitionChar, char newTransitionChar);
-		bool AddStateTransition(char transitionChar, int toState);
+		//bool AddStateTransition(char transitionChar, int toState);
 		void RemoveStateTransition(char transitionChar);
+
+		bool AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue);
+		bool AddStateTransitionSymbol(char transitionChar, int selectedStateTransition);
+		StateTransition GetStateTransition(char symbol);
+	
 
 		sf::Text& GetTextLabelRef();
 
 		void Draw(sf::RenderWindow& window, bool is_selected);
+		void DrawStateArrows(sf::RenderWindow& window);
 };
