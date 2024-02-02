@@ -85,7 +85,7 @@ std::string DfaState::GetStateLabel() {
 	return this->label;
 }
 
-std::map<char, StateTransition> DfaState::GetStateTransitions() {
+std::map<char, StateTransition> DfaState::GetAssignedStateTransitions() {
 	return this->transitions;
 }
 
@@ -119,7 +119,7 @@ void DfaState::DrawStateArrows(sf::RenderWindow& window) {
 	}
 }
 
-bool DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue) {
+StateTransition DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue, int stateFromValue) {
 	//StateTransition transition(stateFromObj, stateToObj, toState);
 	//
 	//if (transitions.count(transitionChar)) {
@@ -129,9 +129,12 @@ bool DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, 
 	//transitions.insert({ transitionChar, transition });
 
 	StateTransition transition;
-	transition.SetUpStateTransition(stateFrom, stateTo, stateFromRadius, stateToRadius, stateToValue);
+	transition.SetUpStateTransition(stateFrom, stateTo, stateFromRadius, stateToRadius, stateToValue, stateFromValue);
 	transitionObjects.push_back(transition);
 
-	return true;
+	return transition;
 }
 
+std::vector<StateTransition> DfaState::GetUnassignedStateTransitions() {
+	return transitionObjects;
+}

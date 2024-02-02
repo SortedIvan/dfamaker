@@ -6,7 +6,9 @@ class StateTransition {
 		sfLine mainArrow;
 		sfLine arrowTipOne;
 		sfLine arrowTipTwo;
+		float arrowLength;
 		int transitionTo;
+		int transitionFrom;
 
 	public:
 		StateTransition();
@@ -14,5 +16,5 @@ class StateTransition {
 		int GetTransitionTo();
 		void Draw(sf::RenderWindow& window);
 		void SetUpStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, 
-			float stateToRadius, int stateToValue);
+			float stateToRadius, int stateToValue, int transitionFromValue);
 };

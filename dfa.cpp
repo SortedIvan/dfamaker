@@ -86,15 +86,25 @@ bool DFA::AddNewTransition(int stateFrom, int stateTo) {
 	// then, if the user clicks on it and adds a character, only then add an entry into the
 	// transition map and have it assigned to that particular transition
 
-	states[stateFrom].AddStateTransition(states[stateFrom].GetStatePosition(),
+	StateTransition transition = states[stateFrom].AddStateTransition(states[stateFrom].GetStatePosition(),
 		stateToObj.GetStatePosition(), states[stateFrom].GetStateCircle().getRadius(),
-		stateToObj.GetStateCircle().getRadius(), stateTo);
+		stateToObj.GetStateCircle().getRadius(), stateTo, stateFrom);
 
-
+	all_transitions.push_back(transition);
 
 	return true;
 }
 
 void DFA::SetSelectedState(int selectedState) {
 	this->selectedState = selectedState;
+}
+
+int DFA::GetClickedStateTransition(sf::Vector2f positionClicked) {
+	// Hack solution (temporary) (slow as shit)
+
+	for (int i = 0; i < all_transitions.size(); i++) {
+		//if (all_transitions[i].)
+	}
+
+	return 0;
 }

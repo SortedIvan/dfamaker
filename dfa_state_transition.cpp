@@ -7,12 +7,14 @@ StateTransition::StateTransition() {
 
 }
 
-void StateTransition::SetUpStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue) {
+void StateTransition::SetUpStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue, int transitionFromValue) {
 	//sf::Vector2f stateFrom = stateFromObj.GetStatePosition();
 	//sf::Vector2f stateTo = stateToObj.GetStatePosition();
 	sf::Vector2f dirVector = stateTo - stateFrom;
 
 	float vectorLength = std::roundf(std::sqrt(dirVector.x * dirVector.x + dirVector.y * dirVector.y));
+
+	arrowLength = vectorLength;
 
 	sf::Vector2f dirVectorNormalized =
 		sf::Vector2f(
@@ -33,7 +35,6 @@ void StateTransition::SetUpStateTransition(sf::Vector2f stateFrom, sf::Vector2f 
 	sf::Vector2f toPoint = (-dirVectorNormalized * stateToRadius) + stateTo;
 
 	mainArrow.setLinePoints(outgoingPoint, toPoint);
-
 	// 4) Rotate the arrow tip lines
 	sf::Transform rotationTransform;
 	rotationTransform.rotate(45.f);

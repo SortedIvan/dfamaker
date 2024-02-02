@@ -9,6 +9,8 @@ class DFA {
 		std::vector<DfaState> states;
 		std::vector<char> alphabet;
 		int selectedState = -2;
+		std::vector<StateTransition> all_transitions;
+
 	public:
 		DFA();
 		// getters
@@ -24,5 +26,6 @@ class DFA {
 		void DeleteStateLabelCharacter(int selectedState);
 		bool AddNewTransition(int stateFrom, int stateTo);
 		void SetSelectedState(int selectedState);
+		int GetClickedStateTransition(sf::Vector2f positionClicked);
 
 };

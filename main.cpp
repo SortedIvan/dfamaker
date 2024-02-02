@@ -128,14 +128,7 @@ int main() {
 
 
 		// --------- draw on the screen ---------	
-		//window.draw(rectangle);
 		dfa.DrawAllStates(window);
-		//window.draw(triangle);
-		//window.draw(line);
-		//window.draw(arrowLineOne);
-		//window.draw(arrowLineTwo);
-
-
 		// --------- display on the screen --------
 		window.display();
 
