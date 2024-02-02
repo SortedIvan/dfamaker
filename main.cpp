@@ -85,22 +85,10 @@ int main() {
 
 					if (stateIsSelected && tempSelected != selectedState && selectedState != -1) { // if a different state was selected
 
-						if (shiftHeldDown) {
+						if (shiftHeldDown) { // Add a new transition
 
-							std::vector<DfaState> states = dfa.GetStates();
-
-							DfaState stateFromObj = states[selectedState];
-							DfaState stateToObj = states[tempSelected];
-
-
-							// Problem: when adding a transition, make it so that it is not assigned a character somehow
-							// One potential solution:
-							// make it so that when you add a transition, it only adds a blank transition
-							// then, if the user clicks on it and adds a character, only then add an entry into the
-							// transition map and have it assigned to that particular transition
-							
-							//stateFromObj.AddStateTransition(' ', tempSelected, stateFromObj, stateToObj);
-						
+							dfa.AddNewTransition(selectedState, tempSelected);
+												
 							selectedState = tempSelected;
 						}
 						else {
@@ -128,7 +116,7 @@ int main() {
 
 		//<----------- End of event logic, anything that takes place before drawing ------------>
 
-		std::cout << selectedState << std::endl;
+		//std::cout << selectedState << std::endl;
 
 		if (selectedState >= 0) {
 			dfa.SetSelectedState(selectedState);
@@ -140,12 +128,12 @@ int main() {
 
 
 		// --------- draw on the screen ---------	
-		window.draw(rectangle);
+		//window.draw(rectangle);
 		dfa.DrawAllStates(window);
-		window.draw(triangle);
-		window.draw(line);
-		window.draw(arrowLineOne);
-		window.draw(arrowLineTwo);
+		//window.draw(triangle);
+		//window.draw(line);
+		//window.draw(arrowLineOne);
+		//window.draw(arrowLineTwo);
 
 
 		// --------- display on the screen --------

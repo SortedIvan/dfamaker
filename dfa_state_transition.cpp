@@ -53,7 +53,6 @@ void StateTransition::SetUpStateTransition(sf::Vector2f stateFrom, sf::Vector2f 
 
 	transitionTo = stateToValue;
 }
-
 void StateTransition::SetTransitionTwo(int stateTo) {
 	transitionTo = stateTo;
 }

@@ -114,8 +114,8 @@ sf::Vector2f DfaState::GetStateCenter() {
 }
 
 void DfaState::DrawStateArrows(sf::RenderWindow& window) {
-	for (int i = 0; i < transitions.size(); i++) {
-		transitions.at(i).Draw(window);
+	for (int i = 0; i < transitionObjects.size(); i++) {
+		transitionObjects.at(i).Draw(window);
 	}
 }
 
@@ -129,8 +129,9 @@ bool DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, 
 	//transitions.insert({ transitionChar, transition });
 
 	StateTransition transition;
-
 	transition.SetUpStateTransition(stateFrom, stateTo, stateFromRadius, stateToRadius, stateToValue);
+	transitionObjects.push_back(transition);
 
 	return true;
 }
+

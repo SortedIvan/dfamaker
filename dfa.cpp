@@ -1,4 +1,5 @@
 #include "dfa.hpp";
+#include <iostream>
 
 
 std::vector<DfaState> DFA::GetStates() {
@@ -75,13 +76,23 @@ void DFA::DeleteStateLabelCharacter(int selectedState) {
 	}
 }
 
-bool DFA::AddNewTransition(int stateA, int stateB) {
-	sf::Vector2f fromPosition = states[stateA].GetStatePosition();
-	sf::Vector2f toPosition = states[stateA].GetStatePosition();
+bool DFA::AddNewTransition(int stateFrom, int stateTo) {
 
-	sf::Vector2f directionVector = fromPosition - toPosition;
+	DfaState stateToObj = states[stateTo];
 
-	return false;
+	// Problem: when adding a transition, make it so that it is not assigned a character somehow
+	// One potential solution:
+	// make it so that when you add a transition, it only adds a blank transition
+	// then, if the user clicks on it and adds a character, only then add an entry into the
+	// transition map and have it assigned to that particular transition
+
+	states[stateFrom].AddStateTransition(states[stateFrom].GetStatePosition(),
+		stateToObj.GetStatePosition(), states[stateFrom].GetStateCircle().getRadius(),
+		stateToObj.GetStateCircle().getRadius(), stateTo);
+
+
+
+	return true;
 }
 
 void DFA::SetSelectedState(int selectedState) {

@@ -29,6 +29,8 @@ void sfLine::draw(sf::RenderTarget& target, sf::RenderStates states) const
 }
 
 void sfLine::setLinePoints(sf::Vector2f pointA, sf::Vector2f pointB) {
+    thickness = 4.f;
+    color = sf::Color::Yellow;
     sf::Vector2f direction = pointB - pointA;
     sf::Vector2f unitDirection = direction / std::sqrt(direction.x * direction.x + direction.y * direction.y);
     sf::Vector2f unitPerpendicular(-unitDirection.y, unitDirection.x);
