@@ -119,7 +119,7 @@ void DfaState::DrawStateArrows(sf::RenderWindow& window) {
 	}
 }
 
-StateTransition DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue, int stateFromValue) {
+StateTransition DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue, int stateFromValue, int id) {
 	//StateTransition transition(stateFromObj, stateToObj, toState);
 	//
 	//if (transitions.count(transitionChar)) {
@@ -130,11 +130,13 @@ StateTransition DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2
 
 	StateTransition transition;
 	transition.SetUpStateTransition(stateFrom, stateTo, stateFromRadius, stateToRadius, stateToValue, stateFromValue);
-	transitionObjects.push_back(transition);
+	transition.SetIsAssigned(false);
+	transition.SetTransitionId(id);
+	transitionObjects.insert({ id, transition });
 
 	return transition;
 }
 
-std::vector<StateTransition> DfaState::GetUnassignedStateTransitions() {
+std::map<int,StateTransition> DfaState::GetUnassignedStateTransitions() {
 	return transitionObjects;
 }

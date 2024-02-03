@@ -10,7 +10,7 @@ class DfaState {
 	private:
 		// ------- state related vars
 		std::string label;
-		std::vector<StateTransition> transitionObjects;
+		std::map<int,StateTransition> transitionObjects;
 		std::map<char, StateTransition> transitions;
 		bool isAccepting = false;
 		bool isStarting;
@@ -44,7 +44,7 @@ class DfaState {
 		//bool AddStateTransition(char transitionChar, int toState);
 		void RemoveStateTransition(char transitionChar);
 
-		StateTransition AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue, int stateFromValue);
+		StateTransition AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue, int stateFromValue, int id);
 		bool AddStateTransitionSymbol(char transitionChar, int selectedStateTransition);
 		StateTransition GetStateTransition(char symbol);
 	
@@ -54,7 +54,7 @@ class DfaState {
 		void Draw(sf::RenderWindow& window, bool is_selected);
 		void DrawStateArrows(sf::RenderWindow& window);
 
-		std::vector<StateTransition> GetUnassignedStateTransitions();
+		std::map<int, StateTransition> GetUnassignedStateTransitions();
 
 
 };

@@ -27,6 +27,9 @@ int main() {
 	sf::RenderWindow window(sf::VideoMode(800, 800), "Test");
 	sf::Event e;
 
+	int transitionIdCounter = 0;
+
+
 
 	DFA dfa;
 	// Define DFA logic here (to be moved onto somewhere else than main.cpp
@@ -87,7 +90,10 @@ int main() {
 
 						if (shiftHeldDown) { // Add a new transition
 
-							dfa.AddNewTransition(selectedState, tempSelected);
+							dfa.AddNewTransition(selectedState, tempSelected, transitionIdCounter);
+							dfa.GetClickedStateTransition(mousePos);
+
+							transitionIdCounter++;
 												
 							selectedState = tempSelected;
 						}

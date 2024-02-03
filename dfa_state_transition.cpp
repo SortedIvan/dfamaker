@@ -67,3 +67,39 @@ void StateTransition::Draw(sf::RenderWindow& window) {
 	window.draw(arrowTipOne);
 	window.draw(arrowTipTwo);
 }
+
+sfLine StateTransition::GetMainArrow() {
+	return mainArrow;
+}
+
+bool StateTransition::GetIsAssigned() {
+	return isAssigned;
+}
+void StateTransition::SetIsAssigned(bool value) {
+	this->isAssigned = value;
+}
+
+int StateTransition::GetTransitionFrom() {
+	return transitionFrom;
+}
+
+int StateTransition::GetTransitionId() {
+	return id;
+}
+
+void StateTransition::SetTransitionId(int id) {
+	this->id = id;
+}
+
+void StateTransition::SetTransitionColor(sf::Color color) {
+	mainArrow.SetArrowColor(color);
+}
+
+
+void StateTransition::SetTransitionSymbol(char symbol) {
+	this->symbol = symbol;
+}
+
+char StateTransition::GetTransitionSymbol() {
+	return symbol;
+}

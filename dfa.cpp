@@ -76,7 +76,7 @@ void DFA::DeleteStateLabelCharacter(int selectedState) {
 	}
 }
 
-bool DFA::AddNewTransition(int stateFrom, int stateTo) {
+bool DFA::AddNewTransition(int stateFrom, int stateTo, int id) {
 
 	DfaState stateToObj = states[stateTo];
 
@@ -88,7 +88,7 @@ bool DFA::AddNewTransition(int stateFrom, int stateTo) {
 
 	StateTransition transition = states[stateFrom].AddStateTransition(states[stateFrom].GetStatePosition(),
 		stateToObj.GetStatePosition(), states[stateFrom].GetStateCircle().getRadius(),
-		stateToObj.GetStateCircle().getRadius(), stateTo, stateFrom);
+		stateToObj.GetStateCircle().getRadius(), stateTo, stateFrom, id);
 
 	all_transitions.push_back(transition);
 
@@ -99,12 +99,15 @@ void DFA::SetSelectedState(int selectedState) {
 	this->selectedState = selectedState;
 }
 
-int DFA::GetClickedStateTransition(sf::Vector2f positionClicked) {
-	// Hack solution (temporary) (slow as shit)
 
-	for (int i = 0; i < all_transitions.size(); i++) {
-		//if (all_transitions[i].)
-	}
+int DFA::GetClickedStateTransition(sf::Vector2f positionClicked) {
+
+	bool transitionIsAssigned = false;
+	int stateFrom = 0;
+
+	all_transitions[0].SetTransitionColor(sf::Color::Red);
+	std::cout << "bomboclaat";
+
 
 	return 0;
 }
