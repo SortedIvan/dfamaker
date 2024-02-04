@@ -1,5 +1,8 @@
 #include "SFML/Graphics.hpp"
 #include "line.hpp"
+#include <algorithm>
+# define M_PI  3.14159265358979323846  /* pi */
+
 
 sfLine::sfLine(const sf::Vector2f& point1, const sf::Vector2f& point2) :
     color(sf::Color::Yellow), thickness(4.f)
@@ -36,41 +39,9 @@ void sfLine::SetArrowColor(sf::Color color) {
 void sfLine::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(vertices, 4, sf::Quads);
+    drawBoundingBox(target);
 }
 
-void sfLine::setLinePoints(sf::Vector2f pointA, sf::Vector2f pointB)
-{
-    thickness = 4.f;
-    color = sf::Color::Yellow;
-
-    float collisionThickness = 16.f;
-
-    sf::Vector2f direction = pointB - pointA;
-    sf::Vector2f unitDirection = direction / std::sqrt(direction.x * direction.x + direction.y * direction.y);
-    sf::Vector2f unitPerpendicular(-unitDirection.y, unitDirection.x);
-
-    sf::Vector2f offset = (thickness / 2.f) * unitPerpendicular;
-
-    vertices[0].position = pointA + offset;
-    vertices[1].position = pointB + offset;
-    vertices[2].position = pointB - offset;
-    vertices[3].position = pointA - offset;
-
-    for (int i = 0; i < 4; ++i) {
-        vertices[i].color = color;
-    }
-
-    boundingBox.left = std::min(vertices[0].position.x - collisionThickness, std::min(vertices[1].position.x - collisionThickness, std::min(vertices[2].position.x - collisionThickness, vertices[3].position.x - collisionThickness)));
-    boundingBox.top = std::min(vertices[0].position.y - collisionThickness, std::min(vertices[1].position.y - collisionThickness, std::min(vertices[2].position.y - collisionThickness, vertices[3].position.y - collisionThickness)));
-    boundingBox.width = std::max(vertices[0].position.x + collisionThickness, std::max(vertices[1].position.x + collisionThickness, std::max(vertices[2].position.x + collisionThickness, vertices[3].position.x + collisionThickness))) - boundingBox.left;
-    boundingBox.height = std::max(vertices[0].position.y + collisionThickness, std::max(vertices[1].position.y + collisionThickness, std::max(vertices[2].position.y + collisionThickness, vertices[3].position.y + collisionThickness))) - boundingBox.top;
-
-}
-
-sf::FloatRect sfLine::getBoundingBox() const
-{
-    return boundingBox;
-}
 
 void sfLine::SetSelfLoopPoint(const sf::Vector2f& center, float radius, float curvature)
 {
@@ -103,3 +74,74 @@ void sfLine::SetSelfLoopPoint(const sf::Vector2f& center, float radius, float cu
     boundingBox.width = 2 * (radius + thickness / 2.f);
     boundingBox.height = 2 * (radius + thickness / 2.f);
 }
+
+void sfLine::setLinePoints(sf::Vector2f pointA, sf::Vector2f pointB)
+{
+    thickness = 4.f;
+    color = sf::Color::Yellow;
+
+    float collisionThickness = 4.f;
+
+    sf::Vector2f direction = pointB - pointA;
+    float lineLength = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+
+    // Determine the number of bounding boxes based on the line length
+    int numBoundingBoxes = static_cast<int>(lineLength / 5); // boundingBoxSpacing is a predefined constant
+
+    // Calculate the unit direction and offset
+    sf::Vector2f unitDirection = direction / lineLength;
+    sf::Vector2f offset = (thickness / 2.f) * sf::Vector2f(-unitDirection.y, unitDirection.x);
+
+    // Clear existing bounding boxes
+    boundingBoxes.clear();
+
+    // Create evenly spaced bounding boxes
+    for (int i = 0; i <= numBoundingBoxes; ++i) {
+        float t = static_cast<float>(i) / static_cast<float>(numBoundingBoxes);
+        sf::Vector2f position = pointA + t * direction;
+        sf::Vector2f boxOffset = (thickness / 2.f) * sf::Vector2f(-unitDirection.y, unitDirection.x);
+
+        sf::FloatRect box;
+        box.left = position.x - collisionThickness;
+        box.top = position.y - collisionThickness;
+        box.width = thickness + 2 * collisionThickness;
+        box.height = lineLength / numBoundingBoxes + 2 * collisionThickness;
+
+        boundingBoxes.push_back(box);
+    }
+
+    // Update the vertices based on the first bounding box
+    vertices[0].position = pointA + offset;
+    vertices[1].position = pointB + offset;
+    vertices[2].position = pointB - offset;
+    vertices[3].position = pointA - offset;
+
+    for (int i = 0; i < 4; ++i) {
+        vertices[i].color = color;
+    }
+}
+
+// Add a function to draw the bounding boxes for debugging
+void sfLine::drawBoundingBox(sf::RenderTarget& target) const
+{
+    sf::RectangleShape rect;
+    rect.setOutlineColor(sf::Color::Red);
+    rect.setOutlineThickness(1.0f);
+    rect.setFillColor(sf::Color::Transparent);
+
+    for (const sf::FloatRect& box : boundingBoxes) {
+        rect.setPosition(box.left, box.top);
+        rect.setSize(sf::Vector2f(box.width, box.height));
+        target.draw(rect);
+    }
+}
+
+bool sfLine::CheckCollision(sf::Vector2f point) {
+    for (int i = 0; i < boundingBoxes.size(); i++) {
+        if (boundingBoxes[i].contains(point)) {
+            return true;
+        }
+    }
+    return false;
+}
+

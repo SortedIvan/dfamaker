@@ -13,7 +13,7 @@ void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState);
 static const sf::Color default_bg_color(0x00, 0x01, 0x33);
 void RotateRectangle(sf::ConvexShape& rect, float angle);
 float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs);
-
+sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f to);
 // Method for spawning arrows
 // 1) Click on the shape
 // 2) Hold ctrl
@@ -28,8 +28,6 @@ int main() {
 	sf::Event e;
 
 	int transitionIdCounter = 0;
-
-
 
 	DFA dfa;
 	// Define DFA logic here (to be moved onto somewhere else than main.cpp
@@ -55,6 +53,8 @@ int main() {
 	int transitionCounter = 0;
 	bool stateIsSelected = false;
 	bool shiftHeldDown = false;
+
+	sf::VertexArray testRect;
 
 	while (window.isOpen()) {
 
@@ -83,6 +83,10 @@ int main() {
 			if (e.type == sf::Event::MouseButtonReleased) {
 				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
 
+				if (dfa.SelectStateTransition(mousePos) != -2) { // We have clicked on a transition
+					continue;
+				}
+
 				if (dfa.CheckIfStateSelected(mousePos)) {
 					int tempSelected = dfa.GetSelectedStateIndex(mousePos);
 
@@ -91,8 +95,7 @@ int main() {
 						if (shiftHeldDown) { // Add a new transition
 
 							dfa.AddNewTransition(selectedState, tempSelected, transitionIdCounter);
-							dfa.GetClickedStateTransition(mousePos);
-
+							testRect = Test(window, dfa.GetStates()[selectedState].GetStateCenter(), dfa.GetStates()[tempSelected].GetStateCenter());
 							transitionIdCounter++;
 												
 							selectedState = tempSelected;
@@ -135,6 +138,8 @@ int main() {
 
 		// --------- draw on the screen ---------	
 		dfa.DrawAllStates(window);
+		window.draw(testRect);
+
 		// --------- display on the screen --------
 		window.display();
 
@@ -195,4 +200,61 @@ void RotateRectangle(sf::ConvexShape& rect, float angle) {
 float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs)
 {
 	return lhs.x * rhs.x + lhs.y + rhs.y;
+}
+
+
+
+// ---------- TO DO: Make a rectangle out of vertices and figure out how to detect collision
+sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f to) {
+	
+	float width = 4.f;
+
+	sf::Vector2f dirVector = to - from;
+
+	sf::Transform transform;
+
+	float distance = std::sqrt(std::pow((to.x - from.x), 2) + std::pow((to.y - from.y), 2));
+
+	//acos(a dot b / len(a) . len(b))
+
+	float adj = to.x - from.x;
+	float opp = to.y - from.y;
+	float hypp = std::sqrt(opp * opp + adj * adj);
+	//float angle = std::acos(adj / hypp) * (180 / M_PI);
+
+	float angle = std::atan2(opp, adj) * (180 / M_PI);
+	std::cout << angle << std::endl;
+
+	sf::Vector2f point1(from.x + width, from.y);
+	sf::Vector2f point2(from.x - width, from.y);
+	sf::Vector2f point3(from.x - width, from.y + distance);
+	sf::Vector2f point4(from.x + width, from.y + distance);
+
+	transform.rotate(angle - 90, from);
+
+	point1 = transform.transformPoint(point1);
+	point2 = transform.transformPoint(point2);
+	point3 = transform.transformPoint(point3);
+	point4 = transform.transformPoint(point4);
+
+	sf::VertexArray rect(sf::Quads, 4);
+	rect[0].position = point1;
+	rect[1].position = point2;
+	rect[2].position = point3;
+	rect[3].position = point4;
+
+	rect[0].texCoords = point1;
+	rect[1].texCoords = point2;
+	rect[2].texCoords = point3;
+	rect[3].texCoords = point4;
+
+	rect[0].color = sf::Color::Red;
+	rect[1].color = sf::Color::Yellow;
+	rect[2].color = sf::Color::Yellow;
+	rect[3].color = sf::Color::Red;
+
+	std::cout << "bomboclaat";
+
+	return rect;
+
 }

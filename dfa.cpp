@@ -89,9 +89,6 @@ bool DFA::AddNewTransition(int stateFrom, int stateTo, int id) {
 	StateTransition transition = states[stateFrom].AddStateTransition(states[stateFrom].GetStatePosition(),
 		stateToObj.GetStatePosition(), states[stateFrom].GetStateCircle().getRadius(),
 		stateToObj.GetStateCircle().getRadius(), stateTo, stateFrom, id);
-
-	all_transitions.push_back(transition);
-
 	return true;
 }
 
@@ -99,15 +96,25 @@ void DFA::SetSelectedState(int selectedState) {
 	this->selectedState = selectedState;
 }
 
-
-int DFA::GetClickedStateTransition(sf::Vector2f positionClicked) {
+// this code is cheap and fucking sucks
+// it has to cycle through all states to find the transition that was clicked
+int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 
 	bool transitionIsAssigned = false;
 	int stateFrom = 0;
 
-	all_transitions[0].SetTransitionColor(sf::Color::Red);
-	std::cout << "bomboclaat";
+	for (int i = 0; i < states.size(); i++) {
+		for (int k = 0; k < states[i].GetTransitionObjects().size(); k++) {
+			if (states[i].GetTransitionObjects()[k].GetMainArrow().CheckCollision(positionClicked)) {
+				std::cout << "bomboclaat";
+				return 0;
+			}
+		}
+	}
 
 
-	return 0;
+	
+
+
+	return -2; // didn't find anything
 }

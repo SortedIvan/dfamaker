@@ -67,27 +67,11 @@ void DfaState::SetStateLabel(std::string label) {
 	this->textLabel.setString(label);
 }
 
-void DfaState::ChangeStateTransition(char oldTransitionChar, char newTransitionChar) {
-	if (oldTransitionChar == newTransitionChar) {
-		return;
-	}
-
-	auto oldTransition = transitions.find(oldTransitionChar);
-
-	if (oldTransition != transitions.end()) { // The transition exists
-		StateTransition oldTransitionValue = transitions.at(oldTransitionChar);
-		RemoveStateTransition(oldTransitionChar);
-		//AddStateTransition(newTransitionChar, oldTransitionValue); TO DO
-	}
-}
 
 std::string DfaState::GetStateLabel() {
 	return this->label;
 }
 
-std::map<char, StateTransition> DfaState::GetAssignedStateTransitions() {
-	return this->transitions;
-}
 
 bool DfaState::GetIsAccepting() {
 	return this->isAccepting;
@@ -119,24 +103,17 @@ void DfaState::DrawStateArrows(sf::RenderWindow& window) {
 	}
 }
 
-StateTransition DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue, int stateFromValue, int id) {
-	//StateTransition transition(stateFromObj, stateToObj, toState);
-	//
-	//if (transitions.count(transitionChar)) {
-	//	return false; // transition already exists with this char
-	//}
-
-	//transitions.insert({ transitionChar, transition });
-
+StateTransition DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo,
+	float stateFromRadius, float stateToRadius, int stateToValue, int stateFromValue, int id) {
 	StateTransition transition;
 	transition.SetUpStateTransition(stateFrom, stateTo, stateFromRadius, stateToRadius, stateToValue, stateFromValue);
 	transition.SetIsAssigned(false);
 	transition.SetTransitionId(id);
-	transitionObjects.insert({ id, transition });
+	transitionObjects.push_back(transition);
 
 	return transition;
 }
 
-std::map<int,StateTransition> DfaState::GetUnassignedStateTransitions() {
+std::vector<StateTransition> DfaState::GetTransitionObjects() {
 	return transitionObjects;
 }
