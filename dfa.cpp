@@ -153,3 +153,7 @@ void DFA::SetTransitionSymbol(char symbol) {
 		states[currentSelectedTrans.first].SetTransitionSymbol(currentSelectedTrans.second, symbol);
 	}
 }
+
+void DFA::DeSelectState() {
+	selectedState = -1;
+}

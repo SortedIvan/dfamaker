@@ -88,6 +88,8 @@ int main() {
 					stateIsSelected = false;
 
 					// TO-DO: DE-SELECT STATE HERE
+					selectedState = -1;
+					dfa.DeSelectState();
 
 					continue;
 				}
