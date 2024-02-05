@@ -12,6 +12,8 @@ class DFA {
 
 		int previousSelectedTransition = -2;
 		int currentSelectedTransition = -2;
+		std::pair<int, int> previousSelectedTrans;
+		std::pair<int, int> currentSelectedTrans;
 
 	public:
 		DFA();

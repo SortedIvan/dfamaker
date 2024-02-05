@@ -51,5 +51,8 @@ class DfaState {
 
 		void Draw(sf::RenderWindow& window, bool is_selected);
 		void DrawStateArrows(sf::RenderWindow& window);
+		void ChangeTransitionColor(int transitionIndex, sf::Color color);
+
+
 
 };

@@ -117,3 +117,7 @@ StateTransition DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2
 std::vector<StateTransition> DfaState::GetTransitionObjects() {
 	return transitionObjects;
 }
+
+void DfaState::ChangeTransitionColor(int transitionIndex, sf::Color color) {
+	transitionObjects[transitionIndex].SetTransitionColor(color);
+}

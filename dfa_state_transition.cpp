@@ -93,6 +93,8 @@ void StateTransition::SetTransitionId(int id) {
 
 void StateTransition::SetTransitionColor(sf::Color color) {
 	mainArrow.SetArrowColor(color);
+	arrowTipOne.SetArrowColor(color);
+	arrowTipTwo.SetArrowColor(color);
 }
 
 

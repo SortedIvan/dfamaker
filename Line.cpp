@@ -5,7 +5,7 @@
 
 
 sfLine::sfLine(const sf::Vector2f& point1, const sf::Vector2f& point2) :
-    color(sf::Color::Yellow), thickness(4.f)
+    color(sf::Color::White), thickness(4.f)
 {
     sf::Vector2f direction = point2 - point1;
     sf::Vector2f unitDirection = direction / std::sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -46,7 +46,7 @@ void sfLine::draw(sf::RenderTarget& target, sf::RenderStates states) const
 void sfLine::SetSelfLoopPoint(const sf::Vector2f& center, float radius, float curvature)
 {
     thickness = 4.f;
-    color = sf::Color::Yellow;
+    color = sf::Color::White;
 
     sf::Vector2f offset(thickness / 2.f, thickness / 2.f);
 
@@ -78,7 +78,7 @@ void sfLine::SetSelfLoopPoint(const sf::Vector2f& center, float radius, float cu
 void sfLine::setLinePoints(sf::Vector2f pointA, sf::Vector2f pointB)
 {
     thickness = 4.f;
-    color = sf::Color::Yellow;
+    color = sf::Color::White;
 
     float collisionThickness = 4.f;
 

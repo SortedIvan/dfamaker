@@ -54,7 +54,7 @@ int main() {
 	bool stateIsSelected = false;
 	bool shiftHeldDown = false;
 
-	sf::VertexArray testRect;
+	// ---- test -----
 
 	while (window.isOpen()) {
 
@@ -95,9 +95,9 @@ int main() {
 						if (shiftHeldDown) { // Add a new transition
 
 							dfa.AddNewTransition(selectedState, tempSelected, transitionIdCounter);
-							testRect = Test(window, dfa.GetStates()[selectedState].GetStateCenter(), dfa.GetStates()[tempSelected].GetStateCenter());
 							transitionIdCounter++;
-												
+							
+
 							selectedState = tempSelected;
 						}
 						else {
@@ -138,7 +138,6 @@ int main() {
 
 		// --------- draw on the screen ---------	
 		dfa.DrawAllStates(window);
-		window.draw(testRect);
 
 		// --------- display on the screen --------
 		window.display();
@@ -204,10 +203,10 @@ float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs)
 
 
 
-// ---------- TO DO: Make a rectangle out of vertices and figure out how to detect collision
+//TO DO: Switch from curr way of collision checking to this
 sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f to) {
 	
-	float width = 4.f;
+	float width = 6.f;
 
 	sf::Vector2f dirVector = to - from;
 
@@ -254,7 +253,7 @@ sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f t
 	rect[3].color = sf::Color::Red;
 
 	std::cout << "bomboclaat";
-
 	return rect;
+
 
 }
