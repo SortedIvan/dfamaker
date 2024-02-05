@@ -12,6 +12,8 @@ class StateTransition {
 		bool isAssigned;
 		int id = 0; // Unsafe, can overflow but I don't care
 		char symbol = '~';
+		float distance;
+		sf::Text transitionLabel;
 
 	public:
 		StateTransition();
@@ -20,7 +22,7 @@ class StateTransition {
 		int GetTransitionFrom();
 		void Draw(sf::RenderWindow& window);
 		void SetUpStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, 
-			float stateToRadius, int stateToValue, int transitionFromValue);
+			float stateToRadius, int stateToValue, int transitionFromValue, sf::Font& font);
 		sfLine GetMainArrow();
 		bool GetIsAssigned();
 		void SetIsAssigned(bool value);
@@ -29,6 +31,6 @@ class StateTransition {
 		void SetTransitionColor(sf::Color color);
 		void SetTransitionSymbol(char symbol);
 		char GetTransitionSymbol();
-
+		void SetTransitionDistance(float distance);
 		
 };

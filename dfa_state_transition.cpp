@@ -7,7 +7,12 @@ StateTransition::StateTransition() {
 
 }
 
-void StateTransition::SetUpStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue, int transitionFromValue) {
+void StateTransition::SetUpStateTransition(
+	sf::Vector2f stateFrom, sf::Vector2f stateTo,
+	float stateFromRadius, float stateToRadius, 
+	int stateToValue, int transitionFromValue,
+	sf::Font& font
+) {
 	//sf::Vector2f stateFrom = stateFromObj.GetStatePosition();
 	//sf::Vector2f stateTo = stateToObj.GetStatePosition();
 	sf::Vector2f dirVector = stateTo - stateFrom;
@@ -27,6 +32,9 @@ void StateTransition::SetUpStateTransition(sf::Vector2f stateFrom, sf::Vector2f 
 	// 2) Calculate the distance between the states
 	float distance = std::sqrt(std::pow((stateTo.x - stateFrom.x), 2)
 		+ std::pow((stateTo.y - stateFrom.y), 2));
+
+	this->distance = distance;
+
 
 	// 3) Calculate the out/in point
 	//sf::Vector2f outgoingPoint = (dirVectorNormalized * stateFromObj.GetStateCircle().getRadius()) + stateFrom;
@@ -53,6 +61,18 @@ void StateTransition::SetUpStateTransition(sf::Vector2f stateFrom, sf::Vector2f 
 	arrowTipTwo.setLinePoints(toPoint, rotatedRight * 15.f + toPoint);
 
 	transitionTo = stateToValue;
+
+	// Set the transition label position:
+	transitionLabel.setPosition(
+		sf::Vector2f(
+			stateFrom.x + dirVector.x / 2,
+			stateFrom.y + dirVector.y / 2
+		)
+	);
+
+	transitionLabel.setFont(font);
+	transitionLabel.setCharacterSize(20);
+	transitionLabel.setFillColor(sf::Color::White);
 }
 void StateTransition::SetTransitionTwo(int stateTo) {
 	transitionTo = stateTo;
@@ -66,6 +86,9 @@ void StateTransition::Draw(sf::RenderWindow& window) {
 	window.draw(mainArrow);
 	window.draw(arrowTipOne);
 	window.draw(arrowTipTwo);
+	if (symbol != '~') {
+		window.draw(transitionLabel);
+	}
 }
 
 sfLine StateTransition::GetMainArrow() {
@@ -100,8 +123,13 @@ void StateTransition::SetTransitionColor(sf::Color color) {
 
 void StateTransition::SetTransitionSymbol(char symbol) {
 	this->symbol = symbol;
+	this->transitionLabel.setString(symbol);
 }
 
 char StateTransition::GetTransitionSymbol() {
 	return symbol;
+}
+
+void StateTransition::SetTransitionDistance(float distance) {
+	this->distance = distance;
 }

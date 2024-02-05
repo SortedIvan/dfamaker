@@ -14,10 +14,7 @@ static const sf::Color default_bg_color(0x00, 0x01, 0x33);
 void RotateRectangle(sf::ConvexShape& rect, float angle);
 float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs);
 sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f to);
-// Method for spawning arrows
-// 1) Click on the shape
-// 2) Hold ctrl
-// 3) Click on other shapes (including possibly itself)
+void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa);
 
 // class DFA -> holds DFA_STATES, Alphabet, etc
 // class DFA_STATE -> holds everything related to the states
@@ -35,10 +32,6 @@ int main() {
 	sf::Font font;
 	TryLoadFont(font, "./testfont.ttf");
 	
-	sf::CircleShape triangle(40, 3);
-	triangle.setFillColor(sf::Color::Yellow);
-	triangle.setPosition(100, 100);
-
 
 	sf::RectangleShape rectangle(sf::Vector2f(5, 5));
 	rectangle.setPosition(300, 300);
@@ -53,6 +46,7 @@ int main() {
 	int transitionCounter = 0;
 	bool stateIsSelected = false;
 	bool shiftHeldDown = false;
+	bool transitionIsSelected = false;
 
 	// ---- test -----
 
@@ -76,7 +70,13 @@ int main() {
 			{
 				if (stateIsSelected) {
 					HandleStateLabelInput(e, dfa, selectedState);
+					continue;
 				}
+				if (transitionIsSelected) {
+					// if there is a transition selected
+					HandleTransitionSymbolInput(e, dfa);
+				}
+
 			}
 
 			// On Mouse Click Release
@@ -84,7 +84,15 @@ int main() {
 				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
 
 				if (dfa.SelectStateTransition(mousePos) != -2) { // We have clicked on a transition
+					transitionIsSelected = true;
+					stateIsSelected = false;
+
+					// TO-DO: DE-SELECT STATE HERE
+
 					continue;
+				}
+				else {
+					transitionIsSelected = false;
 				}
 
 				if (dfa.CheckIfStateSelected(mousePos)) {
@@ -94,7 +102,7 @@ int main() {
 
 						if (shiftHeldDown) { // Add a new transition
 
-							dfa.AddNewTransition(selectedState, tempSelected, transitionIdCounter);
+							dfa.AddNewTransition(selectedState, tempSelected, transitionIdCounter, font);
 							transitionIdCounter++;
 							
 
@@ -170,6 +178,17 @@ void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState) {
 		dfa.DeleteStateLabelCharacter(selectedState);
 	}
 }
+
+void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa) {
+	if (e.text.unicode != '\b' && e.text.unicode != '\r' &&
+		e.key.code != sf::Keyboard::Left && e.key.code != sf::Keyboard::Right && e.text.unicode != 36
+		&& e.key.code != sf::Keyboard::Escape && e.key.code != '~')
+	{
+		dfa.SetTransitionSymbol(e.key.code);
+	}
+
+}
+
 
 void AddStateTransitionBetweenStates() {
 

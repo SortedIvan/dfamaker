@@ -28,8 +28,9 @@ class DFA {
 		bool CheckIfStateSelected(sf::Vector2f positionClicked);
 		void ChangeStateLabelText(sf::Event& event, int selectedState);
 		void DeleteStateLabelCharacter(int selectedState);
-		bool AddNewTransition(int stateFrom, int stateTo, int id);
+		bool AddNewTransition(int stateFrom, int stateTo, int id, sf::Font& font);
 		void SetSelectedState(int selectedState);
 		int SelectStateTransition(sf::Vector2f positionClicked);
+		void SetTransitionSymbol(char symbol);
 
 };

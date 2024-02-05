@@ -27,7 +27,7 @@ void DFA::AddNewState(std::string label, sf::Vector2f position, sf::Font& font) 
 	this->states.push_back(state);
 }
 
-void SetAlphabet(std::vector<char> alphabet) {
+void DFA::SetAlphabet(std::vector<char> alphabet) {
 
 }
 
@@ -78,7 +78,7 @@ void DFA::DeleteStateLabelCharacter(int selectedState) {
 	}
 }
 
-bool DFA::AddNewTransition(int stateFrom, int stateTo, int id) {
+bool DFA::AddNewTransition(int stateFrom, int stateTo, int id, sf::Font& font) {
 
 	DfaState stateToObj = states[stateTo];
 
@@ -90,7 +90,7 @@ bool DFA::AddNewTransition(int stateFrom, int stateTo, int id) {
 
 	StateTransition transition = states[stateFrom].AddStateTransition(states[stateFrom].GetStatePosition(),
 		stateToObj.GetStatePosition(), states[stateFrom].GetStateCircle().getRadius(),
-		stateToObj.GetStateCircle().getRadius(), stateTo, stateFrom, id);
+		stateToObj.GetStateCircle().getRadius(), stateTo, stateFrom, id, font);
 	return true;
 }
 
@@ -146,4 +146,10 @@ int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 
 
 	return -2; // didn't find anything
+}
+
+void DFA::SetTransitionSymbol(char symbol) {
+	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
+		states[currentSelectedTrans.first].SetTransitionSymbol(currentSelectedTrans.second, symbol);
+	}
 }

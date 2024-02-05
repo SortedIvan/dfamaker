@@ -44,7 +44,8 @@ class DfaState {
 		//bool AddStateTransition(char transitionChar, int toState);
 		void RemoveStateTransition(char transitionChar);
 
-		StateTransition AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius, int stateToValue, int stateFromValue, int id);
+		StateTransition AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, 
+			float stateToRadius, int stateToValue, int stateFromValue, int id, sf::Font& font);
 		bool AddStateTransitionSymbol(char transitionChar, int selectedStateTransition);
 	
 		sf::Text& GetTextLabelRef();
@@ -52,6 +53,7 @@ class DfaState {
 		void Draw(sf::RenderWindow& window, bool is_selected);
 		void DrawStateArrows(sf::RenderWindow& window);
 		void ChangeTransitionColor(int transitionIndex, sf::Color color);
+		void SetTransitionSymbol(int transitionIndex, char symbol);
 
 
 

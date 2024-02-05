@@ -104,9 +104,9 @@ void DfaState::DrawStateArrows(sf::RenderWindow& window) {
 }
 
 StateTransition DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo,
-	float stateFromRadius, float stateToRadius, int stateToValue, int stateFromValue, int id) {
+	float stateFromRadius, float stateToRadius, int stateToValue, int stateFromValue, int id, sf::Font& font) {
 	StateTransition transition;
-	transition.SetUpStateTransition(stateFrom, stateTo, stateFromRadius, stateToRadius, stateToValue, stateFromValue);
+	transition.SetUpStateTransition(stateFrom, stateTo, stateFromRadius, stateToRadius, stateToValue, stateFromValue, font);
 	transition.SetIsAssigned(false);
 	transition.SetTransitionId(id);
 	transitionObjects.push_back(transition);
@@ -120,4 +120,8 @@ std::vector<StateTransition> DfaState::GetTransitionObjects() {
 
 void DfaState::ChangeTransitionColor(int transitionIndex, sf::Color color) {
 	transitionObjects[transitionIndex].SetTransitionColor(color);
+}
+
+void DfaState::SetTransitionSymbol(int transitionIndex, char symbol) {
+	transitionObjects[transitionIndex].SetTransitionSymbol(symbol);
 }
