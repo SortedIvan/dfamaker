@@ -15,6 +15,7 @@ void RotateRectangle(sf::ConvexShape& rect, float angle);
 float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs);
 sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f to);
 void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa);
+bool DeleteTransition(sf::Event& e, DFA& dfa);
 
 // class DFA -> holds DFA_STATES, Alphabet, etc
 // class DFA_STATE -> holds everything related to the states
@@ -66,6 +67,25 @@ int main() {
 				window.close();
 			}
 
+			if (e.type == sf::Event::KeyReleased) {
+				if (e.key.code == sf::Keyboard::Delete) {
+					if (transitionIsSelected) {
+						// First, check if user is trying to delete the transition
+						if (DeleteTransition(e, dfa)) { 
+							transitionIsSelected = false;
+							continue;
+						}
+					}
+
+					if (stateIsSelected) { // Check to see if user wants to delete a state
+						dfa.DeleteState(selectedState);
+						stateIsSelected = false;
+						continue;
+					}
+
+				}
+			}
+
 			if (e.type == sf::Event::TextEntered)
 			{
 				if (stateIsSelected) {
@@ -73,8 +93,10 @@ int main() {
 					continue;
 				}
 				if (transitionIsSelected) {
-					// if there is a transition selected
 					HandleTransitionSymbolInput(e, dfa);
+					// De-select transition after
+					dfa.DeSelectTransition();
+					continue;
 				}
 
 			}
@@ -86,8 +108,6 @@ int main() {
 				if (dfa.SelectStateTransition(mousePos) != -2) { // We have clicked on a transition
 					transitionIsSelected = true;
 					stateIsSelected = false;
-
-					// TO-DO: DE-SELECT STATE HERE
 					selectedState = -1;
 					dfa.DeSelectState();
 
@@ -277,4 +297,10 @@ sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f t
 	return rect;
 
 
+}
+
+bool DeleteTransition(sf::Event& e, DFA& dfa) {
+	dfa.DeleteTransition();
+	return true;
+	return false;
 }

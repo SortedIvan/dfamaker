@@ -32,5 +32,6 @@ class StateTransition {
 		void SetTransitionSymbol(char symbol);
 		char GetTransitionSymbol();
 		void SetTransitionDistance(float distance);
+
 		
 };

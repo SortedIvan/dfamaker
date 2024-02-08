@@ -33,6 +33,8 @@ class DFA {
 		int SelectStateTransition(sf::Vector2f positionClicked);
 		void SetTransitionSymbol(char symbol);
 		void DeSelectState();
-
+		void DeSelectTransition();
+		bool DeleteTransition();
+		bool DeleteState(int selectedState);
 
 };

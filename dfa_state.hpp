@@ -12,6 +12,7 @@ class DfaState {
 		std::string label;
 		std::vector<StateTransition> transitionObjects;
 		std::map<char, int> transitions;
+		std::vector<int> incomingTransitions;
 		bool isAccepting = false;
 		bool isStarting;
 
@@ -39,6 +40,7 @@ class DfaState {
 		sf::CircleShape GetStateCircle();
 		sf::Vector2f GetStateCenter();
 		std::vector<StateTransition> GetTransitionObjects();
+		StateTransition GetStateTransition(int index);
 
 		void ChangeStateTransition(char oldTransitionChar, char newTransitionChar);
 		//bool AddStateTransition(char transitionChar, int toState);
@@ -54,7 +56,9 @@ class DfaState {
 		void DrawStateArrows(sf::RenderWindow& window);
 		void ChangeTransitionColor(int transitionIndex, sf::Color color);
 		void SetTransitionSymbol(int transitionIndex, char symbol);
-
-
+		bool DeleteTransition(int transitionIndex);
+		bool AddIncomingTransition(int from);
+		std::vector<int> GetIncomingTransitions();
+		bool DeleteIncomingTransition(int value);
 
 };

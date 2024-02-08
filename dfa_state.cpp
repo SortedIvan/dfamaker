@@ -110,12 +110,15 @@ StateTransition DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2
 	transition.SetIsAssigned(false);
 	transition.SetTransitionId(id);
 	transitionObjects.push_back(transition);
-
 	return transition;
 }
 
 std::vector<StateTransition> DfaState::GetTransitionObjects() {
 	return transitionObjects;
+}
+
+StateTransition DfaState::GetStateTransition(int index) {
+	return transitionObjects[index];
 }
 
 void DfaState::ChangeTransitionColor(int transitionIndex, sf::Color color) {
@@ -124,4 +127,53 @@ void DfaState::ChangeTransitionColor(int transitionIndex, sf::Color color) {
 
 void DfaState::SetTransitionSymbol(int transitionIndex, char symbol) {
 	transitionObjects[transitionIndex].SetTransitionSymbol(symbol);
+}
+
+bool DfaState::DeleteTransition(int transitionIndex) {
+	try {
+		StateTransition ref = transitionObjects[transitionIndex];
+		char symbol = ref.GetTransitionSymbol();
+		transitionObjects.erase(transitionObjects.begin() + transitionIndex);
+
+		// we also have to remove the actual transition (if there existed one)
+
+		if (symbol == '~') { // special assigned character
+			// the transition did not have a symbol assigned to it, continue;
+			return true;
+		}
+
+		if (transitions.find(symbol) == transitions.end()) {
+			// such a transition does not exist
+			return true;
+		}
+
+		transitions.erase(symbol);
+
+		return true;
+
+	}
+	catch (const std::exception& e) {
+		return false;
+	}
+}
+
+bool DfaState::AddIncomingTransition(int from) {
+	incomingTransitions.push_back(from);
+	return true;
+}
+
+std::vector<int> DfaState::GetIncomingTransitions() {
+	return incomingTransitions;
+}
+
+bool DfaState::DeleteIncomingTransition(int value) {
+	
+	for (int i = 0; i < incomingTransitions.size(); i++) {
+		if (incomingTransitions[i] == value) {
+			incomingTransitions.erase(incomingTransitions.begin() + i);
+			break;
+		}
+	}
+
+	return true;
 }

@@ -91,6 +91,9 @@ bool DFA::AddNewTransition(int stateFrom, int stateTo, int id, sf::Font& font) {
 	StateTransition transition = states[stateFrom].AddStateTransition(states[stateFrom].GetStatePosition(),
 		stateToObj.GetStatePosition(), states[stateFrom].GetStateCircle().getRadius(),
 		stateToObj.GetStateCircle().getRadius(), stateTo, stateFrom, id, font);
+
+	states[stateTo].AddIncomingTransition(stateFrom);
+
 	return true;
 }
 
@@ -156,4 +159,60 @@ void DFA::SetTransitionSymbol(char symbol) {
 
 void DFA::DeSelectState() {
 	selectedState = -1;
+}
+
+void DFA::DeSelectTransition() {
+	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
+		states[currentSelectedTrans.first].ChangeTransitionColor(currentSelectedTrans.second,sf::Color::White);
+		currentSelectedTrans.first = -1;
+		currentSelectedTrans.second = -1;
+		previousSelectedTrans.first = -1;
+		previousSelectedTrans.second = -1;
+	}
+}
+
+bool DFA::DeleteTransition() {
+	// Firstly, make sure the transition actually exists
+	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
+		
+		int to = states[currentSelectedTrans.first].GetStateTransition(currentSelectedTrans.second).GetTransitionTo();
+		// using to, delete it from its incoming array
+		states[to].DeleteIncomingTransition(currentSelectedTrans.first);
+
+		// delete the transition here
+		bool result = states[currentSelectedTrans.first].DeleteTransition(
+			currentSelectedTrans.second
+		);
+
+		currentSelectedTrans.first = -1;
+		currentSelectedTrans.second = -1;
+		previousSelectedTrans.first = -1;
+		previousSelectedTrans.second = -1;
+
+		return result;
+	}
+	return false;
+}
+
+// Terrible solution, n^2 complexity but best that can be done with current implementation
+bool DFA::DeleteState(int selectedState) {
+	// Problem: Can't delete the state right away. 
+	// have to check whether the state has incoming transitions from other states
+	
+	// Get all incoming transitions
+	std::vector<int> incomingTransitions = states[selectedState].GetIncomingTransitions();
+
+	// for all incoming transitions,
+	for (int i = 0; i < incomingTransitions.size(); i++) {
+		for (int k = 0; k < states[incomingTransitions[i]].GetTransitionObjects().size(); k++) {
+			if (states[incomingTransitions[i]].GetTransitionObjects()[k].GetTransitionTo() == selectedState) {
+				states[incomingTransitions[i]].DeleteTransition(k); // Remove the incoming transition
+			}
+		}
+	}
+
+	// Finally, delete the state itself and de-select
+	states.erase(states.begin() + selectedState);
+	this->selectedState = -1;
+	return true;
 }

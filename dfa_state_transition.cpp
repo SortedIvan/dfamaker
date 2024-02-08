@@ -61,6 +61,7 @@ void StateTransition::SetUpStateTransition(
 	arrowTipTwo.setLinePoints(toPoint, rotatedRight * 15.f + toPoint);
 
 	transitionTo = stateToValue;
+	transitionFrom = transitionFromValue;
 
 	// Set the transition label position:
 	transitionLabel.setPosition(

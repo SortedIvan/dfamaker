@@ -39,7 +39,7 @@ void sfLine::SetArrowColor(sf::Color color) {
 void sfLine::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
     target.draw(vertices, 4, sf::Quads);
-    drawBoundingBox(target);
+    //drawBoundingBox(target); //<------ FOR DEBUGGING
 }
 
 
@@ -80,7 +80,7 @@ void sfLine::setLinePoints(sf::Vector2f pointA, sf::Vector2f pointB)
     thickness = 4.f;
     color = sf::Color::White;
 
-    float collisionThickness = 4.f;
+    float collisionThickness = 8.f;
 
     sf::Vector2f direction = pointB - pointA;
     float lineLength = std::sqrt(direction.x * direction.x + direction.y * direction.y);
@@ -93,18 +93,18 @@ void sfLine::setLinePoints(sf::Vector2f pointA, sf::Vector2f pointB)
     sf::Vector2f offset = (thickness / 2.f) * sf::Vector2f(-unitDirection.y, unitDirection.x);
 
     // Clear existing bounding boxes
-    boundingBoxes.clear();
+    //boundingBoxes.clear();
 
     // Create evenly spaced bounding boxes
     for (int i = 0; i <= numBoundingBoxes; ++i) {
         float t = static_cast<float>(i) / static_cast<float>(numBoundingBoxes);
         sf::Vector2f position = pointA + t * direction;
-        sf::Vector2f boxOffset = (thickness / 2.f) * sf::Vector2f(-unitDirection.y, unitDirection.x);
+        sf::Vector2f boxOffset = (collisionThickness / 2.f) * sf::Vector2f(-unitDirection.y, unitDirection.x);
 
         sf::FloatRect box;
-        box.left = position.x - collisionThickness;
-        box.top = position.y - collisionThickness;
-        box.width = thickness + 2 * collisionThickness;
+        box.left = position.x - collisionThickness + boxOffset.x;
+        box.top = position.y - collisionThickness + boxOffset.y;
+        box.width = collisionThickness + 2 * collisionThickness;
         box.height = lineLength / numBoundingBoxes + 2 * collisionThickness;
 
         boundingBoxes.push_back(box);
