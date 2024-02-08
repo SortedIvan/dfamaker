@@ -110,6 +110,7 @@ StateTransition DfaState::AddStateTransition(sf::Vector2f stateFrom, sf::Vector2
 	transition.SetIsAssigned(false);
 	transition.SetTransitionId(id);
 	transitionObjects.push_back(transition);
+
 	return transition;
 }
 
@@ -127,6 +128,8 @@ void DfaState::ChangeTransitionColor(int transitionIndex, sf::Color color) {
 
 void DfaState::SetTransitionSymbol(int transitionIndex, char symbol) {
 	transitionObjects[transitionIndex].SetTransitionSymbol(symbol);
+	int to = transitionObjects[transitionIndex].GetTransitionTo();
+	transitions.insert({ symbol, to });
 }
 
 bool DfaState::DeleteTransition(int transitionIndex) {

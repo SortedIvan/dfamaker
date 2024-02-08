@@ -127,7 +127,6 @@ int main() {
 							dfa.AddNewTransition(selectedState, tempSelected, transitionIdCounter, font);
 							transitionIdCounter++;
 							
-
 							selectedState = tempSelected;
 						}
 						else {
