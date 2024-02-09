@@ -14,6 +14,7 @@ class DFA {
 		int currentSelectedTransition = -2;
 		std::pair<int, int> previousSelectedTrans;
 		std::pair<int, int> currentSelectedTrans;
+		int startingStateIndex = 0;
 
 	public:
 		DFA();
@@ -36,5 +37,8 @@ class DFA {
 		void DeSelectTransition();
 		bool DeleteTransition();
 		bool DeleteState(int selectedState);
+		void ChangeStateAccepting(int selectedState);
+		bool CheckIfStringAccepted(std::string input);
+		void SetStartingState(int index);
 
 };

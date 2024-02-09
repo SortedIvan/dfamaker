@@ -21,13 +21,14 @@ class DfaState {
 		sf::Vector2f stateCenter;
 		sf::CircleShape stateCircle;
 		sf::CircleShape outlining;
+		sf::CircleShape acceptingOutline;
 		sf::Text textLabel;
 
 	public:
 		DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font);
 		DfaState();
 		// Setters
-		void SetIsAccepting(bool isAccepting);
+		void SetIsAccepting();
 		void SetStateColor(sf::Color color);
 	    void SetIsStarting(bool isStarting);
 		void SetStateLabel(std::string label);
@@ -60,5 +61,7 @@ class DfaState {
 		bool AddIncomingTransition(int from);
 		std::vector<int> GetIncomingTransitions();
 		bool DeleteIncomingTransition(int value);
+		void SetAcceptingStateManually(bool truthValue);
+
 
 };

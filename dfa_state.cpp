@@ -1,7 +1,9 @@
 #include "dfa_state.hpp"
 
 const int DEFAULT_STATE_RADIUS = 40;
-const int DEFAULT_STATE_SELECTED_RADIUS = 35;
+const int DEFAULT_STATE_SELECTED_RADIUS = 25;
+const int DEFAULT_STATE_ACCEPTING_RADIUS = 35;
+
 
 const sf::Color DEFAULT_STATE_COLOR = sf::Color::White;
 
@@ -20,6 +22,13 @@ DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font
 	this->outlining.setOutlineColor(sf::Color::Red);
 	this->outlining.setFillColor(sf::Color::Transparent);
 
+	this->acceptingOutline.setPosition(statePosition);
+	this->acceptingOutline.setRadius(DEFAULT_STATE_ACCEPTING_RADIUS);
+	this->acceptingOutline.setOrigin(sf::Vector2f(DEFAULT_STATE_ACCEPTING_RADIUS, DEFAULT_STATE_ACCEPTING_RADIUS));
+	this->acceptingOutline.setOutlineThickness(2.0f);
+	this->acceptingOutline.setOutlineColor(sf::Color::Black);
+	this->acceptingOutline.setFillColor(sf::Color::Transparent);
+
 	this->textLabel.setFont(font);
 	this->textLabel.setString(label);
 	this->textLabel.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS / 2 - 5, DEFAULT_STATE_RADIUS / 2)); // Center it in the circle
@@ -28,8 +37,6 @@ DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font
 	this->textLabel.setFillColor(sf::Color::Black);
 
 	this->stateCenter = statePosition;
-
-
 }
 
 DfaState::DfaState() {
@@ -44,11 +51,20 @@ void DfaState::Draw(sf::RenderWindow& window, bool isSelected) {
 		window.draw(outlining);
 	}
 
+	if (isAccepting) {
+		window.draw(acceptingOutline);
+	}
+
 }
 
-void DfaState::SetIsAccepting(bool isAccepting) {
-	this->isAccepting = isAccepting;
+void DfaState::SetIsAccepting() {
+	isAccepting = !isAccepting;
 }
+
+void DfaState::SetAcceptingStateManually(bool truthValue) {
+	isAccepting = truthValue;
+}
+
 
 void DfaState::RemoveStateTransition(char transitionChar) {
 	transitions.erase(transitionChar);

@@ -20,8 +20,9 @@ void DFA::AddNewState(std::string label, sf::Vector2f position, sf::Font& font) 
 	// By default, if its the first state added, make it starting
 	DfaState state(label, position, font);
 
-	if (!states.size()) {
-		state.SetIsAccepting(true);
+	if (states.size() == 0) {
+		state.SetIsAccepting();
+		startingStateIndex = 0;
 	}
 
 	this->states.push_back(state);
@@ -212,7 +213,31 @@ bool DFA::DeleteState(int selectedState) {
 	}
 
 	// Finally, delete the state itself and de-select
+	// First, check if the state was accepting
+
+	bool wasAccepting = states[selectedState].GetIsAccepting();
+
 	states.erase(states.begin() + selectedState);
 	this->selectedState = -1;
+
+	// We also need to make the next available state (if there is one) accepting
+	if (states.size() > 0 && wasAccepting) {
+		states[0].SetAcceptingStateManually(true);
+		return true;
+	}
+
+}
+
+void DFA::ChangeStateAccepting(int selectedState) {
+	states[selectedState].SetIsAccepting();
+}
+
+bool DFA::CheckIfStringAccepted(std::string input) {
+
+
+	
+
 	return true;
+
+
 }

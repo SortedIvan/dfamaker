@@ -84,6 +84,12 @@ int main() {
 					}
 
 				}
+
+				if (e.key.code == sf::Keyboard::Tab) {
+					if (stateIsSelected) {
+
+					}
+				}
 			}
 
 			if (e.type == sf::Event::TextEntered)
