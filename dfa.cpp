@@ -21,7 +21,7 @@ void DFA::AddNewState(std::string label, sf::Vector2f position, sf::Font& font) 
 	DfaState state(label, position, font);
 
 	if (states.size() == 0) {
-		state.SetIsAccepting();
+		state.SetIsStarting(true);
 		startingStateIndex = 0;
 	}
 
@@ -215,13 +215,13 @@ bool DFA::DeleteState(int selectedState) {
 	// Finally, delete the state itself and de-select
 	// First, check if the state was accepting
 
-	bool wasAccepting = states[selectedState].GetIsAccepting();
+	bool wasStarting = states[selectedState].GetIsStarting();
 
 	states.erase(states.begin() + selectedState);
 	this->selectedState = -1;
 
-	// We also need to make the next available state (if there is one) accepting
-	if (states.size() > 0 && wasAccepting) {
+	// We also need to make the next available state (if there is one) starting
+	if (states.size() > 0 && wasStarting) {
 		states[0].SetAcceptingStateManually(true);
 		return true;
 	}
@@ -232,12 +232,40 @@ void DFA::ChangeStateAccepting(int selectedState) {
 	states[selectedState].SetIsAccepting();
 }
 
-bool DFA::CheckIfStringAccepted(std::string input) {
+std::pair<bool, DfaState> DFA::CheckStringAcceptingRecurs(DfaState currentState, std::string input, size_t position) {
+	// Base case: reached the end of the input string
+	if (position == input.length()) {
+		return std::make_pair(currentState.GetIsAccepting(), currentState);
+	}
 
+	// Get the current character from the input string
+	char currentChar = input[position];
 
-	
+	// Check if there is a transition for the current character
+	int nextStateIndex = currentState.GetTransitionTo(currentChar);
 
-	return true;
+	if (nextStateIndex == -1) {
+		// No transition for the current character, string not accepted
+		return std::make_pair(false, currentState);
+	}
 
+	DfaState nextState = states[nextStateIndex];
 
+	return CheckStringAcceptingRecurs(nextState, input, position + 1);
 }
+
+bool DFA::CheckIfStringAccepted(std::string input) {
+	// Check if there are any states in the DFA
+	if (states.empty()) {
+		return false;
+	}
+
+	// Get the starting state
+	DfaState startingState = states[startingStateIndex];
+
+	// Call the recursive helper function
+	auto result = CheckStringAcceptingRecurs(startingState, input, 0);
+
+	return result.first;
+}
+

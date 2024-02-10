@@ -1,9 +1,10 @@
 #include "dfa_state.hpp"
+#include <iostream>
 
 const int DEFAULT_STATE_RADIUS = 40;
 const int DEFAULT_STATE_SELECTED_RADIUS = 25;
 const int DEFAULT_STATE_ACCEPTING_RADIUS = 35;
-
+const int STARTING_STATE_ARROW_LEN = 25.f;
 
 const sf::Color DEFAULT_STATE_COLOR = sf::Color::White;
 
@@ -37,6 +38,31 @@ DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font
 	this->textLabel.setFillColor(sf::Color::Black);
 
 	this->stateCenter = statePosition;
+
+	// <---- starting state graphics logic --->
+	sf::Vector2f dirVector(1, 0);
+
+	sf::Vector2f startingStatePointRef(statePosition.x - DEFAULT_STATE_RADIUS, statePosition.y);
+
+	this->startingOutline.mainArrow.setLinePoints(
+		sf::Vector2f(statePosition.x - DEFAULT_STATE_RADIUS - STARTING_STATE_ARROW_LEN, statePosition.y),
+		startingStatePointRef);
+
+	sf::Transform rotationTransform;
+	rotationTransform.rotate(45.f);
+
+	// Rotate the vector left (counter-clockwise)
+	sf::Vector2f rotatedLeft = rotationTransform.transformPoint(-dirVector);
+
+	// Reset the rotation matrix
+	rotationTransform = sf::Transform();
+
+	// Rotate the vector right (clockwise)
+	rotationTransform.rotate(-45.f); // negative angle for clockwise rotation
+	sf::Vector2f rotatedRight = rotationTransform.transformPoint(-dirVector);
+
+	this->startingOutline.arrowTipOne.setLinePoints(startingStatePointRef, rotatedLeft * 15.f + startingStatePointRef);
+	this->startingOutline.arrowTipTwo.setLinePoints(startingStatePointRef, rotatedRight * 15.f + startingStatePointRef);
 }
 
 DfaState::DfaState() {
@@ -54,6 +80,13 @@ void DfaState::Draw(sf::RenderWindow& window, bool isSelected) {
 	if (isAccepting) {
 		window.draw(acceptingOutline);
 	}
+
+	if (isStarting) {
+		window.draw(startingOutline.arrowTipOne);
+		window.draw(startingOutline.arrowTipTwo);
+		window.draw(startingOutline.mainArrow);
+	}
+
 
 }
 
@@ -195,4 +228,13 @@ bool DfaState::DeleteIncomingTransition(int value) {
 	}
 
 	return true;
+}
+
+int DfaState::GetTransitionTo(char symbol) {
+	if (transitions.find(symbol) == transitions.end()) {
+		return -1;
+	}
+	else {
+		return transitions[symbol];
+	}
 }

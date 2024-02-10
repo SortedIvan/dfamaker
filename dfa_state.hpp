@@ -6,6 +6,14 @@
 #include "line.hpp"
 #include "dfa_state_transition.hpp"
 
+
+struct startingOutline {
+	sfLine mainArrow;
+	sfLine arrowTipOne;
+	sfLine arrowTipTwo;
+	float arrowLength;
+};
+
 class DfaState {
 	private:
 		// ------- state related vars
@@ -15,6 +23,7 @@ class DfaState {
 		std::vector<int> incomingTransitions;
 		bool isAccepting = false;
 		bool isStarting;
+		startingOutline startingOutline;
 
 		// ------- graphics related vars
 		sf::Vector2f statePosition;
@@ -43,13 +52,11 @@ class DfaState {
 		std::vector<StateTransition> GetTransitionObjects();
 		StateTransition GetStateTransition(int index);
 
-		void ChangeStateTransition(char oldTransitionChar, char newTransitionChar);
 		//bool AddStateTransition(char transitionChar, int toState);
 		void RemoveStateTransition(char transitionChar);
 
 		StateTransition AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, 
 			float stateToRadius, int stateToValue, int stateFromValue, int id, sf::Font& font);
-		bool AddStateTransitionSymbol(char transitionChar, int selectedStateTransition);
 	
 		sf::Text& GetTextLabelRef();
 
@@ -62,6 +69,7 @@ class DfaState {
 		std::vector<int> GetIncomingTransitions();
 		bool DeleteIncomingTransition(int value);
 		void SetAcceptingStateManually(bool truthValue);
+		int GetTransitionTo(char symbol);
 
 
 };

@@ -87,9 +87,19 @@ int main() {
 
 				if (e.key.code == sf::Keyboard::Tab) {
 					if (stateIsSelected) {
-
+						dfa.ChangeStateAccepting(selectedState);
 					}
 				}
+
+				if (e.key.code == sf::Keyboard::Enter) {
+					if (dfa.CheckIfStringAccepted("abc")) {
+						std::cout << "GG";
+					}
+					else {
+						std::cout << "FUCK";
+					}
+				}
+
 			}
 
 			if (e.type == sf::Event::TextEntered)

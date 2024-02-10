@@ -1,7 +1,7 @@
 #include "dfa_state_transition.hpp"
 # define M_PI  3.14159265358979323846  /* pi */
 #include "SFML/Graphics.hpp"
-
+#include <iostream>
 
 StateTransition::StateTransition() {
 
@@ -64,9 +64,23 @@ void StateTransition::SetUpStateTransition(
 	transitionFrom = transitionFromValue;
 
 	// Set the transition label position:
+
+	std::cout << rotationDegrees;
+
+	float offset = 0.f;
+
+	// Leaving this as seperate checks for potential change in the future
+	if (rotationDegrees >= 0 && rotationDegrees <= 45) {
+		offset = 5.f;
+	}
+	else if (rotationDegrees >= -135 && rotationDegrees <= -90) {
+		offset = 5.f;
+	}
+
+
 	transitionLabel.setPosition(
 		sf::Vector2f(
-			stateFrom.x + dirVector.x / 2,
+			stateFrom.x + dirVector.x / 2 + offset,
 			stateFrom.y + dirVector.y / 2
 		)
 	);
