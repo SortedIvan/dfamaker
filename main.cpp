@@ -92,7 +92,7 @@ int main() {
 				}
 
 				if (e.key.code == sf::Keyboard::Enter) {
-					if (dfa.CheckIfStringAccepted("abc")) {
+					if (dfa.CheckIfStringAccepted("aaab")) {
 						std::cout << "GG";
 					}
 					else {
@@ -135,8 +135,8 @@ int main() {
 
 				if (dfa.CheckIfStateSelected(mousePos)) {
 					int tempSelected = dfa.GetSelectedStateIndex(mousePos);
-
-					if (stateIsSelected && tempSelected != selectedState && selectedState != -1) { // if a different state was selected
+					// && tempSelected != selectedState - put this in the below if statement for diff state logic
+					if (stateIsSelected && selectedState != -1) { // if a different state was selected
 
 						if (shiftHeldDown) { // Add a new transition
 

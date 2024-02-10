@@ -13,6 +13,46 @@ void StateTransition::SetUpStateTransition(
 	int stateToValue, int transitionFromValue,
 	sf::Font& font
 ) {
+	
+	if (stateFrom == stateTo) { // This means we are looking at a self-loop
+		// TODO: Add logic to handle the same self loop being added twice
+		// First, we need four points for all of the arrow spots
+
+		float fixOffset = 8.f;
+
+		sf::Vector2f pStart(stateFrom.x + stateFromRadius / 2, (stateFrom.y - stateFromRadius + fixOffset));
+		sf::Vector2f firstInterim(stateFrom.x + stateFromRadius / 2, stateFrom.y - stateFromRadius * 2 + fixOffset);
+		sf::Vector2f secondInterim(stateFrom.x - stateFromRadius / 2, stateFrom.y - stateFromRadius * 2 + fixOffset);
+		sf::Vector2f pEnd(stateFrom.x - stateFromRadius / 2, stateFrom.y - stateFromRadius + fixOffset);
+
+		transitionTo = stateToValue;
+		transitionFrom = transitionFromValue;
+
+		isSelfLoop = true;
+
+		rhs.setLinePoints(pStart, firstInterim);
+		top.setLinePoints(firstInterim, secondInterim);
+		lhs.setLinePoints(secondInterim, pEnd);
+
+		sf::Vector2f dirVector(0, 1);
+
+		sf::Transform rotationTransform;
+		rotationTransform.rotate(45.f);
+		sf::Vector2f rotatedLeft = rotationTransform.transformPoint(-dirVector);
+		rotationTransform = sf::Transform();
+		rotationTransform.rotate(-45.f); 
+		sf::Vector2f rotatedRight = rotationTransform.transformPoint(-dirVector);
+
+		arrowTipOne.setLinePoints(pEnd, rotatedLeft * 15.f + pEnd);
+		arrowTipTwo.setLinePoints(pEnd, rotatedRight * 15.f + pEnd);
+
+		transitionLabel.setFont(font);
+		transitionLabel.setCharacterSize(20);
+		transitionLabel.setFillColor(sf::Color::White);
+		
+		return;
+	}
+
 	//sf::Vector2f stateFrom = stateFromObj.GetStatePosition();
 	//sf::Vector2f stateTo = stateToObj.GetStatePosition();
 	sf::Vector2f dirVector = stateTo - stateFrom;
@@ -89,6 +129,7 @@ void StateTransition::SetUpStateTransition(
 	transitionLabel.setCharacterSize(20);
 	transitionLabel.setFillColor(sf::Color::White);
 }
+
 void StateTransition::SetTransitionTwo(int stateTo) {
 	transitionTo = stateTo;
 }
@@ -98,9 +139,20 @@ int StateTransition::GetTransitionTo() {
 }
 
 void StateTransition::Draw(sf::RenderWindow& window) {
-	window.draw(mainArrow);
+
+	if (!isSelfLoop) {
+		window.draw(mainArrow);
+	}
+	else {
+		window.draw(rhs);
+		window.draw(lhs);
+		window.draw(top);
+	}
+
+	// Always draw tips
 	window.draw(arrowTipOne);
 	window.draw(arrowTipTwo);
+
 	if (symbol != '~') {
 		window.draw(transitionLabel);
 	}
@@ -130,9 +182,16 @@ void StateTransition::SetTransitionId(int id) {
 }
 
 void StateTransition::SetTransitionColor(sf::Color color) {
-	mainArrow.SetArrowColor(color);
-	arrowTipOne.SetArrowColor(color);
-	arrowTipTwo.SetArrowColor(color);
+
+	if (!isSelfLoop) {
+		mainArrow.SetArrowColor(color);
+		arrowTipOne.SetArrowColor(color);
+		arrowTipTwo.SetArrowColor(color);
+	}
+	else {
+
+	}
+
 }
 
 
@@ -147,4 +206,12 @@ char StateTransition::GetTransitionSymbol() {
 
 void StateTransition::SetTransitionDistance(float distance) {
 	this->distance = distance;
+}
+
+bool StateTransition::GetIsSelfLoop() {
+	return isSelfLoop;
+}
+
+void StateTransition::SetIsSelfLoop(bool value) {
+	isSelfLoop = value;
 }

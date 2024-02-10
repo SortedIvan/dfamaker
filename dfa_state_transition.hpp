@@ -3,13 +3,23 @@
 
 class StateTransition {
 	private: 
+		// For regular state transitions
 		sfLine mainArrow;
+
+		// For self loops
+		sfLine rhs;
+		sfLine top;
+		sfLine lhs;
+
+		// Both self-loops and regular transitions have arrow tips
 		sfLine arrowTipOne;
 		sfLine arrowTipTwo;
+
 		float arrowLength;
 		int transitionTo;
 		int transitionFrom;
 		bool isAssigned;
+		bool isSelfLoop;
 		int id = 0; // Unsafe, can overflow but I don't care
 		char symbol = '~';
 		float distance;
@@ -32,6 +42,7 @@ class StateTransition {
 		void SetTransitionSymbol(char symbol);
 		char GetTransitionSymbol();
 		void SetTransitionDistance(float distance);
-
+		bool GetIsSelfLoop();
+		void SetIsSelfLoop(bool value);
 		
 };
