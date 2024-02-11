@@ -86,8 +86,6 @@ void DfaState::Draw(sf::RenderWindow& window, bool isSelected) {
 		window.draw(startingOutline.arrowTipTwo);
 		window.draw(startingOutline.mainArrow);
 	}
-
-
 }
 
 void DfaState::SetIsAccepting() {
@@ -176,9 +174,18 @@ void DfaState::ChangeTransitionColor(int transitionIndex, sf::Color color) {
 }
 
 void DfaState::SetTransitionSymbol(int transitionIndex, char symbol) {
+
+	if (transitionObjects[transitionIndex].GetTransitionSymbol())
+
 	transitionObjects[transitionIndex].SetTransitionSymbol(symbol);
 	int to = transitionObjects[transitionIndex].GetTransitionTo();
-	transitions.insert({ symbol, to });
+
+	if (transitions.find(symbol) != transitions.end()) {
+		// the same symbol was added, skip adding it
+	}
+
+	transitions.insert({ symbol, to }); // first time adding the symbol
+
 }
 
 bool DfaState::DeleteTransition(int transitionIndex) {

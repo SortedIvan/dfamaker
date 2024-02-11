@@ -108,12 +108,14 @@ int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 
 	bool transitionIsAssigned = false;
 	int stateFrom = 0;
-	//std::cout << currentSelectedTrans.first;
-
 
 	for (int i = 0; i < states.size(); i++) {
 		for (int k = 0; k < states[i].GetTransitionObjects().size(); k++) {
-			if (states[i].GetTransitionObjects()[k].GetMainArrow().CheckCollision(positionClicked)) {
+			
+			if (states[i].GetTransitionObjects()[k].GetMainArrow().CheckCollision(positionClicked)
+				|| states[i].GetTransitionObjects()[k].GetRhsArrow().CheckCollision(positionClicked)
+				|| states[i].GetTransitionObjects()[k].GetLhsArrow().CheckCollision(positionClicked)
+				|| states[i].GetTransitionObjects()[k].GetTopArrow().CheckCollision(positionClicked)) {
 				
 				std::pair<int, int> trans = std::make_pair(i, k);
 

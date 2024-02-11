@@ -25,7 +25,7 @@ void StateTransition::SetUpStateTransition(
 		sf::Vector2f secondInterim(stateFrom.x - stateFromRadius / 2, stateFrom.y - stateFromRadius * 2 + fixOffset);
 		sf::Vector2f pEnd(stateFrom.x - stateFromRadius / 2, stateFrom.y - stateFromRadius + fixOffset);
 
-		transitionTo = stateToValue;
+		transitionTo = transitionFromValue;
 		transitionFrom = transitionFromValue;
 
 		isSelfLoop = true;
@@ -45,6 +45,13 @@ void StateTransition::SetUpStateTransition(
 
 		arrowTipOne.setLinePoints(pEnd, rotatedLeft * 15.f + pEnd);
 		arrowTipTwo.setLinePoints(pEnd, rotatedRight * 15.f + pEnd);
+
+		transitionLabel.setPosition(
+			sf::Vector2f(
+				stateFrom.x, 
+				stateFrom.y - stateFromRadius * 2 - fixOffset - 12.f
+			)
+		);
 
 		transitionLabel.setFont(font);
 		transitionLabel.setCharacterSize(20);
@@ -105,7 +112,7 @@ void StateTransition::SetUpStateTransition(
 
 	// Set the transition label position:
 
-	std::cout << rotationDegrees;
+	//std::cout << rotationDegrees;
 
 	float offset = 0.f;
 
@@ -185,13 +192,16 @@ void StateTransition::SetTransitionColor(sf::Color color) {
 
 	if (!isSelfLoop) {
 		mainArrow.SetArrowColor(color);
-		arrowTipOne.SetArrowColor(color);
-		arrowTipTwo.SetArrowColor(color);
+
 	}
 	else {
-
+		rhs.SetArrowColor(color);
+		lhs.SetArrowColor(color);
+		top.SetArrowColor(color);
 	}
 
+	arrowTipOne.SetArrowColor(color);
+	arrowTipTwo.SetArrowColor(color);
 }
 
 
@@ -214,4 +224,26 @@ bool StateTransition::GetIsSelfLoop() {
 
 void StateTransition::SetIsSelfLoop(bool value) {
 	isSelfLoop = value;
+}
+
+sfLine StateTransition::GetRhsArrow() {
+	return rhs;
+}
+
+sfLine StateTransition::GetLhsArrow() {
+	return lhs;
+}
+
+sfLine StateTransition::GetTopArrow() {
+	return top;
+}
+
+std::vector<char> StateTransition::GetTransitionSymbols() {
+	return symbols;
+}
+
+void StateTransition::AddTransitionSymbol(char symbol) {
+	if (symbol != '~') {
+		symbols.push_back(symbol);
+	}
 }

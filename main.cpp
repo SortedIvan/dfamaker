@@ -85,6 +85,8 @@ int main() {
 
 				}
 
+
+
 				if (e.key.code == sf::Keyboard::Tab) {
 					if (stateIsSelected) {
 						dfa.ChangeStateAccepting(selectedState);
@@ -93,10 +95,9 @@ int main() {
 
 				if (e.key.code == sf::Keyboard::Enter) {
 					if (dfa.CheckIfStringAccepted("aaab")) {
-						std::cout << "GG";
+						std::cout << "ya";
 					}
 					else {
-						std::cout << "FUCK";
 					}
 				}
 
@@ -120,6 +121,8 @@ int main() {
 			// On Mouse Click Release
 			if (e.type == sf::Event::MouseButtonReleased) {
 				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
+
+				//std::cout << dfa.SelectStateTransition(mousePos);
 
 				if (dfa.SelectStateTransition(mousePos) != -2) { // We have clicked on a transition
 					transitionIsSelected = true;
@@ -157,12 +160,14 @@ int main() {
 					else { // First time selecting state
 						selectedState = tempSelected;
 						stateIsSelected = true;
+						dfa.DeSelectTransition();
 					}
 				}
 				else {
 					dfa.AddNewState("", (sf::Vector2f)GetMousePosition(window), font);
 					stateIsSelected = false;
 					selectedState = -1;
+					dfa.DeSelectTransition();
 				}
 			}
 
@@ -219,11 +224,10 @@ void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState) {
 void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa) {
 	if (e.text.unicode != '\b' && e.text.unicode != '\r' &&
 		e.key.code != sf::Keyboard::Left && e.key.code != sf::Keyboard::Right && e.text.unicode != 36
-		&& e.key.code != sf::Keyboard::Escape && e.key.code != '~')
+		&& e.key.code != sf::Keyboard::Escape && e.key.code != '~' && e.key.code != sf::Keyboard::Tab)
 	{
 		dfa.SetTransitionSymbol(e.key.code);
 	}
-
 }
 
 
@@ -308,7 +312,6 @@ sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f t
 	rect[2].color = sf::Color::Yellow;
 	rect[3].color = sf::Color::Red;
 
-	std::cout << "bomboclaat";
 	return rect;
 
 
@@ -317,5 +320,4 @@ sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f t
 bool DeleteTransition(sf::Event& e, DFA& dfa) {
 	dfa.DeleteTransition();
 	return true;
-	return false;
 }

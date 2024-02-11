@@ -21,6 +21,8 @@ class StateTransition {
 		bool isAssigned;
 		bool isSelfLoop;
 		int id = 0; // Unsafe, can overflow but I don't care
+
+		std::vector<char> symbols;
 		char symbol = '~';
 		float distance;
 		sf::Text transitionLabel;
@@ -34,6 +36,10 @@ class StateTransition {
 		void SetUpStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, 
 			float stateToRadius, int stateToValue, int transitionFromValue, sf::Font& font);
 		sfLine GetMainArrow();
+		sfLine GetRhsArrow();
+		sfLine GetLhsArrow();
+		sfLine GetTopArrow();
+
 		bool GetIsAssigned();
 		void SetIsAssigned(bool value);
 		int GetTransitionId();
@@ -44,5 +50,8 @@ class StateTransition {
 		void SetTransitionDistance(float distance);
 		bool GetIsSelfLoop();
 		void SetIsSelfLoop(bool value);
+		std::vector<char> GetTransitionSymbols();
+		void AddTransitionSymbol(char symbol);
 		
+
 };
