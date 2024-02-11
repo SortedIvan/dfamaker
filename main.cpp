@@ -16,13 +16,12 @@ float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs);
 sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f to);
 void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa);
 bool DeleteTransition(sf::Event& e, DFA& dfa);
-
-// class DFA -> holds DFA_STATES, Alphabet, etc
-// class DFA_STATE -> holds everything related to the states
+void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder);
+void DrawAllTextBoxEntries(std::vector<sf::Text>& textBoxEntries, sf::RenderWindow& window);
 
 int main() {
 
-	sf::RenderWindow window(sf::VideoMode(800, 800), "Test");
+	sf::RenderWindow window(sf::VideoMode(1200, 800), "Test");
 	sf::Event e;
 
 	int transitionIdCounter = 0;
@@ -34,9 +33,44 @@ int main() {
 	TryLoadFont(font, "./testfont.ttf");
 	
 
-	sf::RectangleShape rectangle(sf::Vector2f(5, 5));
-	rectangle.setPosition(300, 300);
-	rectangle.setFillColor(sf::Color::Black);
+	//<------------Begin-textbox-logic------------------------------->
+	sf::RectangleShape textBox(sf::Vector2f(300,window.getSize().y - 50.f));
+	sf::RectangleShape textBoxSecondary(sf::Vector2f(300, 50.f));
+	sf::Text textBoxDescr;
+	sf::Text inputStringHolder; // used to show visually the input strings
+	std::vector<sf::Text> textBoxEntries;
+	int currentTextEntry = 0;
+
+	float textBoxXOffset = 50.f;
+	float textBoxYOffset = 35.f;
+	float stringEntriesBound = textBoxYOffset + 30.f;
+
+
+	textBoxDescr.setString("String history:");
+	textBoxDescr.setCharacterSize(20.f);
+	textBoxDescr.setPosition(window.getSize().x - textBoxXOffset - textBox.getSize().x + 10.f
+		, textBoxYOffset + 10.f);
+	textBoxDescr.setFont(font);
+
+	inputStringHolder.setCharacterSize(20.f);
+	inputStringHolder.setPosition(window.getSize().x - textBoxXOffset - textBox.getSize().x + 15.f
+		, window.getSize().y - 55.f);
+	inputStringHolder.setFont(font);
+
+	textBox.setPosition(window.getSize().x - textBoxXOffset - textBox.getSize().x
+		, textBoxYOffset);
+	textBox.setFillColor(sf::Color::Transparent);
+	textBox.setOutlineThickness(10.f);
+	textBox.setOutlineColor(sf::Color::White);
+
+	textBoxSecondary.setPosition(window.getSize().x - textBoxXOffset - textBox.getSize().x
+		,window.getSize().y - 65.f);
+	textBoxSecondary.setFillColor(sf::Color::Transparent);
+	textBoxSecondary.setOutlineThickness(5.f);
+	textBoxSecondary.setOutlineColor(sf::Color::White);
+
+	// <------------End-textbox-graphics------------------------------>
+
 
 	sfLine line(sf::Vector2f(100, 100), sf::Vector2f(200, 200));
 
@@ -48,12 +82,14 @@ int main() {
 	bool stateIsSelected = false;
 	bool shiftHeldDown = false;
 	bool transitionIsSelected = false;
+	bool stringAcceptedState = false;
+	bool textboxState = false;
+
+	std::string inputString;
 
 	// ---- test -----
 
 	while (window.isOpen()) {
-
-
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 		{
 			shiftHeldDown = true;
@@ -93,10 +129,19 @@ int main() {
 				}
 
 				if (e.key.code == sf::Keyboard::Enter) {
-					if (dfa.CheckIfStringAccepted("aaab")) {
-						std::cout << "ya";
+					if (dfa.CheckIfStringAccepted("")) {
+						stringAcceptedState = true;
+						
+						if (stateIsSelected) {
+							dfa.DeSelectState();
+						}
+						if (transitionIsSelected) {
+							dfa.DeSelectTransition();
+						}
+
 					}
 					else {
+						stringAcceptedState = false;
 					}
 				}
 
@@ -104,11 +149,15 @@ int main() {
 
 			if (e.type == sf::Event::TextEntered)
 			{
+				if (textboxState) {
+					HandleInputStringTextEditing(inputString,e, inputStringHolder);
+					continue;
+				}
+
+
 				// First, check for prevalent conditions
 				if (e.text.unicode == '\b') {
 					if (transitionIsSelected) {
-
-						std::cout << "yahh";
 
 						dfa.RemoveSymbolFromTransition();
 						transitionIsSelected = false;
@@ -133,11 +182,30 @@ int main() {
 			if (e.type == sf::Event::MouseButtonReleased) {
 				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
 
-				//std::cout << dfa.SelectStateTransition(mousePos);
+				if (stringAcceptedState) { // first clear the accepted state
+					dfa.SetAllStatesDefaultColor();
+					stringAcceptedState = false;
+				}
+
+				// Check whether the user clicked in the text box
+
+				if (textBox.getGlobalBounds().contains(mousePos)) {
+					transitionIsSelected = true;
+					stateIsSelected = false;
+					selectedState = -1;
+					dfa.DeSelectState();
+					dfa.DeSelectTransition();
+
+					textboxState = true;
+
+					continue;
+				}
+
 
 				if (dfa.SelectStateTransition(mousePos) != -2) { // We have clicked on a transition
 					transitionIsSelected = true;
 					stateIsSelected = false;
+					textboxState = false;
 					selectedState = -1;
 					dfa.DeSelectState();
 
@@ -145,6 +213,7 @@ int main() {
 				}
 				else {
 					transitionIsSelected = false;
+					textboxState = false;
 				}
 
 				if (dfa.CheckIfStateSelected(mousePos)) {
@@ -166,7 +235,14 @@ int main() {
 						}
 						else {
 							selectedState = tempSelected;
+
 						}
+
+						if (selectedState >= 0) {
+							dfa.SetSelectedState(selectedState);
+						}
+
+						textboxState = false; // Exit textbox
 					}
 					else if (tempSelected != -2 && stateIsSelected && tempSelected == selectedState) { // self-loop
 						if (shiftHeldDown) {
@@ -176,7 +252,13 @@ int main() {
 					else { // First time selecting state
 						selectedState = tempSelected;
 						stateIsSelected = true;
+						textboxState = false; // Exit textbox
 						dfa.DeSelectTransition();
+
+						if (selectedState >= 0) {
+							dfa.SetSelectedState(selectedState);
+						}
+
 					}
 				}
 				else {
@@ -184,6 +266,7 @@ int main() {
 					stateIsSelected = false;
 					selectedState = -1;
 					dfa.DeSelectTransition();
+					textboxState = false; // Exit textbox
 				}
 			}
 
@@ -193,10 +276,6 @@ int main() {
 
 		//std::cout << selectedState << std::endl;
 
-		if (selectedState >= 0) {
-			dfa.SetSelectedState(selectedState);
-		}
-
 		// < ------- DO DRAWING LOGIC HERE ------------->
 		// --------- clear the screen ----------
 		window.clear(default_bg_color);
@@ -204,6 +283,12 @@ int main() {
 
 		// --------- draw on the screen ---------	
 		dfa.DrawAllStates(window);
+		window.draw(textBox);
+		window.draw(textBoxSecondary);
+		window.draw(textBoxDescr);
+		window.draw(inputStringHolder);
+		DrawAllTextBoxEntries(textBoxEntries, window);
+
 
 		// --------- display on the screen --------
 		window.display();
@@ -336,4 +421,25 @@ sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f t
 bool DeleteTransition(sf::Event& e, DFA& dfa) {
 	dfa.DeleteTransition();
 	return true;
+}
+
+void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder) {
+	if (e.text.unicode != '\b' && e.text.unicode != '\r' &&
+		e.key.code != sf::Keyboard::Left && e.key.code != sf::Keyboard::Right && e.text.unicode != 36
+		&& e.key.code != sf::Keyboard::Escape && e.key.code != '~' && e.key.code != sf::Keyboard::Tab)
+	{
+		inputString.push_back(e.text.unicode);
+	}
+	else if (e.text.unicode == '\b'){
+		if (inputString.size() > 0) {
+			inputString.pop_back();
+		}
+	}
+	inputStringHolder.setString(inputString);
+}
+
+void DrawAllTextBoxEntries(std::vector<sf::Text>& textBoxEntries, sf::RenderWindow& window) {
+	for (int i = 0; i < textBoxEntries.size(); i++) {
+		window.draw(textBoxEntries[i]);
+	}
 }

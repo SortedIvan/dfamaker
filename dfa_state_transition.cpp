@@ -245,27 +245,33 @@ bool StateTransition::AddTransitionSymbol(char symbol) {
 
 		std::string symbolString;
 		symbols.push_back(symbol);
-		sf::Text sizeReference;
 
 		bool largeEnough = false;
 		if (symbols.size() > 1) {
 			largeEnough = true;
 		}
 
-		float offset = 0.f;
+		//float offset = 0.f;
 
 		for (int i = 0; i < symbols.size(); i++) {
 			if (largeEnough && i > 0) {
 				symbolString.push_back(',');
 			}
 			symbolString.push_back(symbols[i]);
-			offset -= 5.f;
+			//offset -= 5.f;
 		}
+		float originalCenterX = transitionLabel.getPosition().x + transitionLabel.getLocalBounds().width / 2.0f;
+
 		transitionLabel.setString(symbolString);
+
+		float newCenterX = transitionLabel.getPosition().x + transitionLabel.getLocalBounds().width / 2.0f;
+		float offset = originalCenterX - newCenterX;
+
 		transitionLabel.setPosition(sf::Vector2f(
 			transitionLabel.getPosition().x + offset,
 			transitionLabel.getPosition().y
 		));
+
 
 		return true;
 	}
@@ -277,22 +283,26 @@ char StateTransition::RemoveSingleSymbol() {
 	if (symbols.size() > 0) {
 
 		char ref = symbols[symbols.size() - 1];
-		float offset = 0.f;
+		//float offset = 0.f;
 
 		std::string currentLabel = transitionLabel.getString();
 		
 		if (symbols.size() > 1) {
 			currentLabel.pop_back();
 			currentLabel.pop_back();
-			offset += 11.f;
+			//offset += 11.f;
 		}
+		float originalCenterX = transitionLabel.getPosition().x + transitionLabel.getLocalBounds().width / 2.0f;
 
 		transitionLabel.setString(currentLabel);
+
+		float newCenterX = transitionLabel.getPosition().x + transitionLabel.getLocalBounds().width / 2.0f;
+		float offset = originalCenterX - newCenterX;
+
 		transitionLabel.setPosition(sf::Vector2f(
 			transitionLabel.getPosition().x + offset,
 			transitionLabel.getPosition().y
 		));
-
 		symbols.pop_back();
 
 		return ref;

@@ -72,7 +72,9 @@ class DfaState {
 		int GetTransitionTo(char symbol);
 		bool DeleteSingleTransitionSymbol(int transitionIndex);
 		bool CheckTransitionExists(int from, int to);
-
+		void SetDefaultColor();
+		void SetStringAcceptedColor();
+		void SetStringDeclinedColor();
 
 
 };

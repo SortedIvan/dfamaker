@@ -7,6 +7,9 @@ const int DEFAULT_STATE_ACCEPTING_RADIUS = 35;
 const int STARTING_STATE_ARROW_LEN = 25.f;
 
 const sf::Color DEFAULT_STATE_COLOR = sf::Color::White;
+const sf::Color STRING_ACCEPTED = sf::Color::Green;
+const sf::Color STRING_DECLINED = sf::Color::Red;
+
 
 DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font) {
 	this->label = label;
@@ -281,4 +284,16 @@ bool DfaState::CheckTransitionExists(int from, int to) {
 		}
 	}
 	return false;
+}
+
+void DfaState::SetDefaultColor() {
+	stateCircle.setFillColor(DEFAULT_STATE_COLOR);
+}
+
+void DfaState::SetStringAcceptedColor() {
+	stateCircle.setFillColor(STRING_ACCEPTED);
+}
+
+void DfaState::SetStringDeclinedColor() {
+	stateCircle.setFillColor(STRING_DECLINED);
 }

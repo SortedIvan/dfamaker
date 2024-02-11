@@ -268,6 +268,19 @@ bool DFA::CheckIfStringAccepted(std::string input) {
 	// Call the recursive helper function
 	auto result = CheckStringAcceptingRecurs(startingState, input, 0);
 
+	// Temporary solution: using the state's position as a unique id
+	for (int i = 0; i < states.size(); i++) {
+		if (states[i].GetStatePosition() == result.second.GetStatePosition()) {
+			// Found the final state, make its color change depending on the result
+			if (result.first) { // string was accepted
+				states[i].SetStringAcceptedColor();
+			}
+			else {
+				states[i].SetStringDeclinedColor();
+			}
+		}
+	}
+
 	return result.first;
 }
 bool DFA::RemoveSymbolFromTransition() {
@@ -278,7 +291,6 @@ bool DFA::RemoveSymbolFromTransition() {
 			if (states[currentSelectedTrans.first].GetTransitionObjects().size() > 0) {
 				if (states[currentSelectedTrans.first].GetTransitionObjects()[currentSelectedTrans.second].GetTransitionSymbols().size() > 0) {
 					DeSelectTransition();
-
 					return result;
 				}
 			}
@@ -292,4 +304,15 @@ bool DFA::RemoveSymbolFromTransition() {
 		return result;
 	}
 	return false;
+}
+
+bool DFA::SetAllStatesDefaultColor() {
+
+	if (states.size() < 0) {
+		return false;
+	}
+
+	for (int i = 0; i < states.size(); i++) {
+		states[i].SetDefaultColor();
+	}
 }
