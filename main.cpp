@@ -17,7 +17,12 @@ sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f t
 void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa);
 bool DeleteTransition(sf::Event& e, DFA& dfa);
 void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder);
-void DrawAllTextBoxEntries(std::vector<sf::Text>& textBoxEntries, sf::RenderWindow& window);
+void DrawAllTextBoxEntriesAndHighlights(std::vector<sf::Text>& textBoxEntries,std::vector<sf::RectangleShape>& hightlights,
+	sf::RenderWindow& window);
+void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text& inputStringHolder,
+	std::string& inputString, int& currentTextBoxEntry, bool& stringAcceptedState,
+	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected,sf::Font& font, sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights);
+
 
 int main() {
 
@@ -38,7 +43,8 @@ int main() {
 	sf::RectangleShape textBoxSecondary(sf::Vector2f(300, 50.f));
 	sf::Text textBoxDescr;
 	sf::Text inputStringHolder; // used to show visually the input strings
-	std::vector<sf::Text> textBoxEntries;
+	std::vector<sf::Text> textBoxEntries; // shows the accepted/rejected strings
+	std::vector<sf::RectangleShape> textBoxHighlights; // the highlight over each string, should be parallel to above vector
 	int currentTextEntry = 0;
 
 	float textBoxXOffset = 50.f;
@@ -129,20 +135,9 @@ int main() {
 				}
 
 				if (e.key.code == sf::Keyboard::Enter) {
-					if (dfa.CheckIfStringAccepted("")) {
-						stringAcceptedState = true;
-						
-						if (stateIsSelected) {
-							dfa.DeSelectState();
-						}
-						if (transitionIsSelected) {
-							dfa.DeSelectTransition();
-						}
-
-					}
-					else {
-						stringAcceptedState = false;
-					}
+					HandleInputStringValidation(textBoxEntries, inputStringHolder, inputString,
+						currentTextEntry, stringAcceptedState, dfa, stateIsSelected,
+						transitionIsSelected, font, window, textBoxHighlights);
 				}
 
 			}
@@ -287,7 +282,7 @@ int main() {
 		window.draw(textBoxSecondary);
 		window.draw(textBoxDescr);
 		window.draw(inputStringHolder);
-		DrawAllTextBoxEntries(textBoxEntries, window);
+		DrawAllTextBoxEntriesAndHighlights(textBoxEntries, textBoxHighlights, window);
 
 
 		// --------- display on the screen --------
@@ -438,8 +433,85 @@ void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Te
 	inputStringHolder.setString(inputString);
 }
 
-void DrawAllTextBoxEntries(std::vector<sf::Text>& textBoxEntries, sf::RenderWindow& window) {
-	for (int i = 0; i < textBoxEntries.size(); i++) {
+void DrawAllTextBoxEntriesAndHighlights(std::vector<sf::Text>& textBoxEntries, std::vector<sf::RectangleShape>& hightlights,
+	sf::RenderWindow& window) {
+	for (int i = 0; i < textBoxEntries.size(); i++) { // should be parallel
 		window.draw(textBoxEntries[i]);
+		window.draw(hightlights[i]);
 	}
+}
+
+void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text& inputStringHolder,
+	std::string& inputString, int& currentTextBoxEntry, bool& stringAcceptedState,
+	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected, sf::Font& font, sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights) {
+	// 1) Both inputString and the text are not necessary, but easier to distinct both
+
+	// Explicit check, this is also done in the function below,
+	// but has to be replaced
+	if (dfa.GetStates().size() == 0) {
+		return;
+	}
+
+	// These variables should be passed by reference/value but easier to define here
+	float textBoxXOffset = 50.f;
+	float textBoxYOffset = 35.f;
+	float textBoxSize = 300.f;
+	sf::Color semiTransparentColorRed(255, 0, 0, 128);
+	sf::Color semiTransparentColorGreen(0, 255, 0, 128);
+
+	if (inputString.size() <= 0) {
+		return; // nothing to validate
+	}
+
+	sf::Text stringEntry;
+	stringEntry.setString(inputString);
+	stringEntry.setCharacterSize(20.f);
+	
+	// This makes sure that the positioning between strings is spaced
+	float textPositionHeightValue = (35.f * (textBoxEntries.size() + 2));
+
+	stringEntry.setPosition(window.getSize().x - textBoxXOffset - textBoxSize + 10.f
+		, textBoxYOffset + textPositionHeightValue);
+	stringEntry.setFont(font);
+
+	sf::RectangleShape highlight;
+	highlight.setSize(sf::Vector2f(stringEntry.getGlobalBounds().width, stringEntry.getGlobalBounds().height + 9.f));
+	highlight.setPosition(stringEntry.getPosition());
+
+	// clean the holder variables
+	inputStringHolder.setString("");
+	bool result = dfa.CheckIfStringAccepted(inputString);
+	
+	inputString.clear();
+
+	// !TODO!, this should be a pair of boolean values, as this can break
+	// check CheckIfStringAccepted returns
+	if (result) {
+		stringAcceptedState = true;
+
+		highlight.setFillColor(semiTransparentColorGreen);
+
+		if (stateIsSelected) {
+			dfa.DeSelectState();
+		}
+		if (transitionIsSelected) {
+			dfa.DeSelectTransition();
+		}
+		
+	}
+	else {
+		stringAcceptedState = true;
+		highlight.setFillColor(semiTransparentColorRed);
+
+		if (stateIsSelected) {
+			dfa.DeSelectState();
+		}
+		if (transitionIsSelected) {
+			dfa.DeSelectTransition();
+		}
+
+	}
+	textBoxEntries.push_back(stringEntry);
+	highlights.push_back(highlight);
+
 }
