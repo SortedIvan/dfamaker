@@ -83,11 +83,11 @@ bool DFA::AddNewTransition(int stateFrom, int stateTo, int id, sf::Font& font) {
 
 	DfaState stateToObj = states[stateTo];
 
-	// Problem: when adding a transition, make it so that it is not assigned a character somehow
-	// One potential solution:
-	// make it so that when you add a transition, it only adds a blank transition
-	// then, if the user clicks on it and adds a character, only then add an entry into the
-	// transition map and have it assigned to that particular transition
+	if (states[stateFrom].CheckTransitionExists(stateFrom, stateTo)) {
+		// transition already exists
+		return false;
+	}
+
 
 	StateTransition transition = states[stateFrom].AddStateTransition(states[stateFrom].GetStatePosition(),
 		stateToObj.GetStatePosition(), states[stateFrom].GetStateCircle().getRadius(),
@@ -270,4 +270,26 @@ bool DFA::CheckIfStringAccepted(std::string input) {
 
 	return result.first;
 }
+bool DFA::RemoveSymbolFromTransition() {
+	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
+		bool result = states[currentSelectedTrans.first].DeleteSingleTransitionSymbol(currentSelectedTrans.second);
 
+		if (result) {
+			if (states[currentSelectedTrans.first].GetTransitionObjects().size() > 0) {
+				if (states[currentSelectedTrans.first].GetTransitionObjects()[currentSelectedTrans.second].GetTransitionSymbols().size() > 0) {
+					DeSelectTransition();
+
+					return result;
+				}
+			}
+		}
+		currentSelectedTrans.first = -1;
+		currentSelectedTrans.second = -1;
+		previousSelectedTrans.first = -1;
+		previousSelectedTrans.second = -1;
+
+
+		return result;
+	}
+	return false;
+}

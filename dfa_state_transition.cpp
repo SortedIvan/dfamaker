@@ -160,7 +160,7 @@ void StateTransition::Draw(sf::RenderWindow& window) {
 	window.draw(arrowTipOne);
 	window.draw(arrowTipTwo);
 
-	if (symbol != '~') {
+	if (symbols.size() > 0) {
 		window.draw(transitionLabel);
 	}
 }
@@ -205,15 +205,6 @@ void StateTransition::SetTransitionColor(sf::Color color) {
 }
 
 
-void StateTransition::SetTransitionSymbol(char symbol) {
-	this->symbol = symbol;
-	this->transitionLabel.setString(symbol);
-}
-
-char StateTransition::GetTransitionSymbol() {
-	return symbol;
-}
-
 void StateTransition::SetTransitionDistance(float distance) {
 	this->distance = distance;
 }
@@ -242,8 +233,69 @@ std::vector<char> StateTransition::GetTransitionSymbols() {
 	return symbols;
 }
 
-void StateTransition::AddTransitionSymbol(char symbol) {
+bool StateTransition::AddTransitionSymbol(char symbol) {
 	if (symbol != '~') {
+
+		for (int i = 0;i < symbols.size(); i++) {
+			if (symbols[i] == symbol) {
+				// symbol already exists
+				return false;
+			}
+		}
+
+		std::string symbolString;
 		symbols.push_back(symbol);
+		sf::Text sizeReference;
+
+		bool largeEnough = false;
+		if (symbols.size() > 1) {
+			largeEnough = true;
+		}
+
+		float offset = 0.f;
+
+		for (int i = 0; i < symbols.size(); i++) {
+			if (largeEnough && i > 0) {
+				symbolString.push_back(',');
+			}
+			symbolString.push_back(symbols[i]);
+			offset -= 5.f;
+		}
+		transitionLabel.setString(symbolString);
+		transitionLabel.setPosition(sf::Vector2f(
+			transitionLabel.getPosition().x + offset,
+			transitionLabel.getPosition().y
+		));
+
+		return true;
 	}
+
+	return false;
+}
+
+char StateTransition::RemoveSingleSymbol() {
+	if (symbols.size() > 0) {
+
+		char ref = symbols[symbols.size() - 1];
+		float offset = 0.f;
+
+		std::string currentLabel = transitionLabel.getString();
+		
+		if (symbols.size() > 1) {
+			currentLabel.pop_back();
+			currentLabel.pop_back();
+			offset += 11.f;
+		}
+
+		transitionLabel.setString(currentLabel);
+		transitionLabel.setPosition(sf::Vector2f(
+			transitionLabel.getPosition().x + offset,
+			transitionLabel.getPosition().y
+		));
+
+		symbols.pop_back();
+
+		return ref;
+	}
+	return '~';
 }

@@ -70,6 +70,9 @@ class DfaState {
 		bool DeleteIncomingTransition(int value);
 		void SetAcceptingStateManually(bool truthValue);
 		int GetTransitionTo(char symbol);
+		bool DeleteSingleTransitionSymbol(int transitionIndex);
+		bool CheckTransitionExists(int from, int to);
+
 
 
 };

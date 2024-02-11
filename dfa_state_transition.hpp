@@ -23,7 +23,6 @@ class StateTransition {
 		int id = 0; // Unsafe, can overflow but I don't care
 
 		std::vector<char> symbols;
-		char symbol = '~';
 		float distance;
 		sf::Text transitionLabel;
 
@@ -45,13 +44,13 @@ class StateTransition {
 		int GetTransitionId();
 		void SetTransitionId(int id);
 		void SetTransitionColor(sf::Color color);
-		void SetTransitionSymbol(char symbol);
-		char GetTransitionSymbol();
 		void SetTransitionDistance(float distance);
 		bool GetIsSelfLoop();
 		void SetIsSelfLoop(bool value);
 		std::vector<char> GetTransitionSymbols();
-		void AddTransitionSymbol(char symbol);
+		bool AddTransitionSymbol(char symbol);
+		char RemoveSingleSymbol();
+		
 		
 
 };

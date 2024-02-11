@@ -175,38 +175,48 @@ void DfaState::ChangeTransitionColor(int transitionIndex, sf::Color color) {
 
 void DfaState::SetTransitionSymbol(int transitionIndex, char symbol) {
 
-	if (transitionObjects[transitionIndex].GetTransitionSymbol())
+	//if (transitionObjects[transitionIndex].GetTransitionSymbols().size() > 0) {
+	//	// Means there is already a symbol for this transition
+	//}
 
-	transitionObjects[transitionIndex].SetTransitionSymbol(symbol);
+	bool result = transitionObjects[transitionIndex].AddTransitionSymbol(symbol);
+
+	if (!result) {
+		return;
+	}
+
 	int to = transitionObjects[transitionIndex].GetTransitionTo();
 
 	if (transitions.find(symbol) != transitions.end()) {
 		// the same symbol was added, skip adding it
 	}
+	else {
+		transitions.insert({ symbol, to }); // first time adding the symbol
+	}
 
-	transitions.insert({ symbol, to }); // first time adding the symbol
 
 }
 
 bool DfaState::DeleteTransition(int transitionIndex) {
 	try {
 		StateTransition ref = transitionObjects[transitionIndex];
-		char symbol = ref.GetTransitionSymbol();
+		std::vector<char> symbols = ref.GetTransitionSymbols();
 		transitionObjects.erase(transitionObjects.begin() + transitionIndex);
 
 		// we also have to remove the actual transition (if there existed one)
 
-		if (symbol == '~') { // special assigned character
+		if (symbols.size() < 0) {
 			// the transition did not have a symbol assigned to it, continue;
 			return true;
 		}
 
-		if (transitions.find(symbol) == transitions.end()) {
-			// such a transition does not exist
-			return true;
+		// Erase all transitions that were related to the specific object
+		for (int i = 0; i < symbols.size(); i++) {
+			if (transitions.find(symbols[i]) != transitions.end()) {
+				transitions.erase(symbols[i]);
+				return true;
+			}
 		}
-
-		transitions.erase(symbol);
 
 		return true;
 
@@ -244,4 +254,31 @@ int DfaState::GetTransitionTo(char symbol) {
 	else {
 		return transitions[symbol];
 	}
+}
+
+bool DfaState::DeleteSingleTransitionSymbol(int transitionIndex) {
+	char result = transitionObjects[transitionIndex].RemoveSingleSymbol();
+	
+	if (result == '~') {
+		return false;
+	}
+
+	if (transitionObjects[transitionIndex].GetTransitionSymbols().size() == 0) {
+		DeleteTransition(transitionIndex);
+	}
+	else {
+		transitions.erase(result);
+	}
+
+	return true;
+}
+
+bool DfaState::CheckTransitionExists(int from, int to) {
+	for (int i = 0; i < transitionObjects.size(); i++) {
+		if (transitionObjects[i].GetTransitionFrom() == from
+			&& transitionObjects[i].GetTransitionTo() == to) {
+			return true;
+		}
+	}
+	return false;
 }

@@ -73,6 +73,7 @@ int main() {
 						// First, check if user is trying to delete the transition
 						if (DeleteTransition(e, dfa)) { 
 							transitionIsSelected = false;
+							dfa.DeSelectTransition();
 							continue;
 						}
 					}
@@ -84,8 +85,6 @@ int main() {
 					}
 
 				}
-
-
 
 				if (e.key.code == sf::Keyboard::Tab) {
 					if (stateIsSelected) {
@@ -105,6 +104,18 @@ int main() {
 
 			if (e.type == sf::Event::TextEntered)
 			{
+				// First, check for prevalent conditions
+				if (e.text.unicode == '\b') {
+					if (transitionIsSelected) {
+
+						std::cout << "yahh";
+
+						dfa.RemoveSymbolFromTransition();
+						transitionIsSelected = false;
+
+						continue;
+					}
+				}
 				if (stateIsSelected) {
 					HandleStateLabelInput(e, dfa, selectedState);
 					continue;
@@ -143,10 +154,15 @@ int main() {
 
 						if (shiftHeldDown) { // Add a new transition
 
-							dfa.AddNewTransition(selectedState, tempSelected, transitionIdCounter, font);
-							transitionIdCounter++;
-							
+							bool result = dfa.AddNewTransition(
+								selectedState, tempSelected,
+								transitionIdCounter, font);
+
+							if (result) {
+								transitionIdCounter++;
+							}
 							selectedState = tempSelected;
+
 						}
 						else {
 							selectedState = tempSelected;

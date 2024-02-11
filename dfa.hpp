@@ -41,4 +41,6 @@ class DFA {
 		bool CheckIfStringAccepted(std::string input);
 		void SetStartingState(int index);
 		std::pair<bool, DfaState> CheckStringAcceptingRecurs(DfaState currentState, std::string input, size_t position);
+		bool RemoveSymbolFromTransition();
+
 };
