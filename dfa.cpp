@@ -1,5 +1,10 @@
 #include "dfa.hpp";
 #include <iostream>
+#include <set>
+
+void RemoveSingleCharacterFromAlphabet(std::vector<DfaState>& states,
+	std::pair<int, int>& currentSelectedTrans, char removedChar, bool& symbolExistsAfterRemoval,
+	std::vector<char>& alphabet);
 
 std::vector<DfaState> DFA::GetStates() {
 	return this->states;
@@ -156,9 +161,24 @@ int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 
 void DFA::SetTransitionSymbol(char symbol) {
 	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
+		
+		bool inAlphabet = false;
+
+		for (int i = 0; i < alphabet.size(); i++) {
+			if (alphabet[i] == symbol) {
+				inAlphabet = true;
+				break;
+			}
+		}
+
+		if (!inAlphabet) { // skip adding to if already in alphabet
+			alphabet.push_back(symbol);
+		}
+
 		states[currentSelectedTrans.first].SetTransitionSymbol(currentSelectedTrans.second, symbol);
 	}
 }
+
 
 void DFA::DeSelectState() {
 	selectedState = -1;
@@ -174,7 +194,7 @@ void DFA::DeSelectTransition() {
 	}
 }
 
-bool DFA::DeleteTransition() {
+bool DFA::DeleteSelectedTransition() {
 	// Firstly, make sure the transition actually exists
 	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
 		
@@ -182,11 +202,40 @@ bool DFA::DeleteTransition() {
 		// using to, delete it from its incoming array
 		states[to].DeleteIncomingTransition(currentSelectedTrans.first);
 
+		std::vector<char> transitionSymbolsDeleted = states[currentSelectedTrans.first]
+			.GetTransition(currentSelectedTrans.second).GetTransitionSymbols();
+		
 		// delete the transition here
 		bool result = states[currentSelectedTrans.first].DeleteTransition(
 			currentSelectedTrans.second
 		);
 
+		// After deletion, check whether the symbols are still contained in some transition
+		for (int i = 0; i < transitionSymbolsDeleted.size(); ++i) {
+			for (int k = 0; k < states.size(); ++k) {
+				if (states[k].CheckTransitionExists(transitionSymbolsDeleted[i])) {
+					// In-place solution for symbols that need removal:
+					// Pop out the symbols that do exist
+					transitionSymbolsDeleted.erase(transitionSymbolsDeleted.begin() + i);
+					// Since its in place, we reset the counter 
+					i = -1;
+					break;
+				}
+
+			}
+		}
+
+		for (int i = 0; i < transitionSymbolsDeleted.size(); i++) {
+			for (int k = 0; k < alphabet.size(); k++) {
+				if (alphabet[k] == transitionSymbolsDeleted[i]) {
+					alphabet.erase(alphabet.begin() + k);
+					break;
+				}
+			}
+		}
+		
+		std::cout << alphabet.size();
+		
 		currentSelectedTrans.first = -1;
 		currentSelectedTrans.second = -1;
 		previousSelectedTrans.first = -1;
@@ -197,22 +246,70 @@ bool DFA::DeleteTransition() {
 	return false;
 }
 
-// Terrible solution, n^2 complexity but best that can be done with current implementation
+// O(n^2) complexity but best that can be done with current implementation
 bool DFA::DeleteState(int selectedState) {
-	// Problem: Can't delete the state right away. 
-	// have to check whether the state has incoming transitions from other states
-	
+
 	// Get all incoming transitions
 	std::vector<int> incomingTransitions = states[selectedState].GetIncomingTransitions();
+	std::vector<int> outgoingTransitions;
+
+	for (int i = 0; i < states[selectedState].GetTransitionObjects().size(); i++) {
+		outgoingTransitions.push_back(
+			states[selectedState].GetTransitionObjects()[i].GetTransitionTo());
+	}
+
+	// Remove all the state from all of the states it had an outgoing transition to
+	for (int i = 0; i < outgoingTransitions.size(); i++) {
+		states[outgoingTransitions[i]].DeleteIncomingTransition(selectedState);
+	}
+
+	//-- This has to be re-done
+	// Currently, both a set and a vector are used as 
+	// There might be multiple transitions with the same symbol
+	// Thus trading memory for performance
+	std::set<char> symbolsToCheckIfRemoval;
+	std::vector<char> hasToBeDeleted;
+	// Check if there are any symbols that need to be removed 
+	for (int i = 0; i < states[selectedState].GetTransitionObjects().size(); i++) {
+		for (int k = 0; k < states[selectedState].GetTransitionObjects()[i].GetTransitionSymbols().size(); k++) {
+			symbolsToCheckIfRemoval.insert(states[selectedState].GetTransitionObjects()[i].GetTransitionSymbols()[k]);
+		}
+	}
+
+	for (auto& element : symbolsToCheckIfRemoval)
+	{
+		for (int k = 0; k < states.size(); ++k) {
+			if (states[k].CheckTransitionExists(element)) {
+				hasToBeDeleted.push_back(element);
+				break;
+			}
+
+		}
+	}
+
+	for (auto& element : symbolsToCheckIfRemoval)
+	{
+		for (int k = 0; k < alphabet.size(); k++) {
+			if (alphabet[k] == element) {
+				alphabet.erase(alphabet.begin() + k);
+				break;
+			}
+		}
+	}
+	// -- 
+
 
 	// for all incoming transitions,
 	for (int i = 0; i < incomingTransitions.size(); i++) {
 		for (int k = 0; k < states[incomingTransitions[i]].GetTransitionObjects().size(); k++) {
 			if (states[incomingTransitions[i]].GetTransitionObjects()[k].GetTransitionTo() == selectedState) {
-				states[incomingTransitions[i]].DeleteTransition(k); // Remove the incoming transition
+				//states[incomingTransitions[i]].DeleteTransition(k); // Remove the incoming transition
+				DeleteTransition(incomingTransitions[i], k);
 			}
 		}
 	}
+
+
 
 	// Finally, delete the state itself and de-select
 	// First, check if the state was accepting
@@ -224,10 +321,9 @@ bool DFA::DeleteState(int selectedState) {
 
 	// We also need to make the next available state (if there is one) starting
 	if (states.size() > 0 && wasStarting) {
-		states[0].SetAcceptingStateManually(true);
+		states[0].SetIsStarting(true);
 		return true;
 	}
-
 }
 
 void DFA::ChangeStateAccepting(int selectedState) {
@@ -285,23 +381,45 @@ bool DFA::CheckIfStringAccepted(std::string input) {
 }
 bool DFA::RemoveSymbolFromTransition() {
 	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
-		bool result = states[currentSelectedTrans.first].DeleteSingleTransitionSymbol(currentSelectedTrans.second);
+		int symbolsSize = states[currentSelectedTrans.first].GetTransitionObjects()[currentSelectedTrans.second].GetTransitionSymbols().size();
 
-		if (result) {
-			if (states[currentSelectedTrans.first].GetTransitionObjects().size() > 0) {
-				if (states[currentSelectedTrans.first].GetTransitionObjects()[currentSelectedTrans.second].GetTransitionSymbols().size() > 0) {
-					DeSelectTransition();
-					return result;
+		if (symbolsSize == 1) { // we are about to delete the transiton
+			return DeleteSelectedTransition();
+		}
+
+		char deletedCharRef = states[currentSelectedTrans.first].GetTransitionObjects()[currentSelectedTrans.second].GetTransitionSymbols()[symbolsSize - 1];
+
+		// deletedCharRef is to know what symbol to remove from alphabet (if needed)
+		// if no other transition contains the symbol, we remove it
+
+		std::pair<bool,int> result = states[currentSelectedTrans.first].DeleteSingleTransitionSymbol(currentSelectedTrans.second);
+		bool symbolExistsAfterRemoval = false;
+
+		std::cout << result.first;
+		std::cout << result.second;
+
+		if (result.first) {
+			if (result.second == 0) { // symbol deleted
+				if (states[currentSelectedTrans.first].GetTransitionObjects().size() > 0) {
+					if (states[currentSelectedTrans.first].GetTransitionObjects()[currentSelectedTrans.second].GetTransitionSymbols().size() > 0) {
+
+						RemoveSingleCharacterFromAlphabet(states, currentSelectedTrans, deletedCharRef,
+							symbolExistsAfterRemoval, alphabet);
+
+						DeSelectTransition();
+						return result.first;
+					}
 				}
 			}
 		}
+
 		currentSelectedTrans.first = -1;
 		currentSelectedTrans.second = -1;
 		previousSelectedTrans.first = -1;
 		previousSelectedTrans.second = -1;
 
 
-		return result;
+		return result.first;
 	}
 	return false;
 }
@@ -315,4 +433,71 @@ bool DFA::SetAllStatesDefaultColor() {
 	for (int i = 0; i < states.size(); i++) {
 		states[i].SetDefaultColor();
 	}
+}
+
+void RemoveSingleCharacterFromAlphabet(std::vector<DfaState>& states,
+	std::pair<int,int>& currentSelectedTrans, char removedChar, bool& symbolExistsAfterRemoval,
+	std::vector<char>& alphabet) {
+
+	symbolExistsAfterRemoval = false;
+
+	for (int i = 0; i < states.size(); i++) {
+		if (states[i].CheckTransitionExists(removedChar)) {
+			symbolExistsAfterRemoval = true;
+			break;
+		}
+	}
+
+	if (!symbolExistsAfterRemoval) {
+		for (int i = 0; i < alphabet.size(); i++) {
+			if (alphabet[i] == removedChar) {
+				alphabet.erase(alphabet.begin() + i);
+				break;
+			}
+		}
+	}
+}
+
+bool DFA::DeleteTransition(int state, int transIndex) {
+	// Firstly, make sure the transition actually exists
+	int to = states[state].GetStateTransition(transIndex).GetTransitionTo();
+	// using to, delete it from its incoming array
+	states[to].DeleteIncomingTransition(state);
+
+	std::vector<char> transitionSymbolsDeleted = states[state]
+		.GetTransition(transIndex).GetTransitionSymbols();
+
+	// delete the transition here
+	bool result = states[state].DeleteTransition(transIndex);
+
+	// After deletion, check whether the symbols are still contained in some transition
+	for (int i = 0; i < transitionSymbolsDeleted.size(); ++i) {
+		for (int k = 0; k < states.size(); ++k) {
+			if (states[k].CheckTransitionExists(transitionSymbolsDeleted[i])) {
+				// In-place solution for symbols that need removal:
+				// Pop out the symbols that do exist
+				transitionSymbolsDeleted.erase(transitionSymbolsDeleted.begin() + i);
+				// Since its in place, we reset the counter 
+				i = -1;
+				break;
+			}
+
+		}
+	}
+
+	for (int i = 0; i < transitionSymbolsDeleted.size(); i++) {
+		for (int k = 0; k < alphabet.size(); k++) {
+			if (alphabet[k] == transitionSymbolsDeleted[i]) {
+				alphabet.erase(alphabet.begin() + k);
+				break;
+			}
+		}
+	}
+
+	currentSelectedTrans.first = -1;
+	currentSelectedTrans.second = -1;
+	previousSelectedTrans.first = -1;
+	previousSelectedTrans.second = -1;
+
+	return result;
 }

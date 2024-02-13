@@ -35,7 +35,7 @@ class DFA {
 		void SetTransitionSymbol(char symbol);
 		void DeSelectState();
 		void DeSelectTransition();
-		bool DeleteTransition();
+		bool DeleteSelectedTransition();
 		bool DeleteState(int selectedState);
 		void ChangeStateAccepting(int selectedState);
 		bool CheckIfStringAccepted(std::string input);
@@ -43,5 +43,6 @@ class DFA {
 		std::pair<bool, DfaState> CheckStringAcceptingRecurs(DfaState currentState, std::string input, size_t position);
 		bool RemoveSymbolFromTransition();
 		bool SetAllStatesDefaultColor();
+		bool DeleteTransition(int state, int transIndex);
 
 };

@@ -257,9 +257,6 @@ bool StateTransition::AddTransitionSymbol(char symbol) {
 			transitionLabel.getPosition().y
 		));
 
-		
-
-
 		return true;
 	}
 

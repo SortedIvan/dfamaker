@@ -22,7 +22,7 @@ void DrawAllTextBoxEntriesAndHighlights(std::vector<sf::Text>& textBoxEntries,st
 void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text& inputStringHolder,
 	std::string& inputString, int& currentTextBoxEntry, bool& stringAcceptedState,
 	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected,sf::Font& font, sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights);
-
+void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
 
 int main() {
 
@@ -74,8 +74,19 @@ int main() {
 	textBoxSecondary.setFillColor(sf::Color::Transparent);
 	textBoxSecondary.setOutlineThickness(5.f);
 	textBoxSecondary.setOutlineColor(sf::Color::White);
-
 	// <------------End-textbox-graphics------------------------------>
+
+
+	// <------------Alphabet-graphics--------------------------------->
+	sf::Text alphabetHolder;
+	alphabetHolder.setString("Alphabet:");
+	alphabetHolder.setCharacterSize(20.f);
+	alphabetHolder.setPosition(
+		sf::Vector2f(50.f, window.getSize().y - 50.f)
+	);
+	alphabetHolder.setFont(font);
+	// <------------End-alphabet-graphics----------------------------->
+
 
 
 	sfLine line(sf::Vector2f(100, 100), sf::Vector2f(200, 200));
@@ -116,12 +127,14 @@ int main() {
 						if (DeleteTransition(e, dfa)) { 
 							transitionIsSelected = false;
 							dfa.DeSelectTransition();
+							UpdateAlphabetDisplay(dfa, alphabetHolder);
 							continue;
 						}
 					}
 
 					if (stateIsSelected) { // Check to see if user wants to delete a state
 						dfa.DeleteState(selectedState);
+						UpdateAlphabetDisplay(dfa, alphabetHolder);
 						stateIsSelected = false;
 						continue;
 					}
@@ -155,6 +168,7 @@ int main() {
 					if (transitionIsSelected) {
 
 						dfa.RemoveSymbolFromTransition();
+						UpdateAlphabetDisplay(dfa, alphabetHolder);
 						transitionIsSelected = false;
 
 						continue;
@@ -166,6 +180,7 @@ int main() {
 				}
 				if (transitionIsSelected) {
 					HandleTransitionSymbolInput(e, dfa);
+					UpdateAlphabetDisplay(dfa, alphabetHolder);
 					// De-select transition after
 					dfa.DeSelectTransition();
 					continue;
@@ -269,12 +284,8 @@ int main() {
 
 		//<----------- End of event logic, anything that takes place before drawing ------------>
 
-		//std::cout << selectedState << std::endl;
-
-		// < ------- DO DRAWING LOGIC HERE ------------->
 		// --------- clear the screen ----------
 		window.clear(default_bg_color);
-
 
 		// --------- draw on the screen ---------	
 		dfa.DrawAllStates(window);
@@ -283,7 +294,7 @@ int main() {
 		window.draw(textBoxDescr);
 		window.draw(inputStringHolder);
 		DrawAllTextBoxEntriesAndHighlights(textBoxEntries, textBoxHighlights, window);
-
+		window.draw(alphabetHolder);
 
 		// --------- display on the screen --------
 		window.display();
@@ -414,7 +425,7 @@ sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f t
 }
 
 bool DeleteTransition(sf::Event& e, DFA& dfa) {
-	dfa.DeleteTransition();
+	dfa.DeleteSelectedTransition();
 	return true;
 }
 
@@ -444,8 +455,9 @@ void DrawAllTextBoxEntriesAndHighlights(std::vector<sf::Text>& textBoxEntries, s
 void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text& inputStringHolder,
 	std::string& inputString, int& currentTextBoxEntry, bool& stringAcceptedState,
 	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected, sf::Font& font, sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights) {
-	// 1) Both inputString and the text are not necessary, but easier to distinct both
+	// Both inputString and the text are not necessary, but easier to distinguish them like this
 
+	// First, run a sanity check and see if it satiesfies DFA conditions
 	// Explicit check, this is also done in the function below,
 	// but has to be replaced
 	if (dfa.GetStates().size() == 0) {
@@ -514,4 +526,17 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 	textBoxEntries.push_back(stringEntry);
 	highlights.push_back(highlight);
 
+}
+
+void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder) {
+	std::string alphabetString = "Alphabet: ";
+
+	for (int i = 0; i < dfa.GetAlphabet().size(); i++) {
+		alphabetString.push_back(dfa.GetAlphabet()[i]);
+
+		if (i != dfa.GetAlphabet().size() - 1) { // not the last element
+			alphabetString.push_back(',');
+		}
+	}
+	alphabetHolder.setString(alphabetString);
 }

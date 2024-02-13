@@ -196,8 +196,6 @@ void DfaState::SetTransitionSymbol(int transitionIndex, char symbol) {
 	else {
 		transitions.insert({ symbol, to }); // first time adding the symbol
 	}
-
-
 }
 
 bool DfaState::DeleteTransition(int transitionIndex) {
@@ -208,7 +206,7 @@ bool DfaState::DeleteTransition(int transitionIndex) {
 
 		// we also have to remove the actual transition (if there existed one)
 
-		if (symbols.size() < 0) {
+		if (symbols.size() == 0) {
 			// the transition did not have a symbol assigned to it, continue;
 			return true;
 		}
@@ -217,12 +215,10 @@ bool DfaState::DeleteTransition(int transitionIndex) {
 		for (int i = 0; i < symbols.size(); i++) {
 			if (transitions.find(symbols[i]) != transitions.end()) {
 				transitions.erase(symbols[i]);
-				return true;
 			}
 		}
 
 		return true;
-
 	}
 	catch (const std::exception& e) {
 		return false;
@@ -246,7 +242,6 @@ bool DfaState::DeleteIncomingTransition(int value) {
 			break;
 		}
 	}
-
 	return true;
 }
 
@@ -259,21 +254,27 @@ int DfaState::GetTransitionTo(char symbol) {
 	}
 }
 
-bool DfaState::DeleteSingleTransitionSymbol(int transitionIndex) {
+std::pair<bool, int> DfaState::DeleteSingleTransitionSymbol(int transitionIndex) {
 	char result = transitionObjects[transitionIndex].RemoveSingleSymbol();
 	
-	if (result == '~') {
-		return false;
-	}
+	std::pair<bool, int> returnResult;
 
-	if (transitionObjects[transitionIndex].GetTransitionSymbols().size() == 0) {
-		DeleteTransition(transitionIndex);
+	if (result == '~') {
+		returnResult.first = false;
+		returnResult.second = -1; // Bad input;
+		return returnResult;
 	}
 	else {
+		returnResult.first = true;
+		returnResult.second = 0; // Symbol deleted;
 		transitions.erase(result);
+		return returnResult;
 	}
 
-	return true;
+	returnResult.first = false;
+	returnResult.second = -1; // Bad input
+
+	return returnResult;
 }
 
 bool DfaState::CheckTransitionExists(int from, int to) {
@@ -282,6 +283,13 @@ bool DfaState::CheckTransitionExists(int from, int to) {
 			&& transitionObjects[i].GetTransitionTo() == to) {
 			return true;
 		}
+	}
+	return false;
+}
+
+bool DfaState::CheckTransitionExists(char symbol) {
+	if (transitions.find(symbol) != transitions.end()) {
+		return true;
 	}
 	return false;
 }
@@ -296,4 +304,12 @@ void DfaState::SetStringAcceptedColor() {
 
 void DfaState::SetStringDeclinedColor() {
 	stateCircle.setFillColor(STRING_DECLINED);
+}
+
+std::map<char, int> DfaState::GetTransitions() {
+	return transitions;
+}
+
+StateTransition DfaState::GetTransition(int index) {
+	return transitionObjects[index];
 }

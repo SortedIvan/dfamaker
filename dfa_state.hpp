@@ -70,11 +70,16 @@ class DfaState {
 		bool DeleteIncomingTransition(int value);
 		void SetAcceptingStateManually(bool truthValue);
 		int GetTransitionTo(char symbol);
-		bool DeleteSingleTransitionSymbol(int transitionIndex);
+		std::pair<bool, int> DeleteSingleTransitionSymbol(int transitionIndex);
 		bool CheckTransitionExists(int from, int to);
+		bool CheckTransitionExists(char symbol);
 		void SetDefaultColor();
 		void SetStringAcceptedColor();
 		void SetStringDeclinedColor();
+		std::map<char, int> GetTransitions();
+		StateTransition GetTransition(int index);
+		
+
 
 
 };
