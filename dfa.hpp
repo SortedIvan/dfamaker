@@ -45,5 +45,6 @@ class DFA {
 		bool SetAllStatesDefaultColor();
 		bool DeleteTransition(int state, int transIndex);
 		int CheckStateTransitionCollision(sf::Vector2f position);
+		std::tuple<bool, int, std::string> CheckIfDfa();
 
 };

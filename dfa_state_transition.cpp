@@ -293,3 +293,12 @@ char StateTransition::RemoveSingleSymbol() {
 	}
 	return '~';
 }
+
+bool StateTransition::CheckSymbolExists(char symbol) {
+	for (int i = 0; i < symbols.size(); i++) {
+		if (symbol == symbols[i]) {
+			return true;
+		}
+	}
+	return false;
+}

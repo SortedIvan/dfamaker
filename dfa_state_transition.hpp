@@ -50,6 +50,7 @@ class StateTransition {
 		std::vector<char> GetTransitionSymbols();
 		bool AddTransitionSymbol(char symbol);
 		char RemoveSingleSymbol();
+		bool CheckSymbolExists(char symbol);
 		
 		
 

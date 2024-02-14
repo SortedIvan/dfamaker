@@ -161,6 +161,23 @@ int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 void DFA::SetTransitionSymbol(char symbol) {
 	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
 		
+		int stateOfTransition = currentSelectedTrans.first;
+
+		for (int i = 0; i < states[stateOfTransition].GetTransitionObjects().size(); i++) {
+
+			if (currentSelectedTrans.second == i) {
+				continue; // skip the same transition
+			}
+
+			if (states[stateOfTransition]
+				.GetTransitionObjects()[i]
+				.CheckSymbolExists(symbol)) 
+			{
+				// symbol already exists on this transition
+				return;
+			}
+		}
+
 		bool inAlphabet = false;
 
 		for (int i = 0; i < alphabet.size(); i++) {
@@ -174,7 +191,7 @@ void DFA::SetTransitionSymbol(char symbol) {
 			alphabet.push_back(symbol);
 		}
 
-		states[currentSelectedTrans.first].SetTransitionSymbol(currentSelectedTrans.second, symbol);
+		states[stateOfTransition].SetTransitionSymbol(currentSelectedTrans.second, symbol);
 	}
 }
 
@@ -284,6 +301,21 @@ bool DFA::DeleteState(int selectedState) {
 			}
 
 			if (states[i].CheckTransitionExists(element)) {
+
+				bool isIncomingTransition = false;
+				// Make sure that the state that contains it is not an incoming transition
+				for (int k = 0; k < incomingTransitions.size(); k++) {
+					if (i == incomingTransitions[k]) {
+						isIncomingTransition = true;
+						break;
+					}
+				}
+
+				if (isIncomingTransition) {
+					continue;
+				}
+
+
 				doNotDelete.insert(element);
 				break;
 			}
@@ -522,4 +554,56 @@ int DFA::CheckStateTransitionCollision(sf::Vector2f position) {
 		}
 	}
 	return -2; // didn't find anything
+}
+
+std::tuple<bool, int, std::string> DFA::CheckIfDfa() {
+
+	/*
+		There are a couple of conditions that need to be checked
+		1) Does every state have a label
+		2) Is every symbol from the alphabet contained within every state
+		3) Is there only one transition with a given symbol per state
+	*/ 
+
+	/*
+		structure:
+		bool: yes, no for dfa
+		int: if no, which state
+		string: if no, what problem {
+			0: No state label
+			1: Missing symbols from alphabet
+			2: More than one transition for the same symbol
+			2 is handled implicitly, the rest must be checked
+		}
+	*/
+	std::tuple<bool, int, std::string> result;
+	std::get<1>(result) = -1;
+	std::get<2>(result) = "";
+
+	// 1)
+	for (int i = 0; i < states.size(); ++i) {
+		if (states[i].GetStateLabel() == "") {
+			std::get<0>(result) = false;
+			std::get<1>(result) = i;
+			std::get<2>(result) = "Missing state label";
+			return result;
+		}
+	}
+
+	// 2)
+	for (int i = 0; i < states.size(); i++) {
+		for (int k = 0; k < alphabet.size(); k++) {
+			if (!states[i].CheckTransitionExists(alphabet[k])) {
+				std::get<0>(result) = false;
+				std::get<1>(result) = i;
+
+				std::string errorMessage = "State: " + states[i].GetStateLabel() + " missing transition: " + alphabet[k];
+
+				std::get<2>(result) = errorMessage;
+				return result;
+			}
+		}
+	}
+	std::get<0>(result) = true;
+	return result;
 }

@@ -15,12 +15,13 @@ const int DEFAULT_STATE_SELECTED_RADIUS = 25;
 const int DEFAULT_STATE_ACCEPTING_RADIUS = 35;
 const int STARTING_STATE_ARROW_LEN = 25.f;
 
-const sf::Color DEFAULT_STATE_COLOR = sf::Color::White;
+//const sf::Color DEFAULT_STATE_COLOR = sf::Color::White;
 const sf::Color STRING_ACCEPTED = sf::Color::Green;
 const sf::Color STRING_DECLINED = sf::Color::Red;
 
 const sf::Color DEFAULT_BG_COLOR(0x00, 0x01, 0x33);
 const sf::Color PLACEMENT_INDICATOR_OUTLINE(0x73, 0x93, 0xB3);
+const sf::Color DEFAULT_STATE_COLOR(255, 255, 255, 50);
 
 sf::Vector2i GetMousePosition(sf::RenderWindow& window);
 void TryLoadFont(sf::Font& font, std::string path);
@@ -35,9 +36,11 @@ void DrawAllTextBoxEntriesAndHighlights(std::vector<sf::Text>& textBoxEntries,st
 	sf::RenderWindow& window);
 void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text& inputStringHolder,
 	std::string& inputString, int& currentTextBoxEntry, bool& stringAcceptedState,
-	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected,sf::Font& font, sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights);
+	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected,sf::Font& font,
+	sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights, bool& errorMode);
 void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
 void HandleMouseHover(DFA& dfa, bool& mouseOverItem, int& highlightedState, sf::RenderWindow& window);
+
 
 
 int main() {
@@ -102,15 +105,32 @@ int main() {
 	alphabetHolder.setFont(font);
 	// <------------End-alphabet-graphics----------------------------->
 
-	// <------------Mouse-Overlay-Graphics---------------------------->
+	// <------------Overlay-Graphics---------------------------->
 	sf::CircleShape statePlacementIndicator;
 	statePlacementIndicator.setRadius(DEFAULT_STATE_RADIUS);
 	statePlacementIndicator.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS, DEFAULT_STATE_RADIUS));
 	statePlacementIndicator.setFillColor(DEFAULT_STATE_COLOR);
-	statePlacementIndicator.setOutlineColor(PLACEMENT_INDICATOR_OUTLINE);
-	statePlacementIndicator.setOutlineThickness(4.f);
 
-	// <------------End-Mouse-Overlay-Graphics----------------------->
+	sf::RectangleShape errorIndicator(sf::Vector2f(350, 100));
+	errorIndicator.setPosition(35, 35);
+	errorIndicator.setFillColor(sf::Color::Transparent);
+	errorIndicator.setOutlineThickness(4.f);
+	errorIndicator.setOutlineColor(sf::Color::White);
+
+	sf::Text errorMessageLabel;
+	errorMessageLabel.setString("Error indicator:");
+	errorMessageLabel.setCharacterSize(13.f);
+	errorMessageLabel.setPosition(40.f, 40.f);
+	errorMessageLabel.setFont(font);
+
+	sf::Text errorMessage;
+	errorMessage.setString("");
+	errorMessage.setCharacterSize(13.f);
+	errorMessage.setPosition(sf::Vector2f(sf::Vector2f(40.f, 55.f)));
+	errorMessage.setFont(font);
+
+
+	// <------------End-Overlay-Graphics----------------------->
 
 	int selectedState = -1;
 	int highlightedState = -1;
@@ -123,6 +143,7 @@ int main() {
 	bool mouseOverlayMode = true;
 	bool mouseOnDrawable = false;
 	bool mouseOverItem = false;
+	bool errorMode = false;
 
 	std::string inputString;
 
@@ -150,12 +171,14 @@ int main() {
 		}
 
 		// Check if mouse is ontop of textbox
-		if (textBox.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
+		if (textBox.getGlobalBounds().contains((sf::Vector2f)mousePosition)
+			|| errorIndicator.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
 			mouseOnDrawable = false;
 		}
 		else {
 			mouseOnDrawable = true;
 		}
+
 
 		if (mouseOverlayMode) { 
 			// update the overlay position
@@ -201,9 +224,19 @@ int main() {
 				}
 
 				if (e.key.code == sf::Keyboard::Enter) {
-					HandleInputStringValidation(textBoxEntries, inputStringHolder, inputString,
-						currentTextEntry, stringAcceptedState, dfa, stateIsSelected,
-						transitionIsSelected, font, window, textBoxHighlights);
+
+					std::tuple<bool, int, std::string> isDfa = dfa.CheckIfDfa();
+
+					if (!std::get<0>(isDfa)) {
+						errorMessage.setString(std::get<2>(isDfa));
+						errorMode = true;
+					}
+					else {
+						HandleInputStringValidation(textBoxEntries, inputStringHolder, inputString,
+							currentTextEntry, stringAcceptedState, dfa, stateIsSelected,
+							transitionIsSelected, font, window, textBoxHighlights, errorMode);
+					}
+
 				}
 
 			}
@@ -223,7 +256,6 @@ int main() {
 						dfa.RemoveSymbolFromTransition();
 						UpdateAlphabetDisplay(dfa, alphabetHolder);
 						transitionIsSelected = false;
-
 						continue;
 					}
 				}
@@ -243,6 +275,7 @@ int main() {
 
 			// On Mouse Click Release
 			if (e.type == sf::Event::MouseButtonReleased) {
+				
 				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
 
 				if (stringAcceptedState) { // first clear the accepted state
@@ -340,7 +373,9 @@ int main() {
 		// --------- clear the screen ----------
 		window.clear(DEFAULT_BG_COLOR);
 
-		// --------- draw on the screen ---------	
+		// --------- draw on the screen ---------
+
+		
 		dfa.DrawAllStates(window);
 		window.draw(textBox);
 		window.draw(textBoxSecondary);
@@ -348,6 +383,14 @@ int main() {
 		window.draw(inputStringHolder);
 		DrawAllTextBoxEntriesAndHighlights(textBoxEntries, textBoxHighlights, window);
 		window.draw(alphabetHolder);
+
+		window.draw(errorMessageLabel);
+		window.draw(errorIndicator);
+
+		if (errorMode) {
+			window.draw(errorMessage);
+		}
+;
 
 		if (mouseOverlayMode && mouseOnDrawable && !mouseOverItem) {
 			window.draw(statePlacementIndicator);
@@ -510,7 +553,8 @@ void DrawAllTextBoxEntriesAndHighlights(std::vector<sf::Text>& textBoxEntries, s
 
 void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text& inputStringHolder,
 	std::string& inputString, int& currentTextBoxEntry, bool& stringAcceptedState,
-	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected, sf::Font& font, sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights) {
+	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected, sf::Font& font
+	, sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights, bool& errorMode) {
 	// Both inputString and the text are not necessary, but easier to distinguish them like this
 
 	// First, run a sanity check and see if it satiesfies DFA conditions
@@ -556,6 +600,7 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 	// check CheckIfStringAccepted returns
 	if (result) {
 		stringAcceptedState = true;
+		errorMode = false;
 
 		highlight.setFillColor(semiTransparentColorGreen);
 

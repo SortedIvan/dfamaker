@@ -18,8 +18,6 @@ DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font
 	this->stateCircle.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS, DEFAULT_STATE_RADIUS));
 	this->stateCircle.setPosition(statePosition);
 	this->stateCircle.setFillColor(DEFAULT_STATE_COLOR);
-	this->stateCircle.setOutlineColor(PLACEMENT_INDICATOR_OUTLINE);
-	this->stateCircle.setOutlineThickness(1.5f);
 
 	this->outlining.setPosition(statePosition);
 	this->outlining.setRadius(DEFAULT_STATE_SELECTED_RADIUS);
