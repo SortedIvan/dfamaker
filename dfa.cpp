@@ -267,27 +267,35 @@ bool DFA::DeleteState(int selectedState) {
 	// There might be multiple transitions with the same symbol
 	// Thus trading memory for performance
 	std::set<char> symbolsToCheckIfRemoval;
-	std::vector<char> hasToBeDeleted;
+	std::set<char> doNotDelete;
 	// Check if there are any symbols that need to be removed 
 	for (int i = 0; i < states[selectedState].GetTransitionObjects().size(); i++) {
 		for (int k = 0; k < states[selectedState].GetTransitionObjects()[i].GetTransitionSymbols().size(); k++) {
 			symbolsToCheckIfRemoval.insert(states[selectedState].GetTransitionObjects()[i].GetTransitionSymbols()[k]);
 		}
 	}
+	
 
 	for (auto& element : symbolsToCheckIfRemoval)
 	{
-		for (int k = 0; k < states.size(); ++k) {
-			if (states[k].CheckTransitionExists(element)) {
-				hasToBeDeleted.push_back(element);
-				break;
+		for (int i = 0; i < states.size(); i++) {
+			if (i == selectedState) {
+				continue;
 			}
 
+			if (states[i].CheckTransitionExists(element)) {
+				doNotDelete.insert(element);
+				break;
+			}
 		}
 	}
 
 	for (auto& element : symbolsToCheckIfRemoval)
 	{
+		if (doNotDelete.find(element) != doNotDelete.end()) {
+			continue;
+		}
+
 		for (int k = 0; k < alphabet.size(); k++) {
 			if (alphabet[k] == element) {
 				alphabet.erase(alphabet.begin() + k);
