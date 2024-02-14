@@ -7,10 +7,24 @@
 
 # define M_PI  3.14159265358979323846  /* pi */
 
+/*
+	TODO: Have these placed only here, remove all other instances from different files
+*/
+const int DEFAULT_STATE_RADIUS = 40;
+const int DEFAULT_STATE_SELECTED_RADIUS = 25;
+const int DEFAULT_STATE_ACCEPTING_RADIUS = 35;
+const int STARTING_STATE_ARROW_LEN = 25.f;
+
+const sf::Color DEFAULT_STATE_COLOR = sf::Color::White;
+const sf::Color STRING_ACCEPTED = sf::Color::Green;
+const sf::Color STRING_DECLINED = sf::Color::Red;
+
+const sf::Color DEFAULT_BG_COLOR(0x00, 0x01, 0x33);
+const sf::Color PLACEMENT_INDICATOR_OUTLINE(0x73, 0x93, 0xB3);
+
 sf::Vector2i GetMousePosition(sf::RenderWindow& window);
 void TryLoadFont(sf::Font& font, std::string path);
 void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState);
-static const sf::Color default_bg_color(0x00, 0x01, 0x33);
 void RotateRectangle(sf::ConvexShape& rect, float angle);
 float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs);
 sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f to);
@@ -23,6 +37,8 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 	std::string& inputString, int& currentTextBoxEntry, bool& stringAcceptedState,
 	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected,sf::Font& font, sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights);
 void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
+void HandleMouseHover(DFA& dfa, bool& mouseOverItem, int& highlightedState, sf::RenderWindow& window);
+
 
 int main() {
 
@@ -37,7 +53,6 @@ int main() {
 	sf::Font font;
 	TryLoadFont(font, "./testfont.ttf");
 	
-
 	//<------------Begin-textbox-logic------------------------------->
 	sf::RectangleShape textBox(sf::Vector2f(300,window.getSize().y - 50.f));
 	sf::RectangleShape textBoxSecondary(sf::Vector2f(300, 50.f));
@@ -87,20 +102,27 @@ int main() {
 	alphabetHolder.setFont(font);
 	// <------------End-alphabet-graphics----------------------------->
 
+	// <------------Mouse-Overlay-Graphics---------------------------->
+	sf::CircleShape statePlacementIndicator;
+	statePlacementIndicator.setRadius(DEFAULT_STATE_RADIUS);
+	statePlacementIndicator.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS, DEFAULT_STATE_RADIUS));
+	statePlacementIndicator.setFillColor(DEFAULT_STATE_COLOR);
+	statePlacementIndicator.setOutlineColor(PLACEMENT_INDICATOR_OUTLINE);
+	statePlacementIndicator.setOutlineThickness(4.f);
 
-
-	sfLine line(sf::Vector2f(100, 100), sf::Vector2f(200, 200));
-
-	sfLine arrowLineOne(sf::Vector2f(100, 100), sf::Vector2f(200, 200));
-	sfLine arrowLineTwo(sf::Vector2f(100, 100), sf::Vector2f(200, 200));
+	// <------------End-Mouse-Overlay-Graphics----------------------->
 
 	int selectedState = -1;
+	int highlightedState = -1;
 	int transitionCounter = 0;
 	bool stateIsSelected = false;
 	bool shiftHeldDown = false;
 	bool transitionIsSelected = false;
 	bool stringAcceptedState = false;
 	bool textboxState = false;
+	bool mouseOverlayMode = true;
+	bool mouseOnDrawable = false;
+	bool mouseOverItem = false;
 
 	std::string inputString;
 
@@ -114,6 +136,37 @@ int main() {
 		else {
 			shiftHeldDown = false;
 		}
+
+		
+		//	<------------Mouse-Overlay-Handling----------------------->
+		sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+		if (mousePosition.x >= 0 && mousePosition.x < window.getSize().x &&
+			mousePosition.y >= 0 && mousePosition.y < window.getSize().y) {
+			// Mouse is on the screen
+			mouseOnDrawable = true;
+		}
+		else {
+			mouseOnDrawable = false;
+		}
+
+		// Check if mouse is ontop of textbox
+		if (textBox.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
+			mouseOnDrawable = false;
+		}
+		else {
+			mouseOnDrawable = true;
+		}
+
+		if (mouseOverlayMode) { 
+			// update the overlay position
+			if (mouseOnDrawable) {
+				statePlacementIndicator.setPosition((sf::Vector2f)mousePosition);
+			}
+		}
+
+		HandleMouseHover(dfa, mouseOverItem, highlightedState, window);
+
+		// <------------End-Mouse-Overlay-Handling----------------------->
 
 		while (window.pollEvent(e)) {
 			if (e.type == sf::Event::Closed) {
@@ -285,7 +338,7 @@ int main() {
 		//<----------- End of event logic, anything that takes place before drawing ------------>
 
 		// --------- clear the screen ----------
-		window.clear(default_bg_color);
+		window.clear(DEFAULT_BG_COLOR);
 
 		// --------- draw on the screen ---------	
 		dfa.DrawAllStates(window);
@@ -295,6 +348,11 @@ int main() {
 		window.draw(inputStringHolder);
 		DrawAllTextBoxEntriesAndHighlights(textBoxEntries, textBoxHighlights, window);
 		window.draw(alphabetHolder);
+
+		if (mouseOverlayMode && mouseOnDrawable && !mouseOverItem) {
+			window.draw(statePlacementIndicator);
+		}
+
 
 		// --------- display on the screen --------
 		window.display();
@@ -420,8 +478,6 @@ sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f t
 	rect[3].color = sf::Color::Red;
 
 	return rect;
-
-
 }
 
 bool DeleteTransition(sf::Event& e, DFA& dfa) {
@@ -478,7 +534,7 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 	sf::Text stringEntry;
 	stringEntry.setString(inputString);
 	stringEntry.setCharacterSize(20.f);
-	
+
 	// This makes sure that the positioning between strings is spaced
 	float textPositionHeightValue = (35.f * (textBoxEntries.size() + 2));
 
@@ -493,7 +549,7 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 	// clean the holder variables
 	inputStringHolder.setString("");
 	bool result = dfa.CheckIfStringAccepted(inputString);
-	
+
 	inputString.clear();
 
 	// !TODO!, this should be a pair of boolean values, as this can break
@@ -509,7 +565,7 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 		if (transitionIsSelected) {
 			dfa.DeSelectTransition();
 		}
-		
+
 	}
 	else {
 		stringAcceptedState = true;
@@ -539,4 +595,22 @@ void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder) {
 		}
 	}
 	alphabetHolder.setString(alphabetString);
+}
+
+void HandleMouseHover(DFA& dfa, bool& mouseOverItem, int& highlightedState, sf::RenderWindow& window) {
+	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+
+	mouseOverItem = false;  // Set to false before checking states
+
+	for (int i = 0; i < dfa.GetStates().size(); i++) {
+		if (dfa.GetStates()[i].GetStateCircle().getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
+			mouseOverItem = true;  // Set to true if mouse is over any state
+			break;  // No need to check further once we find a state under the mouse
+		}
+		if (dfa.CheckStateTransitionCollision((sf::Vector2f)mousePosition) == 0) {
+			mouseOverItem = true;
+			break;
+		}
+	}
+
 }

@@ -53,9 +53,9 @@ void DFA::DrawAllStates(sf::RenderWindow& window) {
 	}
 }
 
-bool DFA::CheckIfStateSelected(sf::Vector2f positionClicked) {
+bool DFA::CheckIfStateSelected(sf::Vector2f position) {
 	for (int i = 0; i < states.size(); i++) {
-		if (states[i].GetStateCircle().getGlobalBounds().contains(positionClicked)) {
+		if (states[i].GetStateCircle().getGlobalBounds().contains(position)) {
 			return true;
 		}
 	}
@@ -110,10 +110,6 @@ void DFA::SetSelectedState(int selectedState) {
 // this code is cheap and fucking sucks
 // it has to cycle through all states to find the transition that was clicked
 int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
-
-	bool transitionIsAssigned = false;
-	int stateFrom = 0;
-
 	for (int i = 0; i < states.size(); i++) {
 		for (int k = 0; k < states[i].GetTransitionObjects().size(); k++) {
 			
@@ -154,10 +150,13 @@ int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 			}
 		}
 	}
-
-
 	return -2; // didn't find anything
 }
+
+
+
+
+
 
 void DFA::SetTransitionSymbol(char symbol) {
 	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
@@ -500,4 +499,19 @@ bool DFA::DeleteTransition(int state, int transIndex) {
 	previousSelectedTrans.second = -1;
 
 	return result;
+}
+
+int DFA::CheckStateTransitionCollision(sf::Vector2f position) {
+	for (int i = 0; i < states.size(); i++) {
+		for (int k = 0; k < states[i].GetTransitionObjects().size(); k++) {
+
+			if (states[i].GetTransitionObjects()[k].GetMainArrow().CheckCollision(position)
+				|| states[i].GetTransitionObjects()[k].GetRhsArrow().CheckCollision(position)
+				|| states[i].GetTransitionObjects()[k].GetLhsArrow().CheckCollision(position)
+				|| states[i].GetTransitionObjects()[k].GetTopArrow().CheckCollision(position)) {
+				return 0;
+			}
+		}
+	}
+	return -2; // didn't find anything
 }
