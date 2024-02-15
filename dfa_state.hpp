@@ -65,6 +65,7 @@ class DfaState {
 		void ChangeTransitionColor(int transitionIndex, sf::Color color);
 		void SetTransitionSymbol(int transitionIndex, char symbol);
 		bool DeleteTransition(int transitionIndex);
+		bool DeleteTransitionTo(int toState);
 		bool AddIncomingTransition(int from);
 		std::vector<int> GetIncomingTransitions();
 		bool DeleteIncomingTransition(int value);
@@ -78,6 +79,7 @@ class DfaState {
 		void SetStringDeclinedColor();
 		std::map<char, int> GetTransitions();
 		StateTransition GetTransition(int index);
+		void SetTransitionTo(int transitionIndex, int value);
 		
 
 

@@ -121,8 +121,11 @@ void StateTransition::SetUpStateTransition(
 	
 }
 
-void StateTransition::SetTransitionTwo(int stateTo) {
+void StateTransition::SetTransitionTo(int stateTo) {
+	std::cout << transitionTo << std::endl;
 	transitionTo = stateTo;
+
+	std::cout << transitionTo << std::endl;
 }
 
 int StateTransition::GetTransitionTo() {
@@ -302,3 +305,4 @@ bool StateTransition::CheckSymbolExists(char symbol) {
 	}
 	return false;
 }
+

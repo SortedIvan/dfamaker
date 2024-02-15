@@ -28,7 +28,7 @@ class StateTransition {
 
 	public:
 		StateTransition();
-		void SetTransitionTwo(int stateTo);
+		void SetTransitionTo(int stateTo);
 		int GetTransitionTo();
 		int GetTransitionFrom();
 		void Draw(sf::RenderWindow& window);

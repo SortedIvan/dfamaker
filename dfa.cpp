@@ -154,10 +154,6 @@ int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 }
 
 
-
-
-
-
 void DFA::SetTransitionSymbol(char symbol) {
 	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
 		
@@ -249,9 +245,7 @@ bool DFA::DeleteSelectedTransition() {
 				}
 			}
 		}
-		
-		std::cout << alphabet.size();
-		
+
 		currentSelectedTrans.first = -1;
 		currentSelectedTrans.second = -1;
 		previousSelectedTrans.first = -1;
@@ -262,69 +256,116 @@ bool DFA::DeleteSelectedTransition() {
 	return false;
 }
 
-// O(n^2) complexity but best that can be done with current implementation
+// O(n^3) complexity but best that can be done with current implementation
+// Problem: when deleted, GetStateTo() for all other states gets messed up
 bool DFA::DeleteState(int selectedState) {
 
-	// Get all incoming transitions
-	std::vector<int> incomingTransitions = states[selectedState].GetIncomingTransitions();
-	std::vector<int> outgoingTransitions;
-
-	for (int i = 0; i < states[selectedState].GetTransitionObjects().size(); i++) {
-		outgoingTransitions.push_back(
-			states[selectedState].GetTransitionObjects()[i].GetTransitionTo());
+	if (states.size() == 1) { // if this is the last state
+		states.erase(states.begin() + selectedState);
+		this->selectedState = -1;
+		return true;
 	}
 
-	// Remove all the state from all of the states it had an outgoing transition to
-	for (int i = 0; i < outgoingTransitions.size(); i++) {
-		states[outgoingTransitions[i]].DeleteIncomingTransition(selectedState);
-	}
+	// Get all the symbols that reside in all transitions of this state
+	std::set<char> allSymbolsAffected;
+	std::set<char> toKeep;
 
-	//-- This has to be re-done
-	// Currently, both a set and a vector are used as 
-	// There might be multiple transitions with the same symbol
-	// Thus trading memory for performance
-	std::set<char> symbolsToCheckIfRemoval;
-	std::set<char> doNotDelete;
-	// Check if there are any symbols that need to be removed 
 	for (int i = 0; i < states[selectedState].GetTransitionObjects().size(); i++) {
 		for (int k = 0; k < states[selectedState].GetTransitionObjects()[i].GetTransitionSymbols().size(); k++) {
-			symbolsToCheckIfRemoval.insert(states[selectedState].GetTransitionObjects()[i].GetTransitionSymbols()[k]);
+			allSymbolsAffected.insert(
+				states[selectedState].GetTransitionObjects()[i].GetTransitionSymbols()[k]
+			);
 		}
 	}
-	
 
-	for (auto& element : symbolsToCheckIfRemoval)
+	for (int i = 0; i < states.size(); i++) {
+		for (int k = 0; k < states[i].GetTransitionObjects().size(); k++) {
+			int to = states[i].GetTransitionObjects()[k].GetTransitionTo();
+			std::cout << to << std::endl;
+		}
+	}
+
+	std::cout << "-----------" << std::endl;
+	// We have to update the stateTo variable in StateTransition
+	for (int i = 0; i < states.size(); i++) {
+		for (int k = 0; k < states[i].GetTransitionObjects().size(); k++) {
+
+			if (states[i].GetTransitionObjects()[k].GetTransitionTo() == 0) {
+				continue;
+			}
+
+			int to = states[i].GetTransitionObjects()[k].GetTransitionTo() - 1;
+
+
+			//std::cout << to << std::endl;
+
+			states[i].SetTransitionTo(k, to);
+		}
+	}
+	std::cout << "-----------" << std::endl;
+	for (int i = 0; i < states.size(); i++) {
+		for (int k = 0; k < states[i].GetTransitionObjects().size(); k++) {
+			int to = states[i].GetTransitionObjects()[k].GetTransitionTo();
+			std::cout << to << std::endl;
+		}
+	}
+
+
+	// Furthermore, we need to also get the symbols from the affected incoming transitions
+	// Delete all outgoing and incoming transitions
+	// Outgoing transition deletion is automatically handled by deleting the state object
+	std::vector<int> incomingTransitions = states[selectedState].GetIncomingTransitions();
+	
+	for (int i = 0; i < incomingTransitions.size(); i++) {
+		for (int k = 0; k < states[incomingTransitions[i]].GetTransitionObjects().size(); k++) {
+			for (int j = 0; j < states[incomingTransitions[i]].GetTransitionObjects()[k].GetTransitionSymbols().size(); j++) {
+				allSymbolsAffected.insert(states[incomingTransitions[i]].GetTransitionObjects()[k].GetTransitionSymbols()[j]);
+			}
+		}
+	}
+
+	// We need to go to all states contained in incoming transitions and delete their transition to selectedState
+	for (int i = 0; i < incomingTransitions.size(); i++) {
+		states[incomingTransitions[i]].DeleteTransitionTo(selectedState);
+	}
+
+	// If no other states contain the symbols, remove them from the alphabet
+	for (auto& element : allSymbolsAffected)
 	{
+
 		for (int i = 0; i < states.size(); i++) {
+
 			if (i == selectedState) {
 				continue;
 			}
 
 			if (states[i].CheckTransitionExists(element)) {
+				
+				bool toCorrectTransition = false;
 
-				bool isIncomingTransition = false;
-				// Make sure that the state that contains it is not an incoming transition
-				for (int k = 0; k < incomingTransitions.size(); k++) {
-					if (i == incomingTransitions[k]) {
-						isIncomingTransition = true;
-						break;
+				// We need to check whether the transition here is to the state we are deleting
+				for (int k = 0; k < states[i].GetTransitionObjects().size(); k++) {
+					if (states[i].GetTransitionObjects()[k].GetTransitionTo() == selectedState) {
+						continue; // skip the bad transition
+					}
+
+					if (states[i].GetTransitionObjects()[k].CheckSymbolExists(element)) {
+						toCorrectTransition = true;
 					}
 				}
-
-				if (isIncomingTransition) {
-					continue;
+				
+				if (toCorrectTransition) {
+					toKeep.insert(element);
 				}
 
-
-				doNotDelete.insert(element);
 				break;
 			}
 		}
 	}
 
-	for (auto& element : symbolsToCheckIfRemoval)
+	for (auto& element : allSymbolsAffected)
 	{
-		if (doNotDelete.find(element) != doNotDelete.end()) {
+		if (toKeep.find(element) != toKeep.end()) {
 			continue;
 		}
 
@@ -335,24 +376,25 @@ bool DFA::DeleteState(int selectedState) {
 			}
 		}
 	}
-	// -- 
 
 
-	// for all incoming transitions,
-	for (int i = 0; i < incomingTransitions.size(); i++) {
-		for (int k = 0; k < states[incomingTransitions[i]].GetTransitionObjects().size(); k++) {
-			if (states[incomingTransitions[i]].GetTransitionObjects()[k].GetTransitionTo() == selectedState) {
-				//states[incomingTransitions[i]].DeleteTransition(k); // Remove the incoming transition
-				DeleteTransition(incomingTransitions[i], k);
+	// Remove this state from all other states's incoming transitions list
+	for (int i = 0; i < states.size(); i++) {
+		// skip the state we are removing
+		if (i == selectedState) {
+			continue;
+		}
+		for (int k = 0; k < states[i].GetIncomingTransitions().size(); k++) {
+
+			// Otherwise, check the transitions
+			if (states[i].GetIncomingTransitions()[k] == selectedState) {
+				states[i].DeleteIncomingTransition(selectedState);
 			}
+
 		}
 	}
 
-
-
-	// Finally, delete the state itself and de-select
-	// First, check if the state was accepting
-
+	// Finally, delete the actual state itself
 	bool wasStarting = states[selectedState].GetIsStarting();
 
 	states.erase(states.begin() + selectedState);
@@ -363,6 +405,7 @@ bool DFA::DeleteState(int selectedState) {
 		states[0].SetIsStarting(true);
 		return true;
 	}
+
 }
 
 void DFA::ChangeStateAccepting(int selectedState) {

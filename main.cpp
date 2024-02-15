@@ -41,8 +41,6 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
 void HandleMouseHover(DFA& dfa, bool& mouseOverItem, int& highlightedState, sf::RenderWindow& window);
 
-
-
 int main() {
 
 	sf::RenderWindow window(sf::VideoMode(1200, 800), "Test");
@@ -235,6 +233,8 @@ int main() {
 						HandleInputStringValidation(textBoxEntries, inputStringHolder, inputString,
 							currentTextEntry, stringAcceptedState, dfa, stateIsSelected,
 							transitionIsSelected, font, window, textBoxHighlights, errorMode);
+						errorMode = false;
+						errorMessage.setString("");
 					}
 
 				}
@@ -437,7 +437,6 @@ void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa) {
 		dfa.SetTransitionSymbol(e.key.code);
 	}
 }
-
 
 void AddStateTransitionBetweenStates() {
 

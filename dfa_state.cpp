@@ -225,6 +225,34 @@ bool DfaState::DeleteTransition(int transitionIndex) {
 	}
 }
 
+bool DfaState::DeleteTransitionTo(int toState) {
+	for (int i = 0; i < transitionObjects.size(); i++) {
+		if (transitionObjects[i].GetTransitionTo() == toState) {
+			
+			std::vector<char> symbolsAffected = transitionObjects[i].GetTransitionSymbols();
+			transitionObjects.erase(transitionObjects.begin() + i);
+
+			if (symbolsAffected.size() == 0) {
+				// the transition did not have a symbol assigned to it, continue;
+				return true;
+			}
+
+			// Erase all transitions that were related to the specific object
+			for (int i = 0; i < symbolsAffected.size(); i++) {
+				if (transitions.find(symbolsAffected[i]) != transitions.end()) {
+					transitions.erase(symbolsAffected[i]);
+				}
+			}
+
+			return true;
+
+		}
+	}
+
+	return false;
+}
+
+
 bool DfaState::AddIncomingTransition(int from) {
 	incomingTransitions.push_back(from);
 	return true;
@@ -294,6 +322,8 @@ bool DfaState::CheckTransitionExists(char symbol) {
 	return false;
 }
 
+
+
 void DfaState::SetDefaultColor() {
 	stateCircle.setFillColor(DEFAULT_STATE_COLOR);
 }
@@ -312,4 +342,8 @@ std::map<char, int> DfaState::GetTransitions() {
 
 StateTransition DfaState::GetTransition(int index) {
 	return transitionObjects[index];
+}
+
+void DfaState::SetTransitionTo(int transitionIndex, int value) {
+	transitionObjects[transitionIndex].SetTransitionTo(value);
 }
