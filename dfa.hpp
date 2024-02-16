@@ -23,7 +23,7 @@ class DFA {
 		std::vector<char> GetAlphabet();
 		int GetSelectedStateIndex(sf::Vector2f positionClicked);
 		
-		void AddNewState(std::string label, sf::Vector2f position, sf::Font& font);
+		void AddNewState(std::string label, sf::Vector2f position, sf::Font& font, int id);
 		void SetAlphabet(std::vector<char> alphabet);
 		void DrawAllStates(sf::RenderWindow& window);
 		bool CheckIfStateSelected(sf::Vector2f position);
@@ -44,7 +44,11 @@ class DFA {
 		bool RemoveSymbolFromTransition();
 		bool SetAllStatesDefaultColor();
 		bool DeleteTransition(int state, int transIndex);
+		bool DeleteTransitionById(int stateFrom, int stateTo);
 		int CheckStateTransitionCollision(sf::Vector2f position);
 		std::tuple<bool, int, std::string> CheckIfDfa();
+		int GetSelectedStateId(sf::Vector2f positionClicked);
+		int FindStateIndexById(int id);
+
 
 };

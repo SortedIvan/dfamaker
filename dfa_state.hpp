@@ -18,13 +18,14 @@ class DfaState {
 	private:
 		// ------- state related vars
 		std::string label;
+		int stateId;
 		std::vector<StateTransition> transitionObjects;
 		std::map<char, int> transitions;
 		std::vector<int> incomingTransitions;
+		std::vector<int> outgoingTransitions;
 		bool isAccepting = false;
 		bool isStarting;
 		startingOutline startingOutline;
-
 		// ------- graphics related vars
 		sf::Vector2f statePosition;
 		sf::Vector2f stateCenter;
@@ -67,7 +68,10 @@ class DfaState {
 		bool DeleteTransition(int transitionIndex);
 		bool DeleteTransitionTo(int toState);
 		bool AddIncomingTransition(int from);
+		bool AddOutgoingTransition(int to);
 		std::vector<int> GetIncomingTransitions();
+		std::vector<int> GetOutgoingTransitions();
+		bool DeleteOutgoingTransition(int value);
 		bool DeleteIncomingTransition(int value);
 		void SetAcceptingStateManually(bool truthValue);
 		int GetTransitionTo(char symbol);
@@ -80,6 +84,9 @@ class DfaState {
 		std::map<char, int> GetTransitions();
 		StateTransition GetTransition(int index);
 		void SetTransitionTo(int transitionIndex, int value);
+		void SetStateId(int id);
+		int GetStateId();
+		std::pair<int, StateTransition> GetTransitionByStateTo(int stateTo);
 		
 
 

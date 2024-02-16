@@ -52,6 +52,5 @@ class StateTransition {
 		char RemoveSingleSymbol();
 		bool CheckSymbolExists(char symbol);
 		
-		
 
 };

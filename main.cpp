@@ -132,7 +132,8 @@ int main() {
 
 	int selectedState = -1;
 	int highlightedState = -1;
-	int transitionCounter = 0;
+	int transitionCounter = 0; //<=	These can overflow, but unrealistic in practice
+	int stateCounter = 0;	   //<=|
 	bool stateIsSelected = false;
 	bool shiftHeldDown = false;
 	bool transitionIsSelected = false;
@@ -313,7 +314,7 @@ int main() {
 				}
 
 				if (dfa.CheckIfStateSelected(mousePos)) {
-					int tempSelected = dfa.GetSelectedStateIndex(mousePos);
+					int tempSelected = dfa.GetSelectedStateId(mousePos);
 					// && tempSelected != selectedState - put this in the below if statement for diff state logic
 					if (stateIsSelected && selectedState != -1) { // if a different state was selected
 
@@ -358,7 +359,9 @@ int main() {
 					}
 				}
 				else {
-					dfa.AddNewState("", (sf::Vector2f)GetMousePosition(window), font);
+					dfa.AddNewState("", (sf::Vector2f)GetMousePosition(window), font, stateCounter);
+
+					stateCounter++;
 					stateIsSelected = false;
 					selectedState = -1;
 					dfa.DeSelectTransition();

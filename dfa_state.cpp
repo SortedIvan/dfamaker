@@ -258,9 +258,19 @@ bool DfaState::AddIncomingTransition(int from) {
 	return true;
 }
 
+bool DfaState::AddOutgoingTransition(int to) {
+	outgoingTransitions.push_back(to);
+	return true;
+}
+
 std::vector<int> DfaState::GetIncomingTransitions() {
 	return incomingTransitions;
 }
+
+std::vector<int> DfaState::GetOutgoingTransitions() {
+	return outgoingTransitions;
+}
+
 
 bool DfaState::DeleteIncomingTransition(int value) {
 	
@@ -272,6 +282,17 @@ bool DfaState::DeleteIncomingTransition(int value) {
 	}
 	return true;
 }
+
+bool DfaState::DeleteOutgoingTransition(int value) {
+	for (int i = 0; i < outgoingTransitions.size(); i++) {
+		if (outgoingTransitions[i] == value) {
+			outgoingTransitions.erase(outgoingTransitions.begin() + i);
+			break;
+		}
+	}
+	return true;
+}
+
 
 int DfaState::GetTransitionTo(char symbol) {
 	if (transitions.find(symbol) == transitions.end()) {
@@ -344,6 +365,27 @@ StateTransition DfaState::GetTransition(int index) {
 	return transitionObjects[index];
 }
 
+std::pair<int, StateTransition> DfaState::GetTransitionByStateTo(int stateTo) {
+	for (int i = 0; i < transitionObjects.size(); i++) {
+		if (transitionObjects[i].GetTransitionTo() == stateTo) {
+
+			std::pair<int, StateTransition> result;
+			result.first = i;
+			result.second = transitionObjects[i];
+
+			return result;
+		}
+	}
+}
+
 void DfaState::SetTransitionTo(int transitionIndex, int value) {
 	transitionObjects[transitionIndex].SetTransitionTo(value);
+}
+
+void DfaState::SetStateId(int id) {
+	stateId = id;
+}
+
+int DfaState::GetStateId() {
+	return stateId;
 }
