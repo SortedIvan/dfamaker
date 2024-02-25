@@ -64,6 +64,7 @@ class StateTransition {
 		char RemoveSingleSymbol();
 		bool CheckSymbolExists(char symbol);
 		void ChangeTransitionDirection(TransitionDirection direction, sf::Vector2f stateFrom);
-		
+		void SetStateToPosition(sf::Vector2f newStateToPosition);
+		sf::Vector2f GetStateToPosition();
 
 };

@@ -393,3 +393,40 @@ int DfaState::GetStateId() {
 void DfaState::ChangeStateTransitionDirection(int selectedTransition, TransitionDirection direction) {
 	transitionObjects[selectedTransition].ChangeTransitionDirection(direction, stateCenter);
 }
+
+void DfaState::MoveStatePosition(sf::Vector2f newStatePosition) {
+
+	statePosition = newStatePosition;
+	stateCenter = newStatePosition;
+	stateCircle.setPosition(newStatePosition);
+	outlining.setPosition(newStatePosition);
+	acceptingOutline.setPosition(newStatePosition);
+	textLabel.setPosition(newStatePosition);
+
+	if (isStarting) {
+		sf::Vector2f dirVector(1, 0);
+
+		sf::Vector2f startingStatePointRef(statePosition.x - DEFAULT_STATE_RADIUS, statePosition.y);
+
+		this->startingOutline.mainArrow.setLinePoints(
+			sf::Vector2f(statePosition.x - DEFAULT_STATE_RADIUS - STARTING_STATE_ARROW_LEN, statePosition.y),
+			startingStatePointRef);
+
+		sf::Transform rotationTransform;
+		rotationTransform.rotate(45.f);
+
+		// Rotate the vector left (counter-clockwise)
+		sf::Vector2f rotatedLeft = rotationTransform.transformPoint(-dirVector);
+
+		// Reset the rotation matrix
+		rotationTransform = sf::Transform();
+
+		// Rotate the vector right (clockwise)
+		rotationTransform.rotate(-45.f); // negative angle for clockwise rotation
+		sf::Vector2f rotatedRight = rotationTransform.transformPoint(-dirVector);
+
+		this->startingOutline.arrowTipOne.setLinePoints(startingStatePointRef, rotatedLeft * 15.f + startingStatePointRef);
+		this->startingOutline.arrowTipTwo.setLinePoints(startingStatePointRef, rotatedRight * 15.f + startingStatePointRef);
+	}
+
+}

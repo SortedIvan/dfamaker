@@ -50,5 +50,6 @@ class DFA {
 		int GetSelectedStateId(sf::Vector2f positionClicked);
 		int FindStateIndexById(int id);
 		void ChangeStateTransitionDirection(TransitionDirection direction);
+		void MoveStatePosition(sf::Vector2f mousePosition, int selectedState);
 
 };

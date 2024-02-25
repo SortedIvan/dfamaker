@@ -39,7 +39,7 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected,sf::Font& font,
 	sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights, bool& errorMode);
 void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
-void HandleMouseHover(DFA& dfa, bool& mouseOverItem, int& highlightedState, sf::RenderWindow& window);
+void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window);
 bool ChangeTransitionDirection(DFA& dfa, sf::Event& e);
 
 
@@ -143,8 +143,11 @@ int main() {
 	bool textboxState = false;
 	bool mouseOverlayMode = true;
 	bool mouseOnDrawable = false;
-	bool mouseOverItem = false;
+	bool mouseOverState = false;
+	bool mouseOverTransition = false;
 	bool errorMode = false;
+	bool stateMovingMode = false;
+	int hoveredOverStateId = -1;
 
 	std::string inputString;
 
@@ -188,7 +191,7 @@ int main() {
 			}
 		}
 
-		HandleMouseHover(dfa, mouseOverItem, highlightedState, window);
+		HandleMouseHover(dfa, mouseOverState, mouseOverTransition, hoveredOverStateId, highlightedState, window);
 
 		// <------------End-Mouse-Overlay-Handling----------------------->
 
@@ -234,6 +237,7 @@ int main() {
 				if (e.key.code == sf::Keyboard::Tab) {
 					if (stateIsSelected) {
 						dfa.ChangeStateAccepting(selectedState);
+						continue;
 					}
 				}
 
@@ -275,7 +279,8 @@ int main() {
 						continue;
 					}
 				}
-				if (stateIsSelected) {
+
+				if (stateIsSelected && e.text.unicode != '\t') {
 					HandleStateLabelInput(e, dfa, selectedState);
 					continue;
 				}
@@ -293,6 +298,12 @@ int main() {
 			if (e.type == sf::Event::MouseButtonReleased) {
 				
 				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
+
+				if (stateMovingMode) {
+					stateMovingMode = false;
+				}
+
+
 
 				if (stringAcceptedState) { // first clear the accepted state
 					dfa.SetAllStatesDefaultColor();
@@ -387,6 +398,18 @@ int main() {
 		}
 
 		//<----------- End of event logic, anything that takes place before drawing ------------>
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+			
+			// Handle movement of state
+			if (stateIsSelected && mouseOverState 
+				&& hoveredOverStateId != -1 && hoveredOverStateId == selectedState) {
+
+				stateMovingMode = true;
+
+				sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+				dfa.MoveStatePosition((sf::Vector2f)mousePosition, selectedState);
+			}
+		}
 
 		// --------- clear the screen ----------
 		window.clear(DEFAULT_BG_COLOR);
@@ -410,7 +433,7 @@ int main() {
 		}
 ;
 
-		if (mouseOverlayMode && mouseOnDrawable && !mouseOverItem) {
+		if (mouseOverlayMode && mouseOnDrawable && !mouseOverState && !mouseOverTransition) {
 			window.draw(statePlacementIndicator);
 		}
 
@@ -546,9 +569,9 @@ bool DeleteTransition(sf::Event& e, DFA& dfa) {
 }
 
 void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder) {
-	if (e.text.unicode != '\b' && e.text.unicode != '\r' &&
+	if (e.type == sf::Event::TextEntered && e.text.unicode != '\b' && e.text.unicode != '\r' &&
 		e.key.code != sf::Keyboard::Left && e.key.code != sf::Keyboard::Right && e.text.unicode != 36
-		&& e.key.code != sf::Keyboard::Escape && e.key.code != '~' && e.key.code != sf::Keyboard::Tab)
+		&& e.key.code != sf::Keyboard::Escape && e.key.code != '~' && e.text.unicode != '\t')
 	{
 		inputString.push_back(e.text.unicode);
 	}
@@ -659,18 +682,21 @@ void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder) {
 	alphabetHolder.setString(alphabetString);
 }
 
-void HandleMouseHover(DFA& dfa, bool& mouseOverItem, int& highlightedState, sf::RenderWindow& window) {
+void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window) {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 
-	mouseOverItem = false;  // Set to false before checking states
+	mouseOverState = false;  // Set to false before checking states
+	mouseOverTransition = false;
+
 
 	for (int i = 0; i < dfa.GetStates().size(); i++) {
 		if (dfa.GetStates()[i].GetStateCircle().getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
-			mouseOverItem = true;  // Set to true if mouse is over any state
+			mouseOverState = true;  // Set to true if mouse is over any state
+			hoveredOverStateId = dfa.GetStates()[i].GetStateId();
 			break;  // No need to check further once we find a state under the mouse
 		}
 		if (dfa.CheckStateTransitionCollision((sf::Vector2f)mousePosition) == 0) {
-			mouseOverItem = true;
+			mouseOverTransition = true;
 			break;
 		}
 	}

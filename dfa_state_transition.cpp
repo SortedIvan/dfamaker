@@ -401,3 +401,10 @@ void StateTransition::ChangeTransitionDirection(TransitionDirection direction, s
 	arrowTipTwo.setLinePoints(pEnd, rotatedRight * 15.f + pEnd);
 
 }
+
+void StateTransition::SetStateToPosition(sf::Vector2f newStateToPosition) {
+	stateToPosition = newStateToPosition;
+}
+sf::Vector2f StateTransition::GetStateToPosition() {
+	return stateToPosition;
+}

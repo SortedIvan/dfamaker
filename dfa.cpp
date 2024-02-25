@@ -652,3 +652,16 @@ void DFA::ChangeStateTransitionDirection(TransitionDirection direction) {
 	int stateIndex = FindStateIndexById(currentSelectedTrans.first);
 	states[stateIndex].ChangeStateTransitionDirection(currentSelectedTrans.second, direction);
 }
+
+
+// TODO: Finish move state position
+void DFA::MoveStatePosition(sf::Vector2f mousePosition, int selectedState) {
+	int selectedStateIndex = FindStateIndexById(selectedState);
+	states[selectedStateIndex].MoveStatePosition(mousePosition);
+	
+	for (int i = 0; i < states[selectedStateIndex].GetIncomingTransitions().size(); i++) {
+		int index = FindStateIndexById(states[selectedStateIndex].GetIncomingTransitions()[i]);
+	}
+
+
+}
