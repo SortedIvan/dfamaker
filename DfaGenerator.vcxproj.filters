@@ -21,7 +21,7 @@
     <ClCompile Include="dfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Line.cpp">
+    <ClCompile Include="line.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dfa_state_transition.cpp">

@@ -1,6 +1,13 @@
 #pragma once
 #include "line.hpp"
 
+enum TransitionDirection {
+	TOP = 1,
+	BOTTOM = 2,
+	LEFT = 3,
+	RIGHT = 4
+};
+
 class StateTransition {
 	private: 
 		// For regular state transitions
@@ -25,6 +32,11 @@ class StateTransition {
 		std::vector<char> symbols;
 		float distance;
 		sf::Text transitionLabel;
+
+		// Variables to adjust direction and do future calculations
+		sf::Vector2f stateToPosition;
+		float stateFromRadius;
+		float stateToRadius;
 
 	public:
 		StateTransition();
@@ -51,6 +63,7 @@ class StateTransition {
 		bool AddTransitionSymbol(char symbol);
 		char RemoveSingleSymbol();
 		bool CheckSymbolExists(char symbol);
+		void ChangeTransitionDirection(TransitionDirection direction, sf::Vector2f stateFrom);
 		
 
 };

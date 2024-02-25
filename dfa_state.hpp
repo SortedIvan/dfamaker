@@ -87,7 +87,7 @@ class DfaState {
 		void SetStateId(int id);
 		int GetStateId();
 		std::pair<int, StateTransition> GetTransitionByStateTo(int stateTo);
-		
+		void ChangeStateTransitionDirection(int selectedTransition, TransitionDirection direction);
 
 
 

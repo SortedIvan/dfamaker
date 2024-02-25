@@ -222,7 +222,6 @@ void DFA::SetTransitionSymbol(char symbol) {
 	}
 }
 
-
 void DFA::DeSelectState() {
 	selectedState = -1;
 }
@@ -295,35 +294,40 @@ bool DFA::DeleteSelectedTransition() {
 }
 
 // TODO: Fix this
-// Probably will have to re-work and add state identifiers, rather than using stateTo and array indices
 bool DFA::DeleteState(int selectedState) {
-	int selectedStateIndex = FindStateIndexById(selectedState);
+	try {
+		int selectedStateIndex = FindStateIndexById(selectedState);
 
-	std::vector<int> incomingTransitions = states[selectedStateIndex].GetIncomingTransitions();
-	std::vector<int> outgoingTransitions = states[selectedStateIndex].GetOutgoingTransitions();
+		std::vector<int> incomingTransitions = states[selectedStateIndex].GetIncomingTransitions();
+		std::vector<int> outgoingTransitions = states[selectedStateIndex].GetOutgoingTransitions();
 
-	// Strip the state of all transitions and finally, delete the state itself
-	
-	for (int i = 0; i < incomingTransitions.size(); i++) {
-		DeleteTransitionById(incomingTransitions[i], selectedState);
+		// Strip the state of all transitions and finally, delete the state itself
+
+		for (int i = 0; i < incomingTransitions.size(); i++) {
+			DeleteTransitionById(incomingTransitions[i], selectedState);
+		}
+
+		// The only problem is here:
+		// for self loops, the incoming and outgoing are the same.
+
+		for (int i = 0; i < outgoingTransitions.size(); i++) {
+			DeleteTransitionById(selectedState, outgoingTransitions[i]);
+		}
+
+		states.erase(states.begin() + selectedStateIndex);
+
+		if (states.size()) {
+			// if not last state, we make another state accepting
+			states[0].SetIsStarting(true);
+		}
+
+		this->selectedState = -1;
+		return true;
 	}
-
-	// The only problem is here:
-	// for self loops, the incoming and outgoing are the same.
-
-	for (int i = 0; i < outgoingTransitions.size(); i++) {
-		DeleteTransitionById(selectedState, outgoingTransitions[i]);
+	catch (const std::exception& e) {
+		std::cout << e.what();
+		return false;
 	}
-
-	states.erase(states.begin() + selectedStateIndex);
-
-	if (states.size()) {
-		// if not last state, we make another state accepting
-		states[0].SetIsStarting(true);
-	}
-
-	this->selectedState = -1;
-	return true;
 }
 
 void DFA::ChangeStateAccepting(int selectedState) {
@@ -638,4 +642,13 @@ int DFA::FindStateIndexById(int id) {
 			return i;
 		}
 	}
+}
+
+void DFA::ChangeStateTransitionDirection(TransitionDirection direction) {
+	if (currentSelectedTrans.first == -1 || currentSelectedTrans.second == -1) {
+		return;
+	}
+
+	int stateIndex = FindStateIndexById(currentSelectedTrans.first);
+	states[stateIndex].ChangeStateTransitionDirection(currentSelectedTrans.second, direction);
 }

@@ -389,3 +389,7 @@ void DfaState::SetStateId(int id) {
 int DfaState::GetStateId() {
 	return stateId;
 }
+
+void DfaState::ChangeStateTransitionDirection(int selectedTransition, TransitionDirection direction) {
+	transitionObjects[selectedTransition].ChangeTransitionDirection(direction, stateCenter);
+}

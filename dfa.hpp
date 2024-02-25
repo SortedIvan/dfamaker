@@ -49,6 +49,6 @@ class DFA {
 		std::tuple<bool, int, std::string> CheckIfDfa();
 		int GetSelectedStateId(sf::Vector2f positionClicked);
 		int FindStateIndexById(int id);
-
+		void ChangeStateTransitionDirection(TransitionDirection direction);
 
 };

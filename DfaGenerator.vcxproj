@@ -142,7 +142,7 @@
     <ClCompile Include="dfa.cpp" />
     <ClCompile Include="dfa_state.cpp" />
     <ClCompile Include="dfa_state_transition.cpp" />
-    <ClCompile Include="Line.cpp" />
+    <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>

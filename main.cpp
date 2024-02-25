@@ -40,6 +40,8 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 	sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights, bool& errorMode);
 void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
 void HandleMouseHover(DFA& dfa, bool& mouseOverItem, int& highlightedState, sf::RenderWindow& window);
+bool ChangeTransitionDirection(DFA& dfa, sf::Event& e);
+
 
 int main() {
 
@@ -207,11 +209,24 @@ int main() {
 						}
 					}
 
+
 					if (stateIsSelected) { // Check to see if user wants to delete a state
 						dfa.DeleteState(selectedState);
 						UpdateAlphabetDisplay(dfa, alphabetHolder);
 						stateIsSelected = false;
 						continue;
+					}
+
+				}
+
+				// Check if user is trying to change the state direction
+				if (transitionIsSelected) {
+					bool changed = ChangeTransitionDirection(dfa, e); 
+
+					if (changed) {
+						dfa.DeSelectTransition();
+						stateIsSelected = false;
+						transitionIsSelected = false;
 					}
 
 				}
@@ -423,7 +438,7 @@ sf::Vector2i GetMousePosition(sf::RenderWindow& window) {
 void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState) {
 	if (e.text.unicode != '\b' && e.text.unicode != '\r' &&
 		e.key.code != sf::Keyboard::Left && e.key.code != sf::Keyboard::Right && e.text.unicode != 36
-		&& e.key.code != sf::Keyboard::Escape)
+		&& e.key.code != sf::Keyboard::Escape && e.key.code != sf::Keyboard::Tab)
 	{
 		dfa.ChangeStateLabelText(e, selectedState);
 	}
@@ -660,4 +675,23 @@ void HandleMouseHover(DFA& dfa, bool& mouseOverItem, int& highlightedState, sf::
 		}
 	}
 
+}
+
+bool ChangeTransitionDirection(DFA& dfa, sf::Event& e) {
+	switch (e.key.code) {
+		case sf::Keyboard::Right:
+			dfa.ChangeStateTransitionDirection(RIGHT);
+			return true;
+		case sf::Keyboard::Left:
+			dfa.ChangeStateTransitionDirection(LEFT);
+			return true;
+		case sf::Keyboard::Up:
+			dfa.ChangeStateTransitionDirection(TOP);
+			return true;
+		case sf::Keyboard::Down:
+			dfa.ChangeStateTransitionDirection(BOTTOM);
+			return true;
+	}
+
+	return false;
 }
