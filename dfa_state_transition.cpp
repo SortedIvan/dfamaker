@@ -325,19 +325,34 @@ void StateTransition::ChangeTransitionDirection(TransitionDirection direction, s
 	switch (direction) {
 		case RIGHT:
 		fixOffset = 5.f;
-		pStart = sf::Vector2f(stateFrom.x + stateFromRadius -3.f, (stateFrom.y + stateFromRadius / 2 - fixOffset));
-		firstInterim = sf::Vector2f(stateFrom.x + 2*stateFromRadius-3.f, stateFrom.y + stateFromRadius / 2 - fixOffset);
-		secondInterim = sf::Vector2f(stateFrom.x + 2*stateFromRadius-3.f, stateFrom.y - stateFromRadius / 2 - fixOffset);
+		pStart = sf::Vector2f(stateFrom.x + stateFromRadius -5.f, (stateFrom.y + stateFromRadius / 2 - fixOffset));
+		firstInterim = sf::Vector2f(stateFrom.x + 2*stateFromRadius-5.f, stateFrom.y + stateFromRadius / 2 - fixOffset);
+		secondInterim = sf::Vector2f(stateFrom.x + 2*stateFromRadius-5.f, stateFrom.y - stateFromRadius / 2 - fixOffset);
 		pEnd = sf::Vector2f(stateFrom.x + stateFromRadius-8.f, (stateFrom.y - stateFromRadius /2 - fixOffset));
 		dirVector = sf::Vector2f(-1, 0);
+
+		transitionLabel.setPosition(
+			sf::Vector2f(
+				stateFrom.x + stateFromRadius * 2 + fixOffset + 2.f,
+				stateFrom.y - stateFromRadius / 2
+		));
+
 		break;
-		case TOP:
+		case TOP: // default
 		fixOffset = 8.f;
 		pStart = sf::Vector2f(stateFrom.x + stateFromRadius / 2, (stateFrom.y - stateFromRadius + fixOffset));
 		firstInterim = sf::Vector2f(stateFrom.x + stateFromRadius / 2, stateFrom.y - stateFromRadius * 2 + fixOffset);
 		secondInterim = sf::Vector2f(stateFrom.x - stateFromRadius / 2, stateFrom.y - stateFromRadius * 2 + fixOffset);
 		pEnd = sf::Vector2f(stateFrom.x - stateFromRadius / 2, stateFrom.y - stateFromRadius + fixOffset);
 		dirVector = sf::Vector2f(0, 1);
+
+		transitionLabel.setPosition(
+			sf::Vector2f(
+				stateFrom.x,
+				stateFrom.y - stateFromRadius * 2 - fixOffset - 12.f
+			)
+		);
+
 		break;
 		case LEFT:
 		fixOffset = 5.f;
@@ -346,6 +361,14 @@ void StateTransition::ChangeTransitionDirection(TransitionDirection direction, s
 		secondInterim = sf::Vector2f(stateFrom.x - 2 * stateFromRadius + 3.f, stateFrom.y - stateFromRadius / 2 - fixOffset);
 		pEnd = sf::Vector2f(stateFrom.x - stateFromRadius + 8.f, (stateFrom.y - stateFromRadius / 2 - fixOffset));
 		dirVector = sf::Vector2f(1, 0);
+
+		transitionLabel.setPosition(
+			sf::Vector2f(
+				stateFrom.x - stateFromRadius * 2 - fixOffset - 12.f,
+				stateFrom.y - stateFromRadius / 2
+		));
+		break;
+
 		case BOTTOM:
 		fixOffset = 8.f;
 		pStart = sf::Vector2f(stateFrom.x + stateFromRadius / 2, (stateFrom.y + stateFromRadius - fixOffset));
@@ -353,6 +376,12 @@ void StateTransition::ChangeTransitionDirection(TransitionDirection direction, s
 		secondInterim = sf::Vector2f(stateFrom.x - stateFromRadius / 2, stateFrom.y + stateFromRadius * 2 - fixOffset);
 		pEnd = sf::Vector2f(stateFrom.x - stateFromRadius / 2, stateFrom.y + stateFromRadius - fixOffset);
 		dirVector = sf::Vector2f(0, -1);
+
+		transitionLabel.setPosition(
+			sf::Vector2f(
+				stateFrom.x,
+				stateFrom.y + stateFromRadius * 2 + fixOffset + 12.f
+			));
 
 		break;
 	}
@@ -370,12 +399,5 @@ void StateTransition::ChangeTransitionDirection(TransitionDirection direction, s
 
 	arrowTipOne.setLinePoints(pEnd, rotatedLeft * 15.f + pEnd);
 	arrowTipTwo.setLinePoints(pEnd, rotatedRight * 15.f + pEnd);
-
-	transitionLabel.setPosition(
-		sf::Vector2f(
-			stateFrom.x,
-			stateFrom.y - stateFromRadius * 2 - fixOffset - 12.f
-		)
-	);
 
 }
