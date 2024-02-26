@@ -35,7 +35,7 @@ DfaState::DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font
 
 	this->textLabel.setFont(font);
 	this->textLabel.setString(label);
-	this->textLabel.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS / 2 - 5, DEFAULT_STATE_RADIUS / 2)); // Center it in the circle
+	this->textLabel.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS / 2 - 8.f , DEFAULT_STATE_RADIUS / 2)); // Center it in the circle
 	this->textLabel.setPosition(statePosition);
 	this->textLabel.setCharacterSize(20);
 	this->textLabel.setFillColor(sf::Color::Black);
@@ -342,8 +342,6 @@ bool DfaState::CheckTransitionExists(char symbol) {
 	}
 	return false;
 }
-
-
 
 void DfaState::SetDefaultColor() {
 	stateCircle.setFillColor(DEFAULT_STATE_COLOR);

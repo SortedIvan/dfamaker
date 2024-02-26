@@ -37,6 +37,9 @@ class StateTransition {
 		sf::Vector2f stateToPosition;
 		float stateFromRadius;
 		float stateToRadius;
+		TransitionDirection direction = TOP; // default to top
+
+
 
 	public:
 		StateTransition();
