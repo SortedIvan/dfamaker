@@ -7,6 +7,106 @@ StateTransition::StateTransition() {
 
 }
 
+void StateTransition::MoveStateTransitionRegular(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius) {
+	sf::Vector2f dirVector = stateTo - stateFrom;
+
+	float vectorLength = std::roundf(std::sqrt(dirVector.x * dirVector.x + dirVector.y * dirVector.y));
+
+	arrowLength = vectorLength;
+
+	sf::Vector2f dirVectorNormalized =
+		sf::Vector2f(
+			dirVector.x / vectorLength,
+			dirVector.y / vectorLength
+		);
+	// 1) Calculate the rotation between the states
+	float rotationRadians = std::atan2(dirVectorNormalized.y, dirVectorNormalized.x);
+	float rotationDegrees = rotationRadians * (180 / M_PI); // Normalize to degrees
+	// 2) Calculate the distance between the states
+	float distance = std::sqrt(std::pow((stateTo.x - stateFrom.x), 2)
+		+ std::pow((stateTo.y - stateFrom.y), 2));
+
+	// 3) Calculate the out/in point
+	sf::Vector2f outgoingPoint = (dirVectorNormalized * stateFromRadius) + stateFrom;
+	sf::Vector2f toPoint = (-dirVectorNormalized * stateToRadius) + stateTo;
+
+	mainArrow.setLinePoints(outgoingPoint, toPoint);
+	// 4) Rotate the arrow tip lines
+	sf::Transform rotationTransform;
+	rotationTransform.rotate(45.f);
+
+	// Rotate the vector left (counter-clockwise)
+	sf::Vector2f rotatedLeft = rotationTransform.transformPoint(-dirVectorNormalized);
+
+	// Reset the rotation matrix
+	rotationTransform = sf::Transform();
+
+	// Rotate the vector right (clockwise)
+	rotationTransform.rotate(-45.f); // negative angle for clockwise rotation
+	sf::Vector2f rotatedRight = rotationTransform.transformPoint(-dirVectorNormalized);
+
+	arrowTipOne.setLinePoints(toPoint, rotatedLeft * 15.f + toPoint);
+	arrowTipTwo.setLinePoints(toPoint, rotatedRight * 15.f + toPoint);
+
+	// Set the transition label position:
+	float offset = 0.f;
+
+	// Leaving this as seperate checks for potential change in the future
+	if (rotationDegrees >= 0 && rotationDegrees <= 45) {
+		offset = 5.f;
+	}
+	else if (rotationDegrees >= -135 && rotationDegrees <= -90) {
+		offset = 5.f;
+	}
+
+	transitionLabel.setPosition(
+		sf::Vector2f(
+			stateFrom.x + dirVector.x / 2 + offset,
+			stateFrom.y + dirVector.y / 2
+		)
+	);
+
+	stateToPosition = stateTo;
+	this->stateFromRadius = stateFromRadius;
+	this->stateToRadius = stateToRadius;
+}
+
+void StateTransition::MoveStateTransitionSelfLoop(sf::Vector2f stateFrom) {
+
+	float fixOffset = 8.f;
+
+	sf::Vector2f pStart(stateFrom.x + stateFromRadius / 2, (stateFrom.y - stateFromRadius + fixOffset));
+	sf::Vector2f firstInterim(stateFrom.x + stateFromRadius / 2, stateFrom.y - stateFromRadius * 2 + fixOffset);
+	sf::Vector2f secondInterim(stateFrom.x - stateFromRadius / 2, stateFrom.y - stateFromRadius * 2 + fixOffset);
+	sf::Vector2f pEnd(stateFrom.x - stateFromRadius / 2, stateFrom.y - stateFromRadius + fixOffset);
+
+	isSelfLoop = true;
+
+	rhs.setLinePoints(pStart, firstInterim);
+	top.setLinePoints(firstInterim, secondInterim);
+	lhs.setLinePoints(secondInterim, pEnd);
+
+	sf::Vector2f dirVector(0, 1);
+
+	sf::Transform rotationTransform;
+	rotationTransform.rotate(45.f);
+	sf::Vector2f rotatedLeft = rotationTransform.transformPoint(-dirVector);
+	rotationTransform = sf::Transform();
+	rotationTransform.rotate(-45.f);
+	sf::Vector2f rotatedRight = rotationTransform.transformPoint(-dirVector);
+
+	arrowTipOne.setLinePoints(pEnd, rotatedLeft * 15.f + pEnd);
+	arrowTipTwo.setLinePoints(pEnd, rotatedRight * 15.f + pEnd);
+
+	transitionLabel.setPosition(
+		sf::Vector2f(
+			stateFrom.x,
+			stateFrom.y - stateFromRadius * 2 - fixOffset - 12.f
+		)
+	);
+}
+
+
 void StateTransition::SetUpStateTransition(
 	sf::Vector2f stateFrom, sf::Vector2f stateTo,
 	float stateFromRadius, float stateToRadius, 
@@ -249,7 +349,6 @@ bool StateTransition::AddTransitionSymbol(char symbol) {
 				symbolString.push_back(',');
 			}
 			symbolString.push_back(symbols[i]);
-			//offset -= 5.f;
 		}
 		float originalCenterX = transitionLabel.getPosition().x + transitionLabel.getLocalBounds().width / 2.0f;
 

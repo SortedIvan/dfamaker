@@ -6,7 +6,6 @@
 #include "line.hpp"
 #include "dfa_state_transition.hpp"
 
-
 struct startingOutline {
 	sfLine mainArrow;
 	sfLine arrowTipOne;
@@ -89,4 +88,7 @@ class DfaState {
 		std::pair<int, StateTransition> GetTransitionByStateTo(int stateTo);
 		void ChangeStateTransitionDirection(int selectedTransition, TransitionDirection direction);
 		void MoveStatePosition(sf::Vector2f newStatePosition);
+		void MoveStateTransitionPositionRegular(sf::Vector2f stateTo, int transitionIndex);
+		void MoveStateTransitionPositionSelfLoop(int transitionIndex);
+		int GetStateTransitionByTransitionTo(int transitionTo);
 };

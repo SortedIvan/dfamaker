@@ -118,8 +118,7 @@ bool DFA::AddNewTransition(int stateFrom, int stateTo, int id, sf::Font& font) {
 		stateToObj.GetStateCircle().getRadius(), stateTo, stateFrom, id, font);
 
 
-	// if stateFrom == stateTo, only add to one array
-
+	// if stateFrom == stateTo, only add to one array - for example incoming for consistency
 	if (stateFrom == stateTo) {
 		states[stateToIndex].AddIncomingTransition(stateFrom);
 		return true;
@@ -653,15 +652,31 @@ void DFA::ChangeStateTransitionDirection(TransitionDirection direction) {
 	states[stateIndex].ChangeStateTransitionDirection(currentSelectedTrans.second, direction);
 }
 
-
 // TODO: Finish move state position
 void DFA::MoveStatePosition(sf::Vector2f mousePosition, int selectedState) {
 	int selectedStateIndex = FindStateIndexById(selectedState);
 	states[selectedStateIndex].MoveStatePosition(mousePosition);
 	
 	for (int i = 0; i < states[selectedStateIndex].GetIncomingTransitions().size(); i++) {
-		int index = FindStateIndexById(states[selectedStateIndex].GetIncomingTransitions()[i]);
+
+		// self-loop
+		if (states[selectedStateIndex].GetIncomingTransitions()[i] == selectedState) {
+			states[selectedStateIndex].MoveStateTransitionPositionSelfLoop(
+				states[selectedStateIndex].GetStateTransitionByTransitionTo(selectedState)
+			);
+		}
+		else {
+			int indexFrom = FindStateIndexById(states[selectedStateIndex].GetIncomingTransitions()[i]);
+			states[indexFrom].MoveStateTransitionPositionRegular(states[selectedStateIndex].GetStateCenter(),
+				states[indexFrom].GetStateTransitionByTransitionTo(selectedState));
+		}
 	}
 
+	for (int i = 0; i < states[selectedStateIndex].GetOutgoingTransitions().size(); i++) {
+		int indexTo = FindStateIndexById(states[selectedStateIndex].GetOutgoingTransitions()[i]);
 
+		states[selectedStateIndex].MoveStateTransitionPositionRegular(states[indexTo].GetStateCenter(),
+			states[selectedStateIndex].GetStateTransitionByTransitionTo(states[selectedStateIndex]
+				.GetOutgoingTransitions()[i]));
+	}	
 }

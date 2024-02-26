@@ -430,3 +430,21 @@ void DfaState::MoveStatePosition(sf::Vector2f newStatePosition) {
 	}
 
 }
+
+void DfaState::MoveStateTransitionPositionRegular(sf::Vector2f stateTo, int transitionIndex) {
+	transitionObjects[transitionIndex].MoveStateTransitionRegular(stateCenter, stateTo, DEFAULT_STATE_RADIUS, DEFAULT_STATE_RADIUS);
+}
+
+int DfaState::GetStateTransitionByTransitionTo(int transitionTo) {
+	for (int i = 0; i < transitionObjects.size(); i++) {
+		if (transitionObjects[i].GetTransitionTo() == transitionTo) {
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void DfaState::MoveStateTransitionPositionSelfLoop(int transitionIndex) {
+	transitionObjects[transitionIndex].MoveStateTransitionSelfLoop(GetStateCenter());
+}

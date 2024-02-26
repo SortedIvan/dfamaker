@@ -77,6 +77,9 @@ void sfLine::SetSelfLoopPoint(const sf::Vector2f& center, float radius, float cu
 
 void sfLine::setLinePoints(sf::Vector2f pointA, sf::Vector2f pointB)
 {
+
+    boundingBoxes.clear();
+
     thickness = 4.f;
     color = sf::Color::White;
 

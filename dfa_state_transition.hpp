@@ -66,5 +66,7 @@ class StateTransition {
 		void ChangeTransitionDirection(TransitionDirection direction, sf::Vector2f stateFrom);
 		void SetStateToPosition(sf::Vector2f newStateToPosition);
 		sf::Vector2f GetStateToPosition();
+		void MoveStateTransitionRegular(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, float stateToRadius);
+		void MoveStateTransitionSelfLoop(sf::Vector2f stateFrom);
 
 };
