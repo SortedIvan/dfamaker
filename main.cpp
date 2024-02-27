@@ -303,8 +303,6 @@ int main() {
 					stateMovingMode = false;
 				}
 
-
-
 				if (stringAcceptedState) { // first clear the accepted state
 					dfa.SetAllStatesDefaultColor();
 					stringAcceptedState = false;

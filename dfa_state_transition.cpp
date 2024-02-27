@@ -71,10 +71,7 @@ void StateTransition::MoveStateTransitionRegular(sf::Vector2f stateFrom, sf::Vec
 	this->stateToRadius = stateToRadius;
 }
 
-
-
 void StateTransition::MoveStateTransitionSelfLoop(sf::Vector2f stateFrom) {
-
 
 	float fixOffset; // magic
 	sf::Vector2f pStart;
@@ -172,7 +169,6 @@ void StateTransition::MoveStateTransitionSelfLoop(sf::Vector2f stateFrom) {
 	arrowTipTwo.setLinePoints(pEnd, rotatedRight * 15.f + pEnd);
 
 }
-
 
 void StateTransition::SetUpStateTransition(
 	sf::Vector2f stateFrom, sf::Vector2f stateTo,
@@ -562,7 +558,6 @@ void StateTransition::ChangeTransitionDirection(TransitionDirection direction, s
 
 		break;
 	}
-
 
 	rhs.setLinePoints(pStart, firstInterim);
 	top.setLinePoints(firstInterim, secondInterim);

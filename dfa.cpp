@@ -183,7 +183,6 @@ int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 	return -2; // didn't find anything
 }
 
-
 void DFA::SetTransitionSymbol(char symbol) {
 	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
 		
@@ -241,58 +240,13 @@ void DFA::DeSelectTransition() {
 bool DFA::DeleteSelectedTransition() {
 	// Firstly, make sure the transition actually exists
 	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
-		
 		int selectedStateIndex = FindStateIndexById(currentSelectedTrans.first);
-
 		int to = states[selectedStateIndex].GetStateTransition(currentSelectedTrans.second).GetTransitionTo();
-		// using to, delete it from its incoming array
-		int toIndex = FindStateIndexById(to);
-
-		states[toIndex].DeleteIncomingTransition(currentSelectedTrans.first);
-
-		std::vector<char> transitionSymbolsDeleted = states[selectedStateIndex]
-			.GetTransition(currentSelectedTrans.second).GetTransitionSymbols();
-		
-		// delete the transition here
-		bool result = states[selectedStateIndex].DeleteTransition(
-			currentSelectedTrans.second
-		);
-
-		// After deletion, check whether the symbols are still contained in some transition
-		for (int i = 0; i < transitionSymbolsDeleted.size(); ++i) {
-			for (int k = 0; k < states.size(); ++k) {
-				if (states[k].CheckTransitionExists(transitionSymbolsDeleted[i])) {
-					// In-place solution for symbols that need removal:
-					// Pop out the symbols that do exist
-					transitionSymbolsDeleted.erase(transitionSymbolsDeleted.begin() + i);
-					// Since its in place, we reset the counter 
-					i = -1;
-					break;
-				}
-
-			}
-		}
-
-		for (int i = 0; i < transitionSymbolsDeleted.size(); i++) {
-			for (int k = 0; k < alphabet.size(); k++) {
-				if (alphabet[k] == transitionSymbolsDeleted[i]) {
-					alphabet.erase(alphabet.begin() + k);
-					break;
-				}
-			}
-		}
-
-		currentSelectedTrans.first = -1;
-		currentSelectedTrans.second = -1;
-		previousSelectedTrans.first = -1;
-		previousSelectedTrans.second = -1;
-
-		return result;
+		return DeleteTransitionById(currentSelectedTrans.first, to);
 	}
 	return false;
 }
 
-// TODO: Fix this
 bool DFA::DeleteState(int selectedState) {
 	try {
 		int selectedStateIndex = FindStateIndexById(selectedState);

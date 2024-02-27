@@ -39,8 +39,6 @@ class StateTransition {
 		float stateToRadius;
 		TransitionDirection direction = TOP; // default to top
 
-
-
 	public:
 		StateTransition();
 		void SetTransitionTo(int stateTo);
