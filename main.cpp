@@ -42,7 +42,6 @@ void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
 void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window);
 bool ChangeTransitionDirection(DFA& dfa, sf::Event& e);
 
-
 int main() {
 
 	sf::RenderWindow window(sf::VideoMode(1200, 800), "Test");
@@ -129,9 +128,25 @@ int main() {
 	errorMessage.setPosition(sf::Vector2f(sf::Vector2f(40.f, 55.f)));
 	errorMessage.setFont(font);
 
+	sf::RectangleShape automaticStateLabelsCheckBox(sf::Vector2f(25, 25));
+	sf::RectangleShape automaticStateLabelsCheckBoxChecked(sf::Vector2f(20, 20));
 
-	// <------------End-Overlay-Graphics----------------------->
+	sf::Text automaticStateLabelsText;
+	automaticStateLabelsText.setString("Automatic state labels");
+	automaticStateLabelsText.setCharacterSize(13.f);
+	automaticStateLabelsText.setFont(font);
 
+	automaticStateLabelsCheckBox.setFillColor(sf::Color::Transparent);
+	automaticStateLabelsCheckBox.setOutlineThickness(4.f);
+	automaticStateLabelsCheckBox.setOutlineColor(sf::Color::White);
+	automaticStateLabelsCheckBox.setPosition(sf::Vector2f(errorIndicator.getPosition().x + errorIndicator.getSize().x + 35.f, errorIndicator.getPosition().y));
+
+	automaticStateLabelsCheckBoxChecked.setFillColor(sf::Color::White);
+	automaticStateLabelsCheckBoxChecked.setPosition(sf::Vector2f(errorIndicator.getPosition().x + errorIndicator.getSize().x + 37.5f, errorIndicator.getPosition().y + 2.5f));
+
+	automaticStateLabelsText.setPosition(sf::Vector2f(errorIndicator.getPosition().x + errorIndicator.getSize().x + 75.f, errorIndicator.getPosition().y));
+
+	// <---------------End-Overlay-Graphics----------------------->
 	int selectedState = -1;
 	int highlightedState = -1;
 	int transitionCounter = 0; //<=	These can overflow, but unrealistic in practice
@@ -152,7 +167,6 @@ int main() {
 	std::string inputString;
 
 	// ---- test -----
-
 	while (window.isOpen()) {
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::LShift))
 		{
@@ -423,6 +437,10 @@ int main() {
 		DrawAllTextBoxEntriesAndHighlights(textBoxEntries, textBoxHighlights, window);
 		window.draw(alphabetHolder);
 
+		window.draw(automaticStateLabelsCheckBox);
+		window.draw(automaticStateLabelsCheckBoxChecked);
+		window.draw(automaticStateLabelsText);
+
 		window.draw(errorMessageLabel);
 		window.draw(errorIndicator);
 
@@ -506,8 +524,6 @@ float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs)
 {
 	return lhs.x * rhs.x + lhs.y + rhs.y;
 }
-
-
 
 //TO DO: Switch from curr way of collision checking to this
 sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f to) {

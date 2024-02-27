@@ -91,4 +91,5 @@ class DfaState {
 		void MoveStateTransitionPositionRegular(sf::Vector2f stateTo, int transitionIndex);
 		void MoveStateTransitionPositionSelfLoop(int transitionIndex);
 		int GetStateTransitionByTransitionTo(int transitionTo);
+		void ConfigureStartingOutline();
 };

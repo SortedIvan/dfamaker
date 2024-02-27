@@ -272,6 +272,7 @@ bool DFA::DeleteState(int selectedState) {
 		if (states.size()) {
 			// if not last state, we make another state accepting
 			states[0].SetIsStarting(true);
+			states[0].ConfigureStartingOutline();
 		}
 
 		this->selectedState = -1;
@@ -359,9 +360,6 @@ bool DFA::RemoveSymbolFromTransition() {
 
 		std::pair<bool,int> result = states[selectedStateIndex].DeleteSingleTransitionSymbol(currentSelectedTrans.second);
 		bool symbolExistsAfterRemoval = false;
-
-		std::cout << result.first;
-		std::cout << result.second;
 
 		if (result.first) {
 			if (result.second == 0) { // symbol deleted
