@@ -41,6 +41,7 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
 void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window);
 bool ChangeTransitionDirection(DFA& dfa, sf::Event& e);
+void SwitchAutomaticStateLabelling(bool& automaticStateLabeling, int& automaticStateLabelCounter);
 
 int main() {
 
@@ -157,12 +158,14 @@ int main() {
 	bool stringAcceptedState = false;
 	bool textboxState = false;
 	bool mouseOverlayMode = true;
-	bool mouseOnDrawable = false;
+	bool mouseOnPlaceable = false;
 	bool mouseOverState = false;
 	bool mouseOverTransition = false;
 	bool errorMode = false;
 	bool stateMovingMode = false;
 	int hoveredOverStateId = -1;
+	bool automaticStateLabelGeneration = true;
+	int automaticStateLabelCount = 0;
 
 	std::string inputString;
 
@@ -182,25 +185,31 @@ int main() {
 		if (mousePosition.x >= 0 && mousePosition.x < window.getSize().x &&
 			mousePosition.y >= 0 && mousePosition.y < window.getSize().y) {
 			// Mouse is on the screen
-			mouseOnDrawable = true;
+			mouseOnPlaceable = true;
 		}
 		else {
-			mouseOnDrawable = false;
+			mouseOnPlaceable = false;
 		}
 
-		// Check if mouse is ontop of textbox
+		// Check if mouse is ontop of error indicator textbox
 		if (textBox.getGlobalBounds().contains((sf::Vector2f)mousePosition)
 			|| errorIndicator.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
-			mouseOnDrawable = false;
+			mouseOnPlaceable = false;
 		}
 		else {
-			mouseOnDrawable = true;
+			mouseOnPlaceable = true;
 		}
 
+		if (automaticStateLabelsCheckBox.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
+			mouseOnPlaceable = false;
+		}
+		else {
+			mouseOnPlaceable = true;
+		}
 
 		if (mouseOverlayMode) { 
 			// update the overlay position
-			if (mouseOnDrawable) {
+			if (mouseOnPlaceable) {
 				statePlacementIndicator.setPosition((sf::Vector2f)mousePosition);
 			}
 		}
@@ -323,7 +332,6 @@ int main() {
 				}
 
 				// Check whether the user clicked in the text box
-
 				if (textBox.getGlobalBounds().contains(mousePos)) {
 					transitionIsSelected = true;
 					stateIsSelected = false;
@@ -334,6 +342,10 @@ int main() {
 					textboxState = true;
 
 					continue;
+				}
+
+				if (automaticStateLabelsCheckBox.getGlobalBounds().contains((sf::Vector2f)mousePos)) {
+					SwitchAutomaticStateLabelling(automaticStateLabelGeneration, automaticStateLabelCount);
 				}
 
 
@@ -397,7 +409,18 @@ int main() {
 					}
 				}
 				else {
-					dfa.AddNewState("", (sf::Vector2f)GetMousePosition(window), font, stateCounter);
+
+					if (!mouseOnPlaceable) {
+						continue;
+					}
+
+					if (automaticStateLabelGeneration) {
+						dfa.AddNewState("q" + std::to_string(automaticStateLabelCount), (sf::Vector2f)GetMousePosition(window), font, stateCounter);
+						automaticStateLabelCount += 1;
+					}
+					else {
+						dfa.AddNewState("", (sf::Vector2f)GetMousePosition(window), font, stateCounter);
+					}
 
 					stateCounter++;
 					stateIsSelected = false;
@@ -438,7 +461,11 @@ int main() {
 		window.draw(alphabetHolder);
 
 		window.draw(automaticStateLabelsCheckBox);
-		window.draw(automaticStateLabelsCheckBoxChecked);
+
+		if (automaticStateLabelGeneration) {
+			window.draw(automaticStateLabelsCheckBoxChecked);
+		}
+
 		window.draw(automaticStateLabelsText);
 
 		window.draw(errorMessageLabel);
@@ -449,7 +476,7 @@ int main() {
 		}
 ;
 
-		if (mouseOverlayMode && mouseOnDrawable && !mouseOverState && !mouseOverTransition) {
+		if (mouseOverlayMode && mouseOnPlaceable && !mouseOverState && !mouseOverTransition) {
 			window.draw(statePlacementIndicator);
 		}
 
@@ -497,6 +524,11 @@ void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa) {
 
 void AddStateTransitionBetweenStates() {
 
+}
+
+void SwitchAutomaticStateLabelling(bool& automaticStateLabeling, int& automaticStateLabelCounter) {
+	automaticStateLabeling = !automaticStateLabeling;
+	automaticStateLabelCounter = 0;
 }
 
 void RotateRectangle(sf::ConvexShape& rect, float angle) {
