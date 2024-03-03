@@ -33,6 +33,9 @@
     <ClCompile Include="utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="scalehandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dfa.hpp">
@@ -45,6 +48,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="line.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="globals.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scalehandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

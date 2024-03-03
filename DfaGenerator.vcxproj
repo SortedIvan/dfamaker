@@ -144,13 +144,16 @@
     <ClCompile Include="dfa_state_transition.cpp" />
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="scalehandler.cpp" />
     <ClCompile Include="utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dfa.hpp" />
     <ClInclude Include="dfa_state.hpp" />
     <ClInclude Include="dfa_state_transition.hpp" />
+    <ClInclude Include="globals.hpp" />
     <ClInclude Include="line.hpp" />
+    <ClInclude Include="scalehandler.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

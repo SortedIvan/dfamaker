@@ -285,9 +285,7 @@ bool DFA::DeleteState(int selectedState) {
 }
 
 void DFA::ChangeStateAccepting(int selectedState) {
-
 	int selectedStateIndex = FindStateIndexById(selectedState);
-
 	states[selectedStateIndex].SetIsAccepting();
 }
 

@@ -4,31 +4,22 @@
 #include <iostream>
 #include "dfa.hpp"
 #include "line.hpp"
+#include "scalehandler.hpp"
 
-# define M_PI  3.14159265358979323846  /* pi */
-
-/*
-	TODO: Have these placed only here, remove all other instances from different files
-*/
-const int DEFAULT_STATE_RADIUS = 40;
-const int DEFAULT_STATE_SELECTED_RADIUS = 25;
-const int DEFAULT_STATE_ACCEPTING_RADIUS = 35;
-const int STARTING_STATE_ARROW_LEN = 25.f;
-
-//const sf::Color DEFAULT_STATE_COLOR = sf::Color::White;
 const sf::Color STRING_ACCEPTED = sf::Color::Green;
 const sf::Color STRING_DECLINED = sf::Color::Red;
-
 const sf::Color DEFAULT_BG_COLOR(0x00, 0x01, 0x33);
 const sf::Color PLACEMENT_INDICATOR_OUTLINE(0x73, 0x93, 0xB3);
 const sf::Color DEFAULT_STATE_COLOR(255, 255, 255, 50);
 
-sf::Vector2i GetMousePosition(sf::RenderWindow& window);
+/*
+	- Function definitions -
+*/
+sf::Vector2f GetMousePosition(sf::RenderWindow& window);
 void TryLoadFont(sf::Font& font, std::string path);
 void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState);
 void RotateRectangle(sf::ConvexShape& rect, float angle);
 float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs);
-sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f to);
 void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa);
 bool DeleteTransition(sf::Event& e, DFA& dfa);
 void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder);
@@ -42,11 +33,15 @@ void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
 void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window);
 bool ChangeTransitionDirection(DFA& dfa, sf::Event& e);
 void SwitchAutomaticStateLabelling(bool& automaticStateLabeling, int& automaticStateLabelCounter);
+void TryLoadImage(sf::Image& image, std::string path);
+void HandleTextBoxTypingHighlighter(sf::Text& inputStringHolder, sf::RectangleShape& typingIndicator);
 
 int main() {
 
-	sf::RenderWindow window(sf::VideoMode(1200, 800), "Test");
+	sf::RenderWindow window(sf::VideoMode(SCREEN_X_SIZE, SCREEN_Y_SIZE), "Dfa Generator", sf::Style::Titlebar | sf::Style::Close);
 	sf::Event e;
+
+	ScaleHandler scaleHandler;
 
 	int transitionIdCounter = 0;
 
@@ -54,10 +49,15 @@ int main() {
 	// Define DFA logic here (to be moved onto somewhere else than main.cpp
 
 	sf::Font font;
+	sf::Image icon;
+
 	TryLoadFont(font, "./testfont.ttf");
+	TryLoadImage(icon, "./dfaicon.png");
+
+	window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 	
 	//<------------Begin-textbox-logic------------------------------->
-	sf::RectangleShape textBox(sf::Vector2f(300,window.getSize().y - 50.f));
+	sf::RectangleShape textBox(sf::Vector2f(300 + window.getSize().x / 1200, window.getSize().y - 50.f));
 	sf::RectangleShape textBoxSecondary(sf::Vector2f(300, 50.f));
 	sf::Text textBoxDescr;
 	sf::Text inputStringHolder; // used to show visually the input strings
@@ -92,6 +92,11 @@ int main() {
 	textBoxSecondary.setFillColor(sf::Color::Transparent);
 	textBoxSecondary.setOutlineThickness(5.f);
 	textBoxSecondary.setOutlineColor(sf::Color::White);
+
+	sf::RectangleShape highlightIndicator(sf::Vector2f(inputStringHolder.getCharacterSize() /2, inputStringHolder.getCharacterSize()));
+	highlightIndicator.setFillColor(sf::Color::White);
+	highlightIndicator.setPosition(sf::Vector2f(inputStringHolder.getPosition().x, inputStringHolder.getPosition().y + inputStringHolder.getCharacterSize() / 4));
+
 	// <------------End-textbox-graphics------------------------------>
 
 
@@ -107,8 +112,8 @@ int main() {
 
 	// <------------Overlay-Graphics---------------------------->
 	sf::CircleShape statePlacementIndicator;
-	statePlacementIndicator.setRadius(DEFAULT_STATE_RADIUS);
-	statePlacementIndicator.setOrigin(sf::Vector2f(DEFAULT_STATE_RADIUS, DEFAULT_STATE_RADIUS));
+	statePlacementIndicator.setRadius(scaleHandler.DEFAULT_STATE_RADIUS);
+	statePlacementIndicator.setOrigin(sf::Vector2f(scaleHandler.DEFAULT_STATE_RADIUS, scaleHandler.DEFAULT_STATE_RADIUS));
 	statePlacementIndicator.setFillColor(DEFAULT_STATE_COLOR);
 
 	sf::RectangleShape errorIndicator(sf::Vector2f(350, 100));
@@ -144,10 +149,12 @@ int main() {
 
 	automaticStateLabelsCheckBoxChecked.setFillColor(sf::Color::White);
 	automaticStateLabelsCheckBoxChecked.setPosition(sf::Vector2f(errorIndicator.getPosition().x + errorIndicator.getSize().x + 37.5f, errorIndicator.getPosition().y + 2.5f));
-
 	automaticStateLabelsText.setPosition(sf::Vector2f(errorIndicator.getPosition().x + errorIndicator.getSize().x + 75.f, errorIndicator.getPosition().y));
 
 	// <---------------End-Overlay-Graphics----------------------->
+
+
+
 	int selectedState = -1;
 	int highlightedState = -1;
 	int transitionCounter = 0; //<=	These can overflow, but unrealistic in practice
@@ -161,6 +168,7 @@ int main() {
 	bool mouseOnPlaceable = false;
 	bool mouseOverState = false;
 	bool mouseOverTransition = false;
+	bool mouseOverTextbox = false;
 	bool errorMode = false;
 	bool stateMovingMode = false;
 	int hoveredOverStateId = -1;
@@ -179,16 +187,14 @@ int main() {
 			shiftHeldDown = false;
 		}
 
+		mouseOnPlaceable = true;
 		
 		//	<------------Mouse-Overlay-Handling----------------------->
-		sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+		sf::Vector2i mousePosition = (sf::Vector2i)GetMousePosition(window);
 		if (mousePosition.x >= 0 && mousePosition.x < window.getSize().x &&
 			mousePosition.y >= 0 && mousePosition.y < window.getSize().y) {
 			// Mouse is on the screen
 			mouseOnPlaceable = true;
-		}
-		else {
-			mouseOnPlaceable = false;
 		}
 
 		// Check if mouse is ontop of error indicator textbox
@@ -196,15 +202,17 @@ int main() {
 			|| errorIndicator.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
 			mouseOnPlaceable = false;
 		}
+
+		if (textBox.getGlobalBounds().contains((sf::Vector2f)mousePosition) ||
+			textBoxSecondary.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
+			mouseOverTextbox = true;
+		}
 		else {
-			mouseOnPlaceable = true;
+			mouseOverTextbox = false;
 		}
 
 		if (automaticStateLabelsCheckBox.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
 			mouseOnPlaceable = false;
-		}
-		else {
-			mouseOnPlaceable = true;
 		}
 
 		if (mouseOverlayMode) { 
@@ -224,6 +232,10 @@ int main() {
 			}
 
 			if (e.type == sf::Event::KeyReleased) {
+				if (e.type == sf::Event::Resized) {
+					scaleHandler.UpdateConstants(window.getSize());
+				}
+
 				if (e.key.code == sf::Keyboard::Delete) {
 					if (transitionIsSelected) {
 						// First, check if user is trying to delete the transition
@@ -288,6 +300,7 @@ int main() {
 			{
 				if (textboxState) {
 					HandleInputStringTextEditing(inputString,e, inputStringHolder);
+					HandleTextBoxTypingHighlighter(inputStringHolder, highlightIndicator);
 					continue;
 				}
 
@@ -338,9 +351,7 @@ int main() {
 					selectedState = -1;
 					dfa.DeSelectState();
 					dfa.DeSelectTransition();
-
 					textboxState = true;
-
 					continue;
 				}
 
@@ -399,7 +410,7 @@ int main() {
 					else { // First time selecting state
 						selectedState = tempSelected;
 						stateIsSelected = true;
-						textboxState = false; // Exit textbox
+						textboxState = false;
 						dfa.DeSelectTransition();
 
 						if (selectedState >= 0) {
@@ -415,11 +426,14 @@ int main() {
 					}
 
 					if (automaticStateLabelGeneration) {
-						dfa.AddNewState("q" + std::to_string(automaticStateLabelCount), (sf::Vector2f)GetMousePosition(window), font, stateCounter);
+
+						std::cout << GetMousePosition(window).x << " " << GetMousePosition(window).y << std::endl;
+
+						dfa.AddNewState("q" + std::to_string(automaticStateLabelCount), mousePos, font, stateCounter);
 						automaticStateLabelCount += 1;
 					}
 					else {
-						dfa.AddNewState("", (sf::Vector2f)GetMousePosition(window), font, stateCounter);
+						dfa.AddNewState("", mousePos, font, stateCounter);
 					}
 
 					stateCounter++;
@@ -449,14 +463,17 @@ int main() {
 		// --------- clear the screen ----------
 		window.clear(DEFAULT_BG_COLOR);
 
-		// --------- draw on the screen ---------
 
-		
-		dfa.DrawAllStates(window);
+		// --------- draw on the screen ---------
+		if (mouseOverTextbox) {
+			window.draw(highlightIndicator);
+		}
+
 		window.draw(textBox);
 		window.draw(textBoxSecondary);
 		window.draw(textBoxDescr);
 		window.draw(inputStringHolder);
+		dfa.DrawAllStates(window);
 		DrawAllTextBoxEntriesAndHighlights(textBoxEntries, textBoxHighlights, window);
 		window.draw(alphabetHolder);
 
@@ -467,7 +484,6 @@ int main() {
 		}
 
 		window.draw(automaticStateLabelsText);
-
 		window.draw(errorMessageLabel);
 		window.draw(errorIndicator);
 
@@ -480,7 +496,6 @@ int main() {
 			window.draw(statePlacementIndicator);
 		}
 
-
 		// --------- display on the screen --------
 		window.display();
 
@@ -489,17 +504,18 @@ int main() {
 
 void TryLoadFont(sf::Font& font, std::string path)
 {
-	if (!font.loadFromFile(path))
-	{
+	if (!font.loadFromFile(path)) {
 		std::cout << "Error loading the font file" << std::endl;
 		system("pause");
 	}
 }
 
-sf::Vector2i GetMousePosition(sf::RenderWindow& window) {
-	return sf::Mouse::getPosition(window);
+void TryLoadImage(sf::Image& image, std::string path) {
+	if (!image.loadFromFile(path)) {
+		std::cout << "Error loading the image file at path: " + path << std::endl;
+		system("pause");
+	}
 }
-
 
 void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState) {
 	if (e.text.unicode != '\b' && e.text.unicode != '\r' &&
@@ -520,10 +536,6 @@ void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa) {
 	{
 		dfa.SetTransitionSymbol(e.key.code);
 	}
-}
-
-void AddStateTransitionBetweenStates() {
-
 }
 
 void SwitchAutomaticStateLabelling(bool& automaticStateLabeling, int& automaticStateLabelCounter) {
@@ -557,58 +569,6 @@ float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs)
 	return lhs.x * rhs.x + lhs.y + rhs.y;
 }
 
-//TO DO: Switch from curr way of collision checking to this
-sf::VertexArray Test(sf::RenderWindow& window, sf::Vector2f from, sf::Vector2f to) {
-	
-	float width = 6.f;
-
-	sf::Vector2f dirVector = to - from;
-
-	sf::Transform transform;
-
-	float distance = std::sqrt(std::pow((to.x - from.x), 2) + std::pow((to.y - from.y), 2));
-
-	//acos(a dot b / len(a) . len(b))
-
-	float adj = to.x - from.x;
-	float opp = to.y - from.y;
-	float hypp = std::sqrt(opp * opp + adj * adj);
-	//float angle = std::acos(adj / hypp) * (180 / M_PI);
-
-	float angle = std::atan2(opp, adj) * (180 / M_PI);
-	std::cout << angle << std::endl;
-
-	sf::Vector2f point1(from.x + width, from.y);
-	sf::Vector2f point2(from.x - width, from.y);
-	sf::Vector2f point3(from.x - width, from.y + distance);
-	sf::Vector2f point4(from.x + width, from.y + distance);
-
-	transform.rotate(angle - 90, from);
-
-	point1 = transform.transformPoint(point1);
-	point2 = transform.transformPoint(point2);
-	point3 = transform.transformPoint(point3);
-	point4 = transform.transformPoint(point4);
-
-	sf::VertexArray rect(sf::Quads, 4);
-	rect[0].position = point1;
-	rect[1].position = point2;
-	rect[2].position = point3;
-	rect[3].position = point4;
-
-	rect[0].texCoords = point1;
-	rect[1].texCoords = point2;
-	rect[2].texCoords = point3;
-	rect[3].texCoords = point4;
-
-	rect[0].color = sf::Color::Red;
-	rect[1].color = sf::Color::Yellow;
-	rect[2].color = sf::Color::Yellow;
-	rect[3].color = sf::Color::Red;
-
-	return rect;
-}
-
 bool DeleteTransition(sf::Event& e, DFA& dfa) {
 	dfa.DeleteSelectedTransition();
 	return true;
@@ -627,6 +587,16 @@ void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Te
 		}
 	}
 	inputStringHolder.setString(inputString);
+}
+
+void HandleTextBoxTypingHighlighter(sf::Text& inputStringHolder, sf::RectangleShape& typingIndicator) {
+	if (inputStringHolder.getString().getSize() > 0) {
+		sf::Vector2f position = inputStringHolder.findCharacterPos(inputStringHolder.getString().getSize() - 1);
+		typingIndicator.setPosition(sf::Vector2f(position.x + typingIndicator.getSize().x, position.y + inputStringHolder.getCharacterSize() / 4));
+	}
+	else {
+		typingIndicator.setPosition(sf::Vector2f(inputStringHolder.getPosition().x, inputStringHolder.getPosition().y + inputStringHolder.getCharacterSize() / 4));
+	}
 }
 
 void DrawAllTextBoxEntriesAndHighlights(std::vector<sf::Text>& textBoxEntries, std::vector<sf::RectangleShape>& hightlights,
@@ -689,6 +659,7 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 		errorMode = false;
 
 		highlight.setFillColor(semiTransparentColorGreen);
+		highlight.setFillColor(semiTransparentColorGreen);
 
 		if (stateIsSelected) {
 			dfa.DeSelectState();
@@ -729,11 +700,10 @@ void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder) {
 }
 
 void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window) {
-	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+	sf::Vector2i mousePosition = (sf::Vector2i)GetMousePosition(window);
 
 	mouseOverState = false;  // Set to false before checking states
 	mouseOverTransition = false;
-
 
 	for (int i = 0; i < dfa.GetStates().size(); i++) {
 		if (dfa.GetStates()[i].GetStateCircle().getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
@@ -746,7 +716,6 @@ void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,
 			break;
 		}
 	}
-
 }
 
 bool ChangeTransitionDirection(DFA& dfa, sf::Event& e) {
@@ -764,6 +733,10 @@ bool ChangeTransitionDirection(DFA& dfa, sf::Event& e) {
 			dfa.ChangeStateTransitionDirection(BOTTOM);
 			return true;
 	}
-
 	return false;
+}
+
+sf::Vector2f GetMousePosition(sf::RenderWindow& window) {
+	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+	return window.mapPixelToCoords(mousePosition);
 }
