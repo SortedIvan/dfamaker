@@ -1,5 +1,5 @@
-#include "scalehandler.hpp"
-#include "globals.hpp" // Include your global constants if needed
+#include "../hpp/scalehandler.hpp"
+#include "../hpp/globals.hpp" // Include your global constants if needed
 
 // Initialize the static members
 int ScaleHandler::SCREEN_X_SIZE = 1200;

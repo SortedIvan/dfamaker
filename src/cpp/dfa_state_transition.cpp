@@ -1,4 +1,4 @@
-#include "dfa_state_transition.hpp"
+#include "../hpp/dfa_state_transition.hpp"
 # define M_PI  3.14159265358979323846  /* pi */
 #include "SFML/Graphics.hpp"
 #include <iostream>

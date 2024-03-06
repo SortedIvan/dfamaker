@@ -15,45 +15,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="src\cpp\line.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dfa.cpp">
+    <ClCompile Include="src\cpp\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="line.cpp">
+    <ClCompile Include="src\cpp\scalehandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dfa_state_transition.cpp">
+    <ClCompile Include="src\cpp\utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dfa_state.cpp">
+    <ClCompile Include="src\cpp\dfa.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="utility.cpp">
+    <ClCompile Include="src\cpp\dfa_state.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="scalehandler.cpp">
+    <ClCompile Include="src\cpp\dfa_state_transition.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="dfa.hpp">
+    <ClInclude Include="src\hpp\line.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dfa_state.hpp">
+    <ClInclude Include="src\hpp\scalehandler.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="dfa_state_transition.hpp">
+    <ClInclude Include="src\hpp\dfa.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="line.hpp">
+    <ClInclude Include="src\hpp\dfa_state.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="globals.hpp">
+    <ClInclude Include="src\hpp\dfa_state_transition.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="scalehandler.hpp">
+    <ClInclude Include="src\hpp\globals.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

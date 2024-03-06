@@ -1,4 +1,4 @@
-#include "dfa_state.hpp"
+#include "../hpp/dfa_state.hpp"
 #include <iostream>
 
 const int DEFAULT_STATE_RADIUS = 40;

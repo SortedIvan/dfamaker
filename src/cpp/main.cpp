@@ -2,9 +2,9 @@
 #include <string>
 #include "SFML/Graphics.hpp"
 #include <iostream>
-#include "dfa.hpp"
-#include "line.hpp"
-#include "scalehandler.hpp"
+#include "../hpp/dfa.hpp"
+#include "../hpp/line.hpp"
+#include "../hpp/scalehandler.hpp"
 
 const sf::Color STRING_ACCEPTED = sf::Color::Green;
 const sf::Color STRING_DECLINED = sf::Color::Red;

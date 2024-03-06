@@ -1,4 +1,4 @@
-#include "dfa.hpp";
+#include "../hpp/dfa.hpp";
 #include <iostream>
 #include <set>
 

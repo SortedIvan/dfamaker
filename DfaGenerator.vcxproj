@@ -18,6 +18,23 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\cpp\dfa.cpp" />
+    <ClCompile Include="src\cpp\dfa_state.cpp" />
+    <ClCompile Include="src\cpp\dfa_state_transition.cpp" />
+    <ClCompile Include="src\cpp\line.cpp" />
+    <ClCompile Include="src\cpp\main.cpp" />
+    <ClCompile Include="src\cpp\scalehandler.cpp" />
+    <ClCompile Include="src\cpp\utility.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\hpp\dfa.hpp" />
+    <ClInclude Include="src\hpp\dfa_state.hpp" />
+    <ClInclude Include="src\hpp\dfa_state_transition.hpp" />
+    <ClInclude Include="src\hpp\globals.hpp" />
+    <ClInclude Include="src\hpp\line.hpp" />
+    <ClInclude Include="src\hpp\scalehandler.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -138,23 +155,6 @@
       <AdditionalDependencies>sfml-system.lib;sfml-window.lib;sfml-graphics.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="dfa.cpp" />
-    <ClCompile Include="dfa_state.cpp" />
-    <ClCompile Include="dfa_state_transition.cpp" />
-    <ClCompile Include="line.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="scalehandler.cpp" />
-    <ClCompile Include="utility.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="dfa.hpp" />
-    <ClInclude Include="dfa_state.hpp" />
-    <ClInclude Include="dfa_state_transition.hpp" />
-    <ClInclude Include="globals.hpp" />
-    <ClInclude Include="line.hpp" />
-    <ClInclude Include="scalehandler.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
