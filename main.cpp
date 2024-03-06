@@ -12,6 +12,9 @@ const sf::Color DEFAULT_BG_COLOR(0x00, 0x01, 0x33);
 const sf::Color PLACEMENT_INDICATOR_OUTLINE(0x73, 0x93, 0xB3);
 const sf::Color DEFAULT_STATE_COLOR(255, 255, 255, 50);
 
+const float TEXT_HIGHLIGHTER_CHANGE_SPEED = 0.7f;
+const float TYPING_EXITED_CD = 1.f;
+
 /*
 	- Function definitions -
 */
@@ -22,7 +25,7 @@ void RotateRectangle(sf::ConvexShape& rect, float angle);
 float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs);
 void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa);
 bool DeleteTransition(sf::Event& e, DFA& dfa);
-void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder);
+void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder, bool& isTyping);
 void DrawAllTextBoxEntriesAndHighlights(std::vector<sf::Text>& textBoxEntries,std::vector<sf::RectangleShape>& hightlights,
 	sf::RenderWindow& window);
 void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text& inputStringHolder,
@@ -153,8 +156,6 @@ int main() {
 
 	// <---------------End-Overlay-Graphics----------------------->
 
-
-
 	int selectedState = -1;
 	int highlightedState = -1;
 	int transitionCounter = 0; //<=	These can overflow, but unrealistic in practice
@@ -174,6 +175,10 @@ int main() {
 	int hoveredOverStateId = -1;
 	bool automaticStateLabelGeneration = true;
 	int automaticStateLabelCount = 0;
+	sf::Clock cursorTimer;
+	sf::Clock typingTimer;
+	bool cursorIndicator = true;
+	bool isTyping = false;
 
 	std::string inputString;
 
@@ -299,7 +304,7 @@ int main() {
 			if (e.type == sf::Event::TextEntered)
 			{
 				if (textboxState) {
-					HandleInputStringTextEditing(inputString,e, inputStringHolder);
+					HandleInputStringTextEditing(inputString,e, inputStringHolder, isTyping);
 					HandleTextBoxTypingHighlighter(inputStringHolder, highlightIndicator);
 					continue;
 				}
@@ -460,14 +465,36 @@ int main() {
 			}
 		}
 
+		// Blinking highlighter
+		if (cursorTimer.getElapsedTime().asSeconds() > TEXT_HIGHLIGHTER_CHANGE_SPEED) {
+			cursorIndicator = !cursorIndicator;
+			cursorTimer.restart();
+		}
+
+		// Exiting typing
+		if (isTyping) {
+			if (typingTimer.getElapsedTime().asSeconds() > TYPING_EXITED_CD) {
+				isTyping = false;
+				typingTimer.restart();
+			}
+		}
+
 		// --------- clear the screen ----------
 		window.clear(DEFAULT_BG_COLOR);
 
 
 		// --------- draw on the screen ---------
-		if (mouseOverTextbox) {
+
+		if (isTyping && mouseOverTextbox) {
+			std::cout << "huh";
 			window.draw(highlightIndicator);
 		}
+		if (mouseOverTextbox && !isTyping) {
+			if (cursorIndicator) {
+				window.draw(highlightIndicator);
+			}
+		}
+
 
 		window.draw(textBox);
 		window.draw(textBoxSecondary);
@@ -574,7 +601,7 @@ bool DeleteTransition(sf::Event& e, DFA& dfa) {
 	return true;
 }
 
-void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder) {
+void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder, bool& isTyping) {
 	if (e.type == sf::Event::TextEntered && e.text.unicode != '\b' && e.text.unicode != '\r' &&
 		e.key.code != sf::Keyboard::Left && e.key.code != sf::Keyboard::Right && e.text.unicode != 36
 		&& e.key.code != sf::Keyboard::Escape && e.key.code != '~' && e.text.unicode != '\t')
@@ -587,6 +614,7 @@ void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Te
 		}
 	}
 	inputStringHolder.setString(inputString);
+	isTyping = true;
 }
 
 void HandleTextBoxTypingHighlighter(sf::Text& inputStringHolder, sf::RectangleShape& typingIndicator) {
