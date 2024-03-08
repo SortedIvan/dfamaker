@@ -178,8 +178,14 @@ sf::Vector2f DfaState::GetStateCenter() {
 	return stateCenter;
 }
 
-void DfaState::DrawStateArrows(sf::RenderWindow& window) {
+void DfaState::DrawStateArrows(sf::RenderWindow& window, int selectedTransition) {
 	for (int i = 0; i < transitionObjects.size(); i++) {
+		if (selectedTransition == i) {
+			transitionObjects[i].SetTransitionColor(sf::Color::Yellow);
+		}
+		else {
+			transitionObjects[i].SetTransitionColor(sf::Color::White);
+		}
 		transitionObjects.at(i).Draw(window);
 	}
 }

@@ -61,7 +61,7 @@ class DfaState {
 		sf::Text& GetTextLabelRef();
 
 		void Draw(sf::RenderWindow& window, bool is_selected);
-		void DrawStateArrows(sf::RenderWindow& window);
+		void DrawStateArrows(sf::RenderWindow& window, int selectedTransition);
 		void ChangeTransitionColor(int transitionIndex, sf::Color color);
 		void SetTransitionSymbol(int transitionIndex, char symbol);
 		bool DeleteTransition(int transitionIndex);

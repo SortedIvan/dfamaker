@@ -77,11 +77,16 @@ void DFA::DrawAllStates(sf::RenderWindow& window) {
 
 		if (selectedState == states[i].GetStateId()) {
 			states[i].Draw(window, true);
-			states[i].DrawStateArrows(window);
 		}
 		else {
 			states[i].Draw(window, false);
-			states[i].DrawStateArrows(window);
+		}
+		
+		if (states[i].GetStateId() == currentSelectedTrans.first) {
+			states[i].DrawStateArrows(window, currentSelectedTrans.second);
+		}
+		else {
+			states[i].DrawStateArrows(window, -1);
 		}
 	}
 }
@@ -167,6 +172,7 @@ void DFA::SetSelectedState(int selectedState) {
 
 // this code is cheap and fucking sucks
 // it has to cycle through all states to find the transition that was clicked
+// TODO: Remove all commented out code
 int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 	for (int i = 0; i < states.size(); i++) {
 		for (int k = 0; k < states[i].GetTransitionObjects().size(); k++) {
@@ -180,27 +186,26 @@ int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 
 				if (currentSelectedTrans.first == trans.first && currentSelectedTrans.second == trans.second) {
 					// The same state was clicked;
-					std::cout << "The same state was clicked;";
+					std::cout << "The same transition was clicked;";
 
 					return 0;
 				}
 				
 				try {
-					// First time selecting a state
+					// First time selecting a transition
 					if (previousSelectedTrans.first == -1 && previousSelectedTrans.second == -1) {
 						previousSelectedTrans = trans;
 						currentSelectedTrans = trans;
-						states[i].ChangeTransitionColor(k, sf::Color::Yellow);
+						//states[i].ChangeTransitionColor(k, sf::Color::Yellow);
 					}
 					else {
 						previousSelectedTrans = currentSelectedTrans;
 
-						int previousSelectedIndex = FindStateIndexById(previousSelectedTrans.first);
-
-						states[previousSelectedIndex]
-							.ChangeTransitionColor(previousSelectedTrans.second, sf::Color::White);
+						//int previousSelectedIndex = FindStateIndexById(previousSelectedTrans.first);
+						//states[previousSelectedIndex] 
+						//.ChangeTransitionColor(previousSelectedTrans.second, sf::Color::White);
 						currentSelectedTrans = trans;
-						states[i].ChangeTransitionColor(k, sf::Color::Yellow);
+						//states[i].ChangeTransitionColor(k, sf::Color::Yellow);
 					}
 				}
 				catch (const std::exception& e) {

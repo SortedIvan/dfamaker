@@ -36,6 +36,7 @@
 #include "../hpp/line.hpp"
 #include "../hpp/scalehandler.hpp"
 
+
 const sf::Color STRING_ACCEPTED = sf::Color::Green;
 const sf::Color STRING_DECLINED = sf::Color::Red;
 const sf::Color DEFAULT_BG_COLOR(0x00, 0x01, 0x33);
@@ -84,8 +85,8 @@ int main() {
 	sf::Font font;
 	sf::Image icon;
 
-	TryLoadFont(font, "./testfont.ttf");
-	TryLoadImage(icon, "./dfaicon.png");
+	TryLoadFont(font, "testfont.ttf");
+	TryLoadImage(icon, "dfaicon.png");
 
 	window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 	
@@ -296,10 +297,11 @@ int main() {
 				if (transitionIsSelected) {
 					bool changed = ChangeTransitionDirection(dfa, e); 
 
-					if (changed) {
+					if (!changed) {
 						dfa.DeSelectTransition();
 						stateIsSelected = false;
 						transitionIsSelected = false;
+						errorMessage.setString("Something went wrong while trying to select transition");
 					}
 
 				}
@@ -331,8 +333,7 @@ int main() {
 
 			}
 
-			if (e.type == sf::Event::TextEntered)
-			{
+			if (e.type == sf::Event::TextEntered) {
 				if (textboxState) {
 					HandleInputStringTextEditing(inputString,e, inputStringHolder, isTyping);
 					HandleTextBoxTypingHighlighter(inputStringHolder, highlightIndicator);
@@ -381,7 +382,7 @@ int main() {
 
 				// Check whether the user clicked in the text box
 				if (textBox.getGlobalBounds().contains(mousePos)) {
-					transitionIsSelected = true;
+					transitionIsSelected = false;
 					stateIsSelected = false;
 					selectedState = -1;
 					dfa.DeSelectState();
@@ -437,11 +438,6 @@ int main() {
 
 						textboxState = false; // Exit textbox
 					}
-					else if (tempSelected != -2 && stateIsSelected && tempSelected == selectedState) { // self-loop
-						if (shiftHeldDown) {
-
-						}
-					}
 					else { // First time selecting state
 						selectedState = tempSelected;
 						stateIsSelected = true;
@@ -451,7 +447,6 @@ int main() {
 						if (selectedState >= 0) {
 							dfa.SetSelectedState(selectedState);
 						}
-
 					}
 				}
 				else {
@@ -512,11 +507,8 @@ int main() {
 		// --------- clear the screen ----------
 		window.clear(DEFAULT_BG_COLOR);
 
-
 		// --------- draw on the screen ---------
-
 		if (isTyping && mouseOverTextbox) {
-			std::cout << "huh";
 			window.draw(highlightIndicator);
 		}
 		if (mouseOverTextbox && !isTyping) {
@@ -524,7 +516,6 @@ int main() {
 				window.draw(highlightIndicator);
 			}
 		}
-
 
 		window.draw(textBox);
 		window.draw(textBoxSecondary);
