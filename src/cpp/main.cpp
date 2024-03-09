@@ -410,10 +410,10 @@ int main() {
 					textboxState = false;
 				}
 
-				if (dfa.CheckIfStateSelected(mousePos)) {
-					int tempSelected = dfa.GetSelectedStateId(mousePos);
-					// && tempSelected != selectedState - put this in the below if statement for diff state logic
-					if (stateIsSelected && selectedState != -1) { // if a different state was selected
+				int tempSelected = dfa.GetSelectedStateId(mousePos);
+				if (tempSelected != -2) {
+					// if a different state was selected
+					if (stateIsSelected && selectedState != -1) { 
 
 						if (shiftHeldDown) { // Add a new transition
 
@@ -429,7 +429,6 @@ int main() {
 						}
 						else {
 							selectedState = tempSelected;
-
 						}
 
 						if (selectedState >= 0) {
@@ -443,7 +442,6 @@ int main() {
 						stateIsSelected = true;
 						textboxState = false;
 						dfa.DeSelectTransition();
-
 						if (selectedState >= 0) {
 							dfa.SetSelectedState(selectedState);
 						}
@@ -478,10 +476,21 @@ int main() {
 
 		//<----------- End of event logic, anything that takes place before drawing ------------>
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-			
 			// Handle movement of state
+
+			if (hoveredOverStateId != -1 && !shiftHeldDown) {
+				selectedState = hoveredOverStateId;
+				stateIsSelected = true;
+				textboxState = false;
+				dfa.DeSelectTransition();
+
+				if (selectedState >= 0) {
+					dfa.SetSelectedState(selectedState);
+				}
+			}
+
 			if (stateIsSelected && mouseOverState 
-				&& hoveredOverStateId != -1 && hoveredOverStateId == selectedState) {
+				&& hoveredOverStateId != -1 && hoveredOverStateId == selectedState && !shiftHeldDown) {
 
 				stateMovingMode = true;
 
@@ -753,6 +762,7 @@ void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,
 
 	mouseOverState = false;  // Set to false before checking states
 	mouseOverTransition = false;
+	hoveredOverStateId = -1;
 
 	for (int i = 0; i < dfa.GetStates().size(); i++) {
 		if (dfa.GetStates()[i].GetStateCircle().getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
