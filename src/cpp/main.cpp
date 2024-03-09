@@ -36,18 +36,6 @@
 #include "../hpp/line.hpp"
 #include "../hpp/scalehandler.hpp"
 
-
-/*
-	Editor overlay constants
-*/
-const sf::Color STRING_ACCEPTED = sf::Color::Green;
-const sf::Color STRING_DECLINED = sf::Color::Red;
-const sf::Color DEFAULT_BG_COLOR(0x00, 0x01, 0x33);
-const sf::Color PLACEMENT_INDICATOR_OUTLINE(0x73, 0x93, 0xB3);
-const sf::Color DEFAULT_STATE_COLOR(255, 255, 255, 50);
-const float TEXT_HIGHLIGHTER_CHANGE_SPEED = 0.7f;
-const float TYPING_EXITED_CD = 1.f;
-
 /*
 	 Function definitions
 */
@@ -66,7 +54,9 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected,sf::Font& font,
 	sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights, bool& errorMode);
 void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
-void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window);
+void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,
+	int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window,
+	bool stateMovingMode);
 bool ChangeTransitionDirection(DFA& dfa, sf::Event& e);
 void SwitchAutomaticStateLabelling(bool& automaticStateLabeling, int& automaticStateLabelCounter);
 void TryLoadImage(sf::Image& image, std::string path);
@@ -82,6 +72,8 @@ int main() {
 		sf::VideoMode(SCREEN_X_SIZE, SCREEN_Y_SIZE),
 		"Dfa Generator",
 		sf::Style::Titlebar | sf::Style::Close);
+
+	window.setFramerateLimit(TARGET_FPS);
 
 	sf::Event e;
 
@@ -268,7 +260,7 @@ int main() {
 			}
 		}
 
-		HandleMouseHover(dfa, mouseOverState, mouseOverTransition, hoveredOverStateId, highlightedState, window);
+		HandleMouseHover(dfa, mouseOverState, mouseOverTransition, hoveredOverStateId, highlightedState, window, stateMovingMode);
 
 		// <------------End-Mouse-Overlay-Handling----------------------->
 
@@ -344,9 +336,7 @@ int main() {
 							inputStringHolder.getPosition().x,
 							inputStringHolder.getPosition().y + inputStringHolder.getCharacterSize() / 4
 						));
-
 				}
-
 			}
 
 			if (e.type == sf::Event::TextEntered) {
@@ -358,7 +348,7 @@ int main() {
 
 
 				// First, check for prevalent conditions
-				if (e.text.unicode == '\b') {
+				if (e.text.unicode == BACKSPACE) {
 					if (transitionIsSelected) {
 
 						dfa.RemoveSymbolFromTransition();
@@ -368,7 +358,7 @@ int main() {
 					}
 				}
 
-				if (stateIsSelected && e.text.unicode != '\t') {
+				if (stateIsSelected && e.text.unicode != TAB) {
 					HandleStateLabelInput(e, dfa, selectedState);
 					continue;
 				}
@@ -441,7 +431,6 @@ int main() {
 								transitionIdCounter++;
 							}
 							selectedState = tempSelected;
-
 						}
 						else {
 							selectedState = tempSelected;
@@ -494,7 +483,7 @@ int main() {
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 			// Handle movement of state
 
-			if (hoveredOverStateId != -1 && !shiftHeldDown) {
+			if (hoveredOverStateId != -1 && !shiftHeldDown && !stateMovingMode) {
 				selectedState = hoveredOverStateId;
 				stateIsSelected = true;
 				textboxState = false;
@@ -773,9 +762,13 @@ void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder) {
 	alphabetHolder.setString(alphabetString);
 }
 
-void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window) {
-	sf::Vector2i mousePosition = (sf::Vector2i)GetMousePosition(window);
+void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window, bool stateMovingMode) {
+	
+	if (stateMovingMode) {
+		return;
+	}
 
+	sf::Vector2i mousePosition = (sf::Vector2i)GetMousePosition(window);
 	mouseOverState = false;  // Set to false before checking states
 	mouseOverTransition = false;
 	hoveredOverStateId = -1;
