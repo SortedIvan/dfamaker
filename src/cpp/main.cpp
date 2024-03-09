@@ -5,7 +5,7 @@
  * GNU GENERAL PUBLIC LICENSE
  * Version 3, 29 June 2007
  *
- * Copyright (C) [year] Ivan Ovcharov
+ * Copyright (C) 2024 Ivan Ovcharov
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,17 +37,19 @@
 #include "../hpp/scalehandler.hpp"
 
 
+/*
+	Editor overlay constants
+*/
 const sf::Color STRING_ACCEPTED = sf::Color::Green;
 const sf::Color STRING_DECLINED = sf::Color::Red;
 const sf::Color DEFAULT_BG_COLOR(0x00, 0x01, 0x33);
 const sf::Color PLACEMENT_INDICATOR_OUTLINE(0x73, 0x93, 0xB3);
 const sf::Color DEFAULT_STATE_COLOR(255, 255, 255, 50);
-
 const float TEXT_HIGHLIGHTER_CHANGE_SPEED = 0.7f;
 const float TYPING_EXITED_CD = 1.f;
 
 /*
-	- Function definitions -
+	 Function definitions
 */
 sf::Vector2f GetMousePosition(sf::RenderWindow& window);
 void TryLoadFont(sf::Font& font, std::string path);
@@ -72,19 +74,25 @@ void HandleTextBoxTypingHighlighter(sf::Text& inputStringHolder, sf::RectangleSh
 
 int main() {
 
-	sf::RenderWindow window(sf::VideoMode(SCREEN_X_SIZE, SCREEN_Y_SIZE), "Dfa Generator", sf::Style::Titlebar | sf::Style::Close);
+	/*
+		Titlebar && Close prevent the screen from being resized by default
+		The application is not yet optimized for resizing
+	*/
+	sf::RenderWindow window(
+		sf::VideoMode(SCREEN_X_SIZE, SCREEN_Y_SIZE),
+		"Dfa Generator",
+		sf::Style::Titlebar | sf::Style::Close);
+
 	sf::Event e;
 
 	ScaleHandler scaleHandler;
 
-	int transitionIdCounter = 0;
-
-	DFA dfa;
-	// Define DFA logic here (to be moved onto somewhere else than main.cpp
-
 	sf::Font font;
 	sf::Image icon;
 
+	/*
+		Load the logo and main font for all text
+	*/
 	TryLoadFont(font, "testfont.ttf");
 	TryLoadImage(icon, "dfaicon.png");
 
@@ -103,7 +111,6 @@ int main() {
 	float textBoxYOffset = 35.f;
 	float stringEntriesBound = textBoxYOffset + 30.f;
 
-
 	textBoxDescr.setString("String history:");
 	textBoxDescr.setCharacterSize(20.f);
 	textBoxDescr.setPosition(window.getSize().x - textBoxXOffset - textBox.getSize().x + 10.f
@@ -118,7 +125,7 @@ int main() {
 	textBox.setPosition(window.getSize().x - textBoxXOffset - textBox.getSize().x
 		, textBoxYOffset);
 	textBox.setFillColor(sf::Color::Transparent);
-	textBox.setOutlineThickness(10.f);
+	textBox.setOutlineThickness(5.f);
 	textBox.setOutlineColor(sf::Color::White);
 
 	textBoxSecondary.setPosition(window.getSize().x - textBoxXOffset - textBox.getSize().x
@@ -187,6 +194,9 @@ int main() {
 
 	// <---------------End-Overlay-Graphics----------------------->
 
+	
+	DFA dfa;
+	int transitionIdCounter = 0;
 	int selectedState = -1;
 	int highlightedState = -1;
 	int transitionCounter = 0; //<=	These can overflow, but unrealistic in practice
@@ -290,7 +300,6 @@ int main() {
 						stateIsSelected = false;
 						continue;
 					}
-
 				}
 
 				// Check if user is trying to change the state direction
@@ -328,6 +337,13 @@ int main() {
 						errorMode = false;
 						errorMessage.setString("");
 					}
+
+					// Reset the typing highlight indicator to the default position
+					highlightIndicator.setPosition(
+						sf::Vector2f(
+							inputStringHolder.getPosition().x,
+							inputStringHolder.getPosition().y + inputStringHolder.getCharacterSize() / 4
+						));
 
 				}
 
