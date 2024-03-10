@@ -36,6 +36,7 @@
 #include "../hpp/line.hpp"
 #include "../hpp/scalehandler.hpp"
 #include "../hpp/filesystem.hpp"
+#include "../hpp/button.hpp"
 
 /*
 	 Function definitions
@@ -55,9 +56,9 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected,sf::Font& font,
 	sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights, bool& errorMode);
 void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder);
-void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,
+void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition, bool& mouseOverButton,
 	int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window,
-	bool stateMovingMode);
+	bool stateMovingMode, Button& saveFileBtn, Button& loadFileBtn);
 bool ChangeTransitionDirection(DFA& dfa, sf::Event& e);
 void SwitchAutomaticStateLabelling(bool& automaticStateLabeling, int& automaticStateLabelCounter);
 void TryLoadImage(sf::Image& image, std::string path);
@@ -78,6 +79,9 @@ int main() {
 
 	sf::Event e;
 
+	/*
+		Utility classes
+	*/ 
 	ScaleHandler scaleHandler;
 	FileSystem fileSystem;
 	
@@ -175,7 +179,7 @@ int main() {
 	sf::RectangleShape automaticStateLabelsCheckBoxChecked(sf::Vector2f(20, 20));
 
 	sf::Text automaticStateLabelsText;
-	automaticStateLabelsText.setString("Automatic state labels");
+	automaticStateLabelsText.setString("Auto state label");
 	automaticStateLabelsText.setCharacterSize(13.f);
 	automaticStateLabelsText.setFont(font);
 
@@ -188,9 +192,22 @@ int main() {
 	automaticStateLabelsCheckBoxChecked.setPosition(sf::Vector2f(errorIndicator.getPosition().x + errorIndicator.getSize().x + 37.5f, errorIndicator.getPosition().y + 2.5f));
 	automaticStateLabelsText.setPosition(sf::Vector2f(errorIndicator.getPosition().x + errorIndicator.getSize().x + 75.f, errorIndicator.getPosition().y));
 
+	/*
+		Button declarations
+		save & file, size is calculated with respect to the checkbox
+	*/
+	Button saveFileBtn(sf::Vector2f(
+		automaticStateLabelsText.getPosition().x + 150.f,
+		automaticStateLabelsCheckBox.getPosition().y),
+		sf::Vector2f(75.f, 40.f), font, "Save");
+
+	Button loadFileBtn(sf::Vector2f(
+		automaticStateLabelsText.getPosition().x + 250.f,
+		automaticStateLabelsCheckBox.getPosition().y),
+		sf::Vector2f(75.f, 40.f), font, "Load");
+
 	// <---------------End-Overlay-Graphics----------------------->
 
-	
 	DFA dfa;
 	int transitionIdCounter = 0;
 	int selectedState = -1;
@@ -203,10 +220,10 @@ int main() {
 	bool stringAcceptedState = false;
 	bool textboxState = false;
 	bool mouseOverlayMode = true;
-	bool mouseOnPlaceable = false;
 	bool mouseOverState = false;
 	bool mouseOverTransition = false;
 	bool mouseOverTextbox = false;
+	bool mouseOverButton = false;
 	bool errorMode = false;
 	bool stateMovingMode = false;
 	int hoveredOverStateId = -1;
@@ -216,6 +233,7 @@ int main() {
 	sf::Clock typingTimer;
 	bool cursorIndicator = true;
 	bool isTyping = false;
+	bool canPlace = false;
 
 	std::string inputString;
 
@@ -228,21 +246,13 @@ int main() {
 		else {
 			shiftHeldDown = false;
 		}
-
-		mouseOnPlaceable = true;
 		
 		//	<------------Mouse-Overlay-Handling----------------------->
 		sf::Vector2i mousePosition = (sf::Vector2i)GetMousePosition(window);
 		if (mousePosition.x >= 0 && mousePosition.x < window.getSize().x &&
 			mousePosition.y >= 0 && mousePosition.y < window.getSize().y) {
 			// Mouse is on the screen
-			mouseOnPlaceable = true;
-		}
-
-		// Check if mouse is ontop of error indicator textbox
-		if (textBox.getGlobalBounds().contains((sf::Vector2f)mousePosition)
-			|| errorIndicator.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
-			mouseOnPlaceable = false;
+			canPlace = true;
 		}
 
 		if (textBox.getGlobalBounds().contains((sf::Vector2f)mousePosition) ||
@@ -253,18 +263,21 @@ int main() {
 			mouseOverTextbox = false;
 		}
 
-		if (automaticStateLabelsCheckBox.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
-			mouseOnPlaceable = false;
-		}
+		canPlace = !mouseOverButton && !mouseOverTextbox && !mouseOverState && !mouseOverTransition
+			&& !errorIndicator.getGlobalBounds().contains((sf::Vector2f)mousePosition)
+			&& !automaticStateLabelsCheckBox.getGlobalBounds().contains((sf::Vector2f)mousePosition);
 
 		if (mouseOverlayMode) { 
 			// update the overlay position
-			if (mouseOnPlaceable) {
+			if (canPlace) {
 				statePlacementIndicator.setPosition((sf::Vector2f)mousePosition);
 			}
 		}
 
-		HandleMouseHover(dfa, mouseOverState, mouseOverTransition, hoveredOverStateId, highlightedState, window, stateMovingMode);
+		
+		HandleMouseHover(dfa, mouseOverState, mouseOverTransition,mouseOverButton,
+			hoveredOverStateId, highlightedState, window, stateMovingMode,
+			saveFileBtn, loadFileBtn);
 
 		// <------------End-Mouse-Overlay-Handling----------------------->
 
@@ -300,14 +313,6 @@ int main() {
 				// Check if user is trying to change the state direction
 				if (transitionIsSelected) {
 					bool changed = ChangeTransitionDirection(dfa, e); 
-
-					//if (!changed) {
-					//	//dfa.DeSelectTransition();
-					//	stateIsSelected = false;
-					//	transitionIsSelected = false;
-					//	errorMessage.setString("Something went wrong while trying to select transition");
-					//}
-
 				}
 
 				if (e.key.code == sf::Keyboard::Tab) {
@@ -458,32 +463,32 @@ int main() {
 					}
 				}
 				else {
+					if (canPlace) {
+						if (automaticStateLabelGeneration) {
 
-					if (!mouseOnPlaceable) {
-						continue;
+							std::cout << GetMousePosition(window).x << " " << GetMousePosition(window).y << std::endl;
+
+							dfa.AddNewState("q" + std::to_string(automaticStateLabelCount), mousePos, font, stateCounter);
+							automaticStateLabelCount += 1;
+							dfa.StateToString(stateCounter);
+						}
+						else {
+							dfa.AddNewState("", mousePos, font, stateCounter);
+						}
+
+						stateCounter++;
+						stateIsSelected = false;
+						selectedState = -1;
+						dfa.DeSelectTransition();
+						textboxState = false; // Exit textbox
 					}
-
-					if (automaticStateLabelGeneration) {
-
-						std::cout << GetMousePosition(window).x << " " << GetMousePosition(window).y << std::endl;
-
-						dfa.AddNewState("q" + std::to_string(automaticStateLabelCount), mousePos, font, stateCounter);
-						automaticStateLabelCount += 1;
-						dfa.StateToString(stateCounter);
-					}
-					else {
-						dfa.AddNewState("", mousePos, font, stateCounter);
-					}
-
-					stateCounter++;
-					stateIsSelected = false;
-					selectedState = -1;
-					dfa.DeSelectTransition();
-					textboxState = false; // Exit textbox
 				}
 			}
 
 		}
+
+		saveFileBtn.Update(GetMousePosition(window));
+		loadFileBtn.Update(GetMousePosition(window));
 
 		//<----------- End of event logic, anything that takes place before drawing ------------>
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
@@ -545,6 +550,9 @@ int main() {
 		DrawAllTextBoxEntriesAndHighlights(textBoxEntries, textBoxHighlights, window);
 		window.draw(alphabetHolder);
 
+		saveFileBtn.Render(window);
+		loadFileBtn.Render(window);
+
 		window.draw(automaticStateLabelsCheckBox);
 
 		if (automaticStateLabelGeneration) {
@@ -560,7 +568,7 @@ int main() {
 		}
 ;
 
-		if (mouseOverlayMode && mouseOnPlaceable && !mouseOverState && !mouseOverTransition) {
+		if (mouseOverlayMode && canPlace && !mouseOverState && !mouseOverTransition && !mouseOverButton) {
 			window.draw(statePlacementIndicator);
 		}
 
@@ -768,10 +776,19 @@ void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder) {
 	alphabetHolder.setString(alphabetString);
 }
 
-void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window, bool stateMovingMode) {
+void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,bool& mouseOverButton, 
+	int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window, bool stateMovingMode,
+	Button& saveFileBtn, Button& loadFileBtn) {
 	
 	if (stateMovingMode) {
 		return;
+	}
+
+	if (saveFileBtn.IsMouseOverButton() || loadFileBtn.IsMouseOverButton()) {
+		mouseOverButton = true;
+	}
+	else {
+		mouseOverButton = false;
 	}
 
 	sf::Vector2i mousePosition = (sf::Vector2i)GetMousePosition(window);
@@ -814,3 +831,4 @@ sf::Vector2f GetMousePosition(sf::RenderWindow& window) {
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 	return window.mapPixelToCoords(mousePosition);
 }
+
