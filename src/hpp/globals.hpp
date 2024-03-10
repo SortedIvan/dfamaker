@@ -25,13 +25,13 @@ const static int TARGET_FPS = 315;
 /*
 	Editor overlay constants
 */
-const sf::Color STRING_ACCEPTED = sf::Color::Green;
-const sf::Color STRING_DECLINED = sf::Color::Red;
-const sf::Color DEFAULT_BG_COLOR(0x00, 0x01, 0x33);
-const sf::Color PLACEMENT_INDICATOR_OUTLINE(0x73, 0x93, 0xB3);
-const sf::Color DEFAULT_STATE_COLOR(255, 255, 255, 50);
-const float TEXT_HIGHLIGHTER_CHANGE_SPEED = 0.7f;
-const float TYPING_EXITED_CD = 1.f;
+const static sf::Color STRING_ACCEPTED = sf::Color::Green;
+const static sf::Color STRING_DECLINED = sf::Color::Red;
+const static sf::Color DEFAULT_BG_COLOR(0x00, 0x01, 0x33);
+const static sf::Color PLACEMENT_INDICATOR_OUTLINE(0x73, 0x93, 0xB3);
+const static sf::Color DEFAULT_STATE_COLOR(255, 255, 255, 50);
+const static float TEXT_HIGHLIGHTER_CHANGE_SPEED = 0.7f;
+const static float TYPING_EXITED_CD = 1.f;
 
 /*
 	Character naming conventions

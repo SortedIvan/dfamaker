@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,21 +19,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="filesystem.cpp" />
     <ClCompile Include="src\cpp\dfa.cpp" />
     <ClCompile Include="src\cpp\dfa_state.cpp" />
     <ClCompile Include="src\cpp\dfa_state_transition.cpp" />
+    <ClCompile Include="src\cpp\filesystem.cpp" />
     <ClCompile Include="src\cpp\line.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
     <ClCompile Include="src\cpp\scalehandler.cpp" />
     <ClCompile Include="src\cpp\utility.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="filesystem.hpp" />
     <ClInclude Include="src\hpp\dfa.hpp" />
     <ClInclude Include="src\hpp\dfa_state.hpp" />
     <ClInclude Include="src\hpp\dfa_state_transition.hpp" />
+    <ClInclude Include="src\hpp\filesystem.hpp" />
     <ClInclude Include="src\hpp\globals.hpp" />
+    <ClInclude Include="src\hpp\json.hpp" />
     <ClInclude Include="src\hpp\line.hpp" />
     <ClInclude Include="src\hpp\scalehandler.hpp" />
   </ItemGroup>

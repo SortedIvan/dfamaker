@@ -35,6 +35,7 @@
 #include "../hpp/dfa.hpp"
 #include "../hpp/line.hpp"
 #include "../hpp/scalehandler.hpp"
+#include "../hpp/filesystem.hpp"
 
 /*
 	 Function definitions
@@ -78,6 +79,9 @@ int main() {
 	sf::Event e;
 
 	ScaleHandler scaleHandler;
+	FileSystem fileSystem;
+	
+	fileSystem.Test();
 
 	sf::Font font;
 	sf::Image icon;
@@ -285,7 +289,6 @@ int main() {
 						}
 					}
 
-
 					if (stateIsSelected) { // Check to see if user wants to delete a state
 						dfa.DeleteState(selectedState);
 						UpdateAlphabetDisplay(dfa, alphabetHolder);
@@ -298,12 +301,12 @@ int main() {
 				if (transitionIsSelected) {
 					bool changed = ChangeTransitionDirection(dfa, e); 
 
-					if (!changed) {
-						dfa.DeSelectTransition();
-						stateIsSelected = false;
-						transitionIsSelected = false;
-						errorMessage.setString("Something went wrong while trying to select transition");
-					}
+					//if (!changed) {
+					//	//dfa.DeSelectTransition();
+					//	stateIsSelected = false;
+					//	transitionIsSelected = false;
+					//	errorMessage.setString("Something went wrong while trying to select transition");
+					//}
 
 				}
 
@@ -336,6 +339,9 @@ int main() {
 							inputStringHolder.getPosition().x,
 							inputStringHolder.getPosition().y + inputStringHolder.getCharacterSize() / 4
 						));
+
+					dfa.DeSelectState();
+					dfa.DeSelectTransition();
 				}
 			}
 
@@ -365,8 +371,7 @@ int main() {
 				if (transitionIsSelected) {
 					HandleTransitionSymbolInput(e, dfa);
 					UpdateAlphabetDisplay(dfa, alphabetHolder);
-					// De-select transition after
-					dfa.DeSelectTransition();
+					//dfa.DeSelectTransition();
 					continue;
 				}
 
@@ -464,6 +469,7 @@ int main() {
 
 						dfa.AddNewState("q" + std::to_string(automaticStateLabelCount), mousePos, font, stateCounter);
 						automaticStateLabelCount += 1;
+						dfa.StateToString(stateCounter);
 					}
 					else {
 						dfa.AddNewState("", mousePos, font, stateCounter);

@@ -666,3 +666,12 @@ void DFA::MoveStatePosition(sf::Vector2f mousePosition, int selectedState) {
 				.GetOutgoingTransitions()[i]));
 	}	
 }
+
+void DFA::StateToString(int stateId) {
+	int stateIndex = FindStateIndexById(stateId);
+
+	std::cout << "State id: " << states[stateIndex].GetStateId() << std::endl;
+	std::cout << "State label:" << states[stateIndex].GetStateLabel() << std::endl;
+	std::cout << "State center: {x:" << states[stateIndex].GetStateCenter().x << ", y: " << states[stateIndex].GetStateCenter().y << " }" << std::endl;
+	std::cout << "State position: {x:" << states[stateIndex].GetStatePosition().x << ", y: " << states[stateIndex].GetStatePosition().y << " }" << std::endl;
+}

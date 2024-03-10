@@ -36,7 +36,7 @@
     <ClCompile Include="src\cpp\dfa_state_transition.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="filesystem.cpp">
+    <ClCompile Include="src\cpp\filesystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,7 +59,10 @@
     <ClInclude Include="src\hpp\globals.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="filesystem.hpp">
+    <ClInclude Include="src\hpp\filesystem.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hpp\json.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

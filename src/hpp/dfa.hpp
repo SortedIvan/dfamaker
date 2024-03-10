@@ -51,5 +51,6 @@ class DFA {
 		int FindStateIndexById(int id);
 		void ChangeStateTransitionDirection(TransitionDirection direction);
 		void MoveStatePosition(sf::Vector2f mousePosition, int selectedState);
+		void StateToString(int stateId);
 
 };

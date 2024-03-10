@@ -1,0 +1,43 @@
+{
+    "filename": "test",
+    "automaticStateLabels": false,
+    "automaticStateLabelCount": 2,
+    "stateCounter": 2,
+    "transitionCounter": 1,
+    "states": [
+        {
+            "label":"q0",
+            "stateId": 0,
+            "transitionObjects":[
+                {
+                    "id":0,
+                    "transitionTo":1,
+                    "transitionFrom":0,
+                    "isAssigned":true,
+                    "isSelfLoop": false,
+                    "symbols": ["a"]
+                }
+            ],
+            "transitions":{"a":1},
+            "incomingTransitions":[],
+            "outgoingTransitions": [1],
+            "isAccepting": false,
+            "isStarting": true,
+            "statePosition":{ "x": 200.0, "y": 300.0},
+            "stateCenter":{ "x": 200.0, "y": 300.0}
+
+        },
+        {
+            "label":"q1",
+            "stateId": 1,
+            "transitionObjects":[],
+            "transitions":{},
+            "incomingTransitions":[0],
+            "outgoingTransitions": [],
+            "isAccepting": false,
+            "isStarting": true,
+            "statePosition":{ "x": 200.0, "y": 500.0},
+            "stateCenter":{ "x": 200.0, "y": 500.0}
+        }
+    ]
+}
