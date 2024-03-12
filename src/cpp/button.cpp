@@ -35,6 +35,10 @@ void Button::Update(const sf::Vector2f& mousePosition) {
         // Check if the button is clicked
         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
             shape.setFillColor(activeColor);
+            wasPressed = true;
+        }
+        else {
+            wasPressed = false;
         }
 
         mouseOverButton = true;
@@ -50,10 +54,10 @@ void Button::Render(sf::RenderWindow& window) {
     window.draw(text);
 }
 
-bool Button::IsPressed() const {
-    return (shape.getFillColor() == activeColor);
-}
-
 bool Button::IsMouseOverButton() {
     return mouseOverButton;
+}
+
+bool Button::GetIsPressed() {
+    return wasPressed;
 }

@@ -374,6 +374,10 @@ bool DFA::CheckIfStringAccepted(std::string input) {
 		}
 	}
 
+	if (result.first) {
+		inputStrings.push_back(input);
+	}
+
 	return result.first;
 }
 bool DFA::RemoveSymbolFromTransition() {

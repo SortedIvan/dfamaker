@@ -20,7 +20,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  *
- * ---
  *
  * If you have questions or need further information, you can contact me through my GitHub:
  *
@@ -39,7 +38,7 @@
 #include "../hpp/button.hpp"
 
 /*
-	 Function definitions
+	 Function definitions 
 */
 sf::Vector2f GetMousePosition(sf::RenderWindow& window);
 void TryLoadFont(sf::Font& font, std::string path);
@@ -63,6 +62,7 @@ bool ChangeTransitionDirection(DFA& dfa, sf::Event& e);
 void SwitchAutomaticStateLabelling(bool& automaticStateLabeling, int& automaticStateLabelCounter);
 void TryLoadImage(sf::Image& image, std::string path);
 void HandleTextBoxTypingHighlighter(sf::Text& inputStringHolder, sf::RectangleShape& typingIndicator);
+void HandleButtonPresses(Button& saveFileButton, Button& loadFileButton, bool& saved);
 
 int main() {
 
@@ -84,8 +84,6 @@ int main() {
 	*/ 
 	ScaleHandler scaleHandler;
 	FileSystem fileSystem;
-	
-	fileSystem.Test();
 
 	sf::Font font;
 	sf::Image icon;
@@ -139,7 +137,6 @@ int main() {
 	highlightIndicator.setPosition(sf::Vector2f(inputStringHolder.getPosition().x, inputStringHolder.getPosition().y + inputStringHolder.getCharacterSize() / 4));
 
 	// <------------End-textbox-graphics------------------------------>
-
 
 	// <------------Alphabet-graphics--------------------------------->
 	sf::Text alphabetHolder;
@@ -207,7 +204,6 @@ int main() {
 		sf::Vector2f(75.f, 40.f), font, "Load");
 
 	// <---------------End-Overlay-Graphics----------------------->
-
 	DFA dfa;
 	int transitionIdCounter = 0;
 	int selectedState = -1;
@@ -234,6 +230,7 @@ int main() {
 	bool cursorIndicator = true;
 	bool isTyping = false;
 	bool canPlace = false;
+	bool saved = false;
 
 	std::string inputString;
 
@@ -274,16 +271,19 @@ int main() {
 			}
 		}
 
-		
-		HandleMouseHover(dfa, mouseOverState, mouseOverTransition,mouseOverButton,
-			hoveredOverStateId, highlightedState, window, stateMovingMode,
-			saveFileBtn, loadFileBtn);
+		HandleMouseHover(dfa, mouseOverState, mouseOverTransition,
+			mouseOverButton, hoveredOverStateId, highlightedState,
+			window, stateMovingMode, saveFileBtn, loadFileBtn);
 
 		// <------------End-Mouse-Overlay-Handling----------------------->
 
 		while (window.pollEvent(e)) {
 			if (e.type == sf::Event::Closed) {
 				window.close();
+			}
+
+			if (saveFileBtn.GetIsPressed()) {
+
 			}
 
 			if (e.type == sf::Event::KeyReleased) {
@@ -313,11 +313,16 @@ int main() {
 				// Check if user is trying to change the state direction
 				if (transitionIsSelected) {
 					bool changed = ChangeTransitionDirection(dfa, e); 
+
+					if (changed) {
+						saved = false;
+					}
 				}
 
 				if (e.key.code == sf::Keyboard::Tab) {
 					if (stateIsSelected) {
 						dfa.ChangeStateAccepting(selectedState);
+						saved = false;
 						continue;
 					}
 				}
@@ -336,6 +341,7 @@ int main() {
 							transitionIsSelected, font, window, textBoxHighlights, errorMode);
 						errorMode = false;
 						errorMessage.setString("");
+						saved = false;
 					}
 
 					// Reset the typing highlight indicator to the default position
@@ -354,6 +360,7 @@ int main() {
 				if (textboxState) {
 					HandleInputStringTextEditing(inputString,e, inputStringHolder, isTyping);
 					HandleTextBoxTypingHighlighter(inputStringHolder, highlightIndicator);
+					saved = false;
 					continue;
 				}
 
@@ -361,22 +368,23 @@ int main() {
 				// First, check for prevalent conditions
 				if (e.text.unicode == BACKSPACE) {
 					if (transitionIsSelected) {
-
 						dfa.RemoveSymbolFromTransition();
 						UpdateAlphabetDisplay(dfa, alphabetHolder);
 						transitionIsSelected = false;
+						saved = false;
 						continue;
 					}
 				}
 
 				if (stateIsSelected && e.text.unicode != TAB) {
 					HandleStateLabelInput(e, dfa, selectedState);
+					saved = false;
 					continue;
 				}
 				if (transitionIsSelected) {
 					HandleTransitionSymbolInput(e, dfa);
 					UpdateAlphabetDisplay(dfa, alphabetHolder);
-					//dfa.DeSelectTransition();
+					saved = false;
 					continue;
 				}
 
@@ -386,6 +394,9 @@ int main() {
 			if (e.type == sf::Event::MouseButtonReleased) {
 				
 				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
+
+				// Check if load/save button was clicked
+
 
 				if (stateMovingMode) {
 					stateMovingMode = false;
@@ -450,6 +461,7 @@ int main() {
 							dfa.SetSelectedState(selectedState);
 						}
 
+						saved = false;
 						textboxState = false; // Exit textbox
 					}
 					else { // First time selecting state
@@ -465,9 +477,7 @@ int main() {
 				else {
 					if (canPlace) {
 						if (automaticStateLabelGeneration) {
-
 							std::cout << GetMousePosition(window).x << " " << GetMousePosition(window).y << std::endl;
-
 							dfa.AddNewState("q" + std::to_string(automaticStateLabelCount), mousePos, font, stateCounter);
 							automaticStateLabelCount += 1;
 							dfa.StateToString(stateCounter);
@@ -481,6 +491,7 @@ int main() {
 						selectedState = -1;
 						dfa.DeSelectTransition();
 						textboxState = false; // Exit textbox
+						saved = false;
 					}
 				}
 			}
@@ -503,6 +514,7 @@ int main() {
 				if (selectedState >= 0) {
 					dfa.SetSelectedState(selectedState);
 				}
+				saved = false;
 			}
 
 			if (stateIsSelected && mouseOverState 
@@ -512,6 +524,7 @@ int main() {
 
 				sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 				dfa.MoveStatePosition((sf::Vector2f)mousePosition, selectedState);
+				saved = false;
 			}
 		}
 
@@ -832,3 +845,12 @@ sf::Vector2f GetMousePosition(sf::RenderWindow& window) {
 	return window.mapPixelToCoords(mousePosition);
 }
 
+void HandleButtonPresses(Button& saveFileButton, Button& loadFileButton, bool& saved) {
+	if (saveFileButton.GetIsPressed()) {
+		if (saved) {
+			return;
+		}
+
+
+	}
+}

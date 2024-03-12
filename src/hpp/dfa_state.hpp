@@ -32,7 +32,6 @@ class DfaState {
 		sf::CircleShape outlining;
 		sf::CircleShape acceptingOutline;
 		sf::Text textLabel;
-
 	public:
 		DfaState(std::string label, sf::Vector2f statePosition, sf::Font& font);
 		DfaState();
@@ -41,7 +40,6 @@ class DfaState {
 		void SetStateColor(sf::Color color);
 	    void SetIsStarting(bool isStarting);
 		void SetStateLabel(std::string label);
-
 		// Getters
 		std::string GetStateLabel();
 		bool GetIsAccepting();
@@ -51,15 +49,11 @@ class DfaState {
 		sf::Vector2f GetStateCenter();
 		std::vector<StateTransition> GetTransitionObjects();
 		StateTransition GetStateTransition(int index);
-
 		//bool AddStateTransition(char transitionChar, int toState);
 		void RemoveStateTransition(char transitionChar);
-
 		StateTransition AddStateTransition(sf::Vector2f stateFrom, sf::Vector2f stateTo, float stateFromRadius, 
 			float stateToRadius, int stateToValue, int stateFromValue, int id, sf::Font& font);
-	
 		sf::Text& GetTextLabelRef();
-
 		void Draw(sf::RenderWindow& window, bool is_selected);
 		void DrawStateArrows(sf::RenderWindow& window, int selectedTransition);
 		void ChangeTransitionColor(int transitionIndex, sf::Color color);

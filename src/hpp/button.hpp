@@ -11,6 +11,7 @@ private:
     sf::Color hoverColor;
     sf::Color activeColor;
     bool mouseOverButton = false;
+    bool wasPressed = false;
 
 public:
     Button(sf::Vector2f position, sf::Vector2f size, sf::Font& font, std::string buttonText);
@@ -18,6 +19,6 @@ public:
 
     void Update(const sf::Vector2f& mousePosition);
     void Render(sf::RenderWindow& window);
-    bool IsPressed() const;
     bool IsMouseOverButton();
+    bool GetIsPressed();
 };

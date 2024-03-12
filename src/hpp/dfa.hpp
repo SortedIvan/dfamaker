@@ -8,6 +8,7 @@ class DFA {
 	private:
 		std::vector<DfaState> states;
 		std::vector<char> alphabet;
+		std::vector<std::string> inputStrings;
 		int selectedState = -2;
 
 		int previousSelectedTransition = -2;
@@ -22,7 +23,6 @@ class DFA {
 		std::vector<DfaState> GetStates();
 		std::vector<char> GetAlphabet();
 		int GetSelectedStateIndex(sf::Vector2f positionClicked);
-		
 		void AddNewState(std::string label, sf::Vector2f position, sf::Font& font, int id);
 		void SetAlphabet(std::vector<char> alphabet);
 		void DrawAllStates(sf::RenderWindow& window);

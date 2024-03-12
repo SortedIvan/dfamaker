@@ -23,6 +23,7 @@
     <ClCompile Include="src\cpp\dfa.cpp" />
     <ClCompile Include="src\cpp\dfa_state.cpp" />
     <ClCompile Include="src\cpp\dfa_state_transition.cpp" />
+    <ClCompile Include="src\cpp\file.cpp" />
     <ClCompile Include="src\cpp\filesystem.cpp" />
     <ClCompile Include="src\cpp\line.cpp" />
     <ClCompile Include="src\cpp\main.cpp" />
@@ -34,6 +35,7 @@
     <ClInclude Include="src\hpp\dfa.hpp" />
     <ClInclude Include="src\hpp\dfa_state.hpp" />
     <ClInclude Include="src\hpp\dfa_state_transition.hpp" />
+    <ClInclude Include="src\hpp\file.hpp" />
     <ClInclude Include="src\hpp\filesystem.hpp" />
     <ClInclude Include="src\hpp\globals.hpp" />
     <ClInclude Include="src\hpp\json.hpp" />
