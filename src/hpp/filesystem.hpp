@@ -1,6 +1,8 @@
 #pragma once
 #include "../hpp/file.hpp"
 #include "../hpp/json.hpp"
+#include "SFML/Graphics.hpp"
+
 
 using json = nlohmann::json;
 

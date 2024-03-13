@@ -85,6 +85,8 @@ int main() {
 	ScaleHandler scaleHandler;
 	FileSystem fileSystem;
 
+	fileSystem.LoadFile("filestructure.json");
+
 	sf::Font font;
 	sf::Image icon;
 

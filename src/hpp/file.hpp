@@ -8,6 +8,7 @@ private:
 
 public:
 	File(std::string fileName, std::string path);
+	File();
 	std::string GetFileName();
 	std::string GetPath();
 };

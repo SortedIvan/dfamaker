@@ -13,3 +13,7 @@ std::string File::GetFileName() {
 std::string File::GetPath() {
 	return path;
 }
+
+File::File() {
+
+}
