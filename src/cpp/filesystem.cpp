@@ -24,11 +24,7 @@ void FileSystem::LoadFile(std::string path) {
 		int stateCounter = data["stateCounter"];
 		int transitionCounter = data["transitionCounter"];
 		std::vector<std::string> inputStrings = data["inputStrings"].get<std::vector<std::string>>();
-		//std::vector<StateDto> states = LoadStateDtoObjects(data);
-
-
-		std::cout << data["filename"];
-
+		std::vector<StateDto> states = LoadStateDtoObjects(data);
 
 	}
 	catch (json::parse_error& ex)
@@ -63,10 +59,21 @@ FileSystem::FileSystem() {
 std::vector<StateDto> FileSystem::LoadStateDtoObjects(json& data)
 {
 	json states = data["states"];
-	
+	std::vector<StateDto> loadedStates;
+
 	for (const auto& state : states) {
+
+		std::string label = state["label"];
+		int stateId = state["stateId"];
+
 
 	}
 }
 
+std::vector<TransitionObjectDto> FileSystem::LoadStateTransitionDtoObjects(json& data) {
 
+	for (const auto& transition : data) {
+
+
+	}
+}

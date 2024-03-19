@@ -41,4 +41,5 @@ public:
 	void SaveLoadedFile();
 	void SaveNewFile();
 	std::vector<StateDto> LoadStateDtoObjects(json& data);
+	std::vector<TransitionObjectDto> LoadStateTransitionDtoObjects(json& data);
 };
