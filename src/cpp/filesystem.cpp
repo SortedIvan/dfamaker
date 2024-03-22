@@ -61,19 +61,48 @@ std::vector<StateDto> FileSystem::LoadStateDtoObjects(json& data)
 	json states = data["states"];
 	std::vector<StateDto> loadedStates;
 
-	for (const auto& state : states) {
+	for (auto& state : states) {
 
 		std::string label = state["label"];
 		int stateId = state["stateId"];
+		std::vector<TransitionObjectDto> transObjects;
+		LoadStateTransitionDtoObjects(state["transitionObjects"], transObjects);
+		auto transitionsJson = state["transitions"];
+		std::map<char, int> transitions;
+		for (auto it = transitionsJson.begin(); it != transitionsJson.end(); ++it) {
+			std::cout << "    " << it.key() << " -> " << it.value() << std::endl;
+			transitions.insert({ it.key()[0], it.value()});
+		}
 
+		std::vector<int> incomingTransitions = state["incomingTransitions"].get<std::vector<int>>();
+		std::vector<int> outgoingTransitions = state["outgoingTransitions"].get<std::vector<int>>();
+		bool isAccepting = state["isAccepting"];
+		bool isStarting = state["isStarting"];
 
+		auto statePosition = state["statePosition"];
+		float statePosX = statePosition["x"];
+		float statePosY = statePosition["y"];
+
+		auto stateCenter = state["stateCenter"];
+		float stateCenterX = stateCenter["x"];
+		float stateCenterY = stateCenter["y"];
 	}
 }
 
-std::vector<TransitionObjectDto> FileSystem::LoadStateTransitionDtoObjects(json& data) {
+void FileSystem::LoadStateTransitionDtoObjects(json& data, std::vector<TransitionObjectDto>& transObjects) {
 
 	for (const auto& transition : data) {
-
-
+		TransitionObjectDto transitionObj;
+		transitionObj.id = transition["id"];
+		transitionObj.transitionTo = transition["transitionTo"];
+		transitionObj.transitionFrom = transition["transitionFrom"];
+		transitionObj.isAssigned = transition["isAssigned"];
+		transitionObj.isSelfLoop = transition["isSelfLoop"];
+		std::vector<std::string> symbols = transition["symbols"].get<std::vector<std::string>>();
+		for (int i = 0; i < symbols.size(); i++) {
+			transitionObj.symbols.push_back(symbols[i][0]);
+		}
+		
+		transObjects.push_back(transitionObj);
 	}
 }

@@ -12,7 +12,7 @@ struct TransitionObjectDto {
 	int transitionFrom;
 	bool isAssigned;
 	bool isSelfLoop;
-	std::vector<std::string> symbols;
+	std::vector<char> symbols;
 };
 
 struct StateDto {
@@ -41,5 +41,5 @@ public:
 	void SaveLoadedFile();
 	void SaveNewFile();
 	std::vector<StateDto> LoadStateDtoObjects(json& data);
-	std::vector<TransitionObjectDto> LoadStateTransitionDtoObjects(json& data);
+	void LoadStateTransitionDtoObjects(json& data, std::vector<TransitionObjectDto>& transObjects);
 };
