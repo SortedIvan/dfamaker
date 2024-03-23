@@ -349,6 +349,12 @@ std::pair<bool, DfaState> DFA::CheckStringAcceptingRecurs(DfaState currentState,
 	return CheckStringAcceptingRecurs(nextState, input, position + 1);
 }
 
+void DFA::SetStartingState(int id) {
+	int stateId = FindStateIndexById(id);
+	states[stateId].SetIsStarting(true);
+}
+
+
 bool DFA::CheckIfStringAccepted(std::string input) {
 	// Check if there are any states in the DFA
 	if (states.empty()) {

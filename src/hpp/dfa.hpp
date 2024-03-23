@@ -39,7 +39,7 @@ class DFA {
 		bool DeleteState(int selectedState);
 		void ChangeStateAccepting(int selectedState);
 		bool CheckIfStringAccepted(std::string input);
-		void SetStartingState(int index);
+		void SetStartingState(int id);
 		std::pair<bool, DfaState> CheckStringAcceptingRecurs(DfaState currentState, std::string input, size_t position);
 		bool RemoveSymbolFromTransition();
 		bool SetAllStatesDefaultColor();

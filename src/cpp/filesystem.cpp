@@ -10,7 +10,7 @@
 
 using json = nlohmann::json;
 
-void FileSystem::LoadFile(std::string path) {
+DfaFile FileSystem::LoadFile(std::string path) {
 	try
 	{
 		std::ifstream file(path);
@@ -26,6 +26,10 @@ void FileSystem::LoadFile(std::string path) {
 		std::vector<std::string> inputStrings = data["inputStrings"].get<std::vector<std::string>>();
 		std::vector<StateDto> states = LoadStateDtoObjects(data);
 
+		DfaFile dfaFile(filename, path, automaticStateLabels, automaticStateLabelCount, stateCounter, transitionCounter,
+			inputStrings, states);
+
+		return dfaFile;
 	}
 	catch (json::parse_error& ex)
 	{
@@ -43,10 +47,7 @@ void FileSystem::SaveLoadedFile() {
 		std::cout << "File already saved";
 		return;
 	}
-
-
 }
-
 
 void FileSystem::SaveNewFile() {
 
@@ -70,7 +71,6 @@ std::vector<StateDto> FileSystem::LoadStateDtoObjects(json& data)
 		auto transitionsJson = state["transitions"];
 		std::map<char, int> transitions;
 		for (auto it = transitionsJson.begin(); it != transitionsJson.end(); ++it) {
-			std::cout << "    " << it.key() << " -> " << it.value() << std::endl;
 			transitions.insert({ it.key()[0], it.value()});
 		}
 
