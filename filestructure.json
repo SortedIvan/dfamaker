@@ -25,12 +25,12 @@
       "isAccepting": false,
       "isStarting": true,
       "statePosition": {
-        "x": 200.0,
-        "y": 300.0
+        "x": 315.0,
+        "y": 450.0
       },
       "stateCenter": {
-        "x": 200.0,
-        "y": 300.0
+        "x": 315.0,
+        "y": 450.0
       }
     },
     {
@@ -43,12 +43,12 @@
       "isAccepting": false,
       "isStarting": true,
       "statePosition": {
-        "x": 200.0,
-        "y": 500.0
+        "x": 600.0,
+        "y": 350.0
       },
       "stateCenter": {
-        "x": 200.0,
-        "y": 500.0
+        "x": 600.0,
+        "y": 350.0
       }
     }
   ]

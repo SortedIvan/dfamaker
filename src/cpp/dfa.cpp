@@ -269,6 +269,20 @@ void DFA::SetTransitionSymbol(char symbol, int stateId, int transitionIndex) {
 	}
 
 	int stateIndex = FindStateIndexById(stateId);
+
+	bool inAlphabet = false;
+
+	for (int i = 0; i < alphabet.size(); i++) {
+		if (alphabet[i] == symbol) {
+			inAlphabet = true;
+			break;
+		}
+	}
+
+	if (!inAlphabet) { // skip adding to if already in alphabet
+		alphabet.push_back(symbol);
+	}
+
 	states[stateIndex].SetTransitionSymbol(transitionIndex, symbol);
 
 }

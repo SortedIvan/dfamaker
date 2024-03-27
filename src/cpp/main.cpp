@@ -304,6 +304,8 @@ int main() {
 
 				dfa = LoadDfaFromFile(file, automaticStateLabelGeneration, automaticStateLabelCount, stateCounter, transitionCounter, font);
 
+				UpdateAlphabetDisplay(dfa, alphabetHolder);
+
 				userLoadingFileMode = false;
 			}
 
@@ -924,13 +926,16 @@ DFA LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticSta
 				Add all of the symbols to all of the transitions
 				This also handles the global transitions dictionary in the DFA class
 			*/
-			for (auto symbol : file.GetStates()[i].transitionObjects[k].symbols) {
-				newDfa.SetTransitionSymbol(symbol, file.GetStates()[i].stateId, file.GetStates()[i].transitionObjects[k].id);
+			for (int s = 0; s < file.GetStates()[i].transitionObjects[k].symbols.size(); s++) {
+				newDfa.SetTransitionSymbol(
+					file.GetStates()[i].transitionObjects[k].symbols[s],
+					file.GetStates()[i].stateId,
+					file.GetStates()[i].transitionObjects[k].id);
 			}
+
 
 		}
 	}
 
 	return newDfa;
-
 }

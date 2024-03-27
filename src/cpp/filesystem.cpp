@@ -121,7 +121,7 @@ void FileSystem::LoadStateTransitionDtoObjects(json& data, std::vector<Transitio
 		for (int i = 0; i < symbols.size(); i++) {
 			transitionObj.symbols.push_back(symbols[i][0]);
 		}
-		
+
 		transObjects.push_back(transitionObj);
 	}
 }
