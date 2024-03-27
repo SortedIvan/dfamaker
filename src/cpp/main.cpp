@@ -63,8 +63,8 @@ void SwitchAutomaticStateLabelling(bool& automaticStateLabeling, int& automaticS
 void TryLoadImage(sf::Image& image, std::string path);
 void HandleTextBoxTypingHighlighter(sf::Text& inputStringHolder, sf::RectangleShape& typingIndicator);
 void HandleButtonPresses(Button& saveFileButton, Button& loadFileButton, bool& saved);
-void LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticStateLabelCount, int& stateCounter,
-	int& transitionCounter, DFA& dfa);
+DFA LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticStateLabelCount, int& stateCounter,
+	int& transitionCounter, sf::Font& font);
 
 int main() {
 
@@ -301,6 +301,10 @@ int main() {
 				}
 
 				userLoadingFileMode = true;
+
+				dfa = LoadDfaFromFile(file, automaticStateLabelGeneration, automaticStateLabelCount, stateCounter, transitionCounter, font);
+
+				userLoadingFileMode = false;
 			}
 
 
@@ -879,31 +883,54 @@ void HandleButtonPresses(Button& saveFileButton, Button& loadFileButton, bool& s
 	}
 }
 
-void LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticStateLabelCount, int& stateCounter,
-	int& transitionCounter, DFA& dfa, sf::Font& font) {
+DFA LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticStateLabelCount, int& stateCounter,
+	int& transitionCounter, sf::Font& font) {
 	
+	DFA newDfa;
+
 	automaticStateLabels = file.GetAutomaticStateLabels();
+
 	automaticStateLabelCount = file.GetAutomaticStateLabelCount();
 	stateCounter = file.GetStateCounter();
 	transitionCounter = file.GetTransitionCounter();
 	
+
+	// First, add all of the states
 	for (int i = 0; i < file.GetStates().size(); i++) {
 		
-		dfa.AddNewState(file.GetStates()[i].label, file.GetStates()[i].statePosition, font, file.GetStates()[i].stateId);
+		newDfa.AddNewState(file.GetStates()[i].label, file.GetStates()[i].statePosition, font, file.GetStates()[i].stateId);
 
 		if (file.GetStates()[i].isAccepting) {
-			dfa.ChangeStateAccepting(file.GetStates()[i].stateId);
+			newDfa.ChangeStateAccepting(file.GetStates()[i].stateId);
 		}
-
-		for (int k = 0; k < file.GetStates()[i].transitionObjects.size(); k++) {
-			dfa.AddNewTransition(
-				file.GetStates()[i].transitionObjects[k].transitionFrom,
-				file.GetStates()[i].transitionObjects[k].transitionTo, 
-				file.GetStates()[i].transitionObjects[k].id, 
-				font);
-		}
-
-		//dfa.AddNewState()
 	}
+
+	// Secondly, iterate over all states again and add all of their transitions
+	for (int i = 0; i < file.GetStates().size(); i++) {
+		for (int k = 0; k < file.GetStates()[i].transitionObjects.size(); k++) {
+
+			/*
+				Self loops are automatically handle
+				given that transitionFrom == transitionTo
+				This further handles incoming and outgoing transitions under the hood
+			*/
+			newDfa.AddNewTransition(
+				file.GetStates()[i].transitionObjects[k].transitionFrom,
+				file.GetStates()[i].transitionObjects[k].transitionTo,
+				file.GetStates()[i].transitionObjects[k].id,
+				font);
+
+			/*
+				Add all of the symbols to all of the transitions
+				This also handles the global transitions dictionary in the DFA class
+			*/
+			for (auto symbol : file.GetStates()[i].transitionObjects[k].symbols) {
+				newDfa.SetTransitionSymbol(symbol, file.GetStates()[i].stateId, file.GetStates()[i].transitionObjects[k].id);
+			}
+
+		}
+	}
+
+	return newDfa;
 
 }

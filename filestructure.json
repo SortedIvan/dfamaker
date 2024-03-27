@@ -1,6 +1,6 @@
 {
   "filename": "test",
-  "automaticStateLabels": false,
+  "automaticStateLabels": true,
   "automaticStateLabelCount": 2,
   "stateCounter": 2,
   "transitionCounter": 1,

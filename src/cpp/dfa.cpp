@@ -219,6 +219,12 @@ int DFA::SelectStateTransition(sf::Vector2f positionClicked) {
 	return -2; // didn't find anything
 }
 
+
+/*
+	currentSelectedTrans tuple:
+	.first is the id of the state from where the transition is outgoing
+	.second is the index of the transition itself within that state
+*/
 void DFA::SetTransitionSymbol(char symbol) {
 	if (currentSelectedTrans.first != -1 && currentSelectedTrans.second != -1) {
 		
@@ -254,6 +260,17 @@ void DFA::SetTransitionSymbol(char symbol) {
 
 		states[stateOfTransition].SetTransitionSymbol(currentSelectedTrans.second, symbol);
 	}
+}
+
+void DFA::SetTransitionSymbol(char symbol, int stateId, int transitionIndex) {
+	
+	if (stateId == -1 || transitionIndex == -1) {
+		return;
+	}
+
+	int stateIndex = FindStateIndexById(stateId);
+	states[stateIndex].SetTransitionSymbol(transitionIndex, symbol);
+
 }
 
 void DFA::DeSelectState() {

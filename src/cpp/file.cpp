@@ -1,8 +1,10 @@
 #include "../hpp/file.hpp"
 #include <string>
+#include <iostream>
+
 
 DfaFile::DfaFile(std::string fileName, std::string path, bool automaticStateLabels, int automaticStateLabelCount, int stateCounter,
-	int transitionCounter, std::vector<std::string> inputStrings, std::vector<StateDto> states) {
+	int transitionCounter, std::vector<std::string>& inputStrings, std::vector<StateDto>& states) {
 	this->filename = fileName;
 	this->path = path;
 	this->automaticStateLabelCount = automaticStateLabelCount;

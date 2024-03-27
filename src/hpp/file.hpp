@@ -42,7 +42,7 @@ private:
 public:
 	DfaFile();
 	DfaFile(std::string fileName, std::string path, bool automaticStateLabels, int automaticStateLabelCount, int stateCounter,
-		int transitionCounter, std::vector<std::string> inputStrings, std::vector<StateDto> states);
+		int transitionCounter, std::vector<std::string>& inputStrings, std::vector<StateDto>& states);
 	std::string GetFileName();
 	std::string GetPath();
 	bool GetAutomaticStateLabels();
