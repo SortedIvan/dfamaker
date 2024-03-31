@@ -4,7 +4,8 @@
 #include <map>
 #include "SFML/Graphics.hpp"
 
-struct TransitionObjectDto {
+struct TransitionObjectDto 
+{
 	int id;
 	int transitionTo;
 	int transitionFrom;
@@ -14,7 +15,8 @@ struct TransitionObjectDto {
 };
 
 
-struct StateDto {
+struct StateDto 
+{
 	std::string label;
 	int stateId;
 	std::vector<TransitionObjectDto> transitionObjects;
@@ -28,27 +30,28 @@ struct StateDto {
 };
 
 
-class DfaFile{
-private:
-	std::string path;
-	std::string filename;
-	bool automaticStateLabels;
-	int automaticStateLabelCount;
-	int stateCounter;
-	int transitionCounter;
-	std::vector<std::string> inputStrings;
-	std::vector<StateDto> states;
+class DfaFile
+{
+	private:
+		std::string path;
+		std::string filename;
+		bool automaticStateLabels;
+		int automaticStateLabelCount;
+		int stateCounter;
+		int transitionCounter;
+		std::vector<std::string> inputStrings;
+		std::vector<StateDto> states;
 
-public:
-	DfaFile();
-	DfaFile(std::string fileName, std::string path, bool automaticStateLabels, int automaticStateLabelCount, int stateCounter,
-		int transitionCounter, std::vector<std::string>& inputStrings, std::vector<StateDto>& states);
-	std::string GetFileName();
-	std::string GetPath();
-	bool GetAutomaticStateLabels();
-	int GetAutomaticStateLabelCount();
-	int GetStateCounter();
-	int GetTransitionCounter();
-	std::vector<std::string> GetInputStrings();
-	std::vector<StateDto> GetStates();
+	public:
+		DfaFile();
+		DfaFile(std::string fileName, std::string path, bool automaticStateLabels, int automaticStateLabelCount, int stateCounter,
+			int transitionCounter, std::vector<std::string>& inputStrings, std::vector<StateDto>& states);
+		std::string GetFileName();
+		std::string GetPath();
+		bool GetAutomaticStateLabels();
+		int GetAutomaticStateLabelCount();
+		int GetStateCounter();
+		int GetTransitionCounter();
+		std::vector<std::string> GetInputStrings();
+		std::vector<StateDto> GetStates();
 };

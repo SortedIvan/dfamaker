@@ -1,7 +1,8 @@
 // Button.cpp
 #include "../hpp/button.hpp"
 
-Button::Button(sf::Vector2f position, sf::Vector2f size, sf::Font& font, std::string buttonText) {
+Button::Button(sf::Vector2f position, sf::Vector2f size, sf::Font& font, std::string buttonText) 
+{
     shape.setPosition(position);
     shape.setSize(size);
 
@@ -23,41 +24,50 @@ Button::Button(sf::Vector2f position, sf::Vector2f size, sf::Font& font, std::st
     activeColor = sf::Color(255, 255, 255);
 }
 
-Button::~Button() {
+Button::~Button() 
+{
     // Destructor if needed
 }
 
-void Button::Update(const sf::Vector2f& mousePosition) {
+void Button::Update(const sf::Vector2f& mousePosition) 
+{
     // Check if the mouse is over the button
-    if (shape.getGlobalBounds().contains(mousePosition)) {
+    if (shape.getGlobalBounds().contains(mousePosition)) 
+    {
         shape.setFillColor(hoverColor);
 
         // Check if the button is clicked
-        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) 
+        {
             shape.setFillColor(activeColor);
             wasPressed = true;
         }
-        else {
+        else 
+        {
             wasPressed = false;
         }
 
         mouseOverButton = true;
     }
-    else {
+    else 
+    {
         shape.setFillColor(idleColor);
         mouseOverButton = false;
     }
 }
 
-void Button::Render(sf::RenderWindow& window) {
+void Button::Render(sf::RenderWindow& window)
+{
     window.draw(shape);
     window.draw(text);
 }
 
-bool Button::IsMouseOverButton() {
+bool Button::IsMouseOverButton() 
+{
     return mouseOverButton;
 }
 
-bool Button::GetIsPressed() {
+bool Button::GetIsPressed() 
+{
     return wasPressed;
 }

@@ -6,14 +6,16 @@
 #include "line.hpp"
 #include "dfa_state_transition.hpp"
 
-struct startingOutline {
+struct startingOutline 
+{
 	sfLine mainArrow;
 	sfLine arrowTipOne;
 	sfLine arrowTipTwo;
 	float arrowLength;
 };
 
-class DfaState {
+class DfaState 
+{
 	private:
 		// ------- state related vars
 		std::string label;

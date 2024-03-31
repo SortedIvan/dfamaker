@@ -4,7 +4,8 @@
 #include "SFML/Graphics.hpp"
 #include "dfa_state.hpp"
 
-class DFA {
+class DFA 
+{
 	private:
 		std::vector<DfaState> states;
 		std::vector<char> alphabet;
@@ -20,6 +21,7 @@ class DFA {
 	public:
 		DFA();
 		// getters
+		std::vector<std::string>& GetInputStrings();
 		std::vector<DfaState> GetStates();
 		std::vector<char> GetAlphabet();
 		int GetSelectedStateIndex(sf::Vector2f positionClicked);

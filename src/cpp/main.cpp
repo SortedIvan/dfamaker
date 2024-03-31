@@ -66,7 +66,8 @@ void HandleButtonPresses(Button& saveFileButton, Button& loadFileButton, bool& s
 DFA LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticStateLabelCount, int& stateCounter,
 	int& transitionCounter, sf::Font& font);
 
-int main() {
+int main() 
+{
 
 	/*
 		Titlebar && Close prevent the screen from being resized by default
@@ -245,7 +246,8 @@ int main() {
 		{
 			shiftHeldDown = true;
 		}
-		else {
+		else 
+		{
 			shiftHeldDown = false;
 		}
 		
@@ -258,10 +260,12 @@ int main() {
 		}
 
 		if (textBox.getGlobalBounds().contains((sf::Vector2f)mousePosition) ||
-			textBoxSecondary.getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
+			textBoxSecondary.getGlobalBounds().contains((sf::Vector2f)mousePosition)) 
+		{
 			mouseOverTextbox = true;
 		}
-		else {
+		else 
+		{
 			mouseOverTextbox = false;
 		}
 
@@ -269,14 +273,17 @@ int main() {
 			&& !errorIndicator.getGlobalBounds().contains((sf::Vector2f)mousePosition)
 			&& !automaticStateLabelsCheckBox.getGlobalBounds().contains((sf::Vector2f)mousePosition);
 
-		if (mouseOverlayMode) { 
+		if (mouseOverlayMode) 
+		{ 
 			// update the overlay position
-			if (canPlace) {
+			if (canPlace) 
+			{
 				statePlacementIndicator.setPosition((sf::Vector2f)mousePosition);
 			}
 		}
 
-		if (!userLoadingFileMode) {
+		if (!userLoadingFileMode) 
+		{
 			HandleMouseHover(dfa, mouseOverState, mouseOverTransition,
 				mouseOverButton, hoveredOverStateId, highlightedState,
 				window, stateMovingMode, saveFileBtn, loadFileBtn);
@@ -284,19 +291,25 @@ int main() {
 
 		// <------------End-Mouse-Overlay-Handling----------------------->
 
-		while (window.pollEvent(e)) {
-			if (e.type == sf::Event::Closed) {
+		while (window.pollEvent(e)) 
+		{
+			if (e.type == sf::Event::Closed) 
+			{
 				window.close();
 			}
 
-			if (saveFileBtn.GetIsPressed()) {
-				if (saved) {
+			if (saveFileBtn.GetIsPressed()) 
+			{
+				if (saved) 
+				{
 					continue;
 				}
 			}
 
-			if (loadFileBtn.GetIsPressed() && !userLoadingFileMode) {
-				if (!saved) {
+			if (loadFileBtn.GetIsPressed() && !userLoadingFileMode) 
+			{
+				if (!saved) 
+				{
 					 // prompt user to save here
 				}
 
@@ -310,17 +323,23 @@ int main() {
 			}
 
 
-			if (e.type == sf::Event::KeyReleased) {
-				if (e.type == sf::Event::Resized) {
+			if (e.type == sf::Event::KeyReleased) 
+			{
+				if (e.type == sf::Event::Resized) 
+				{
 					scaleHandler.UpdateConstants(window.getSize());
 				}
 
-				if (e.key.code == sf::Keyboard::Delete) {
+				if (e.key.code == sf::Keyboard::Delete) 
+				{
 
-					if (!userLoadingFileMode) {
-						if (transitionIsSelected) {
+					if (!userLoadingFileMode) 
+					{
+						if (transitionIsSelected) 
+						{
 							// First, check if user is trying to delete the transition
-							if (DeleteTransition(e, dfa)) {
+							if (DeleteTransition(e, dfa)) 
+							{
 								transitionIsSelected = false;
 								dfa.DeSelectTransition();
 								UpdateAlphabetDisplay(dfa, alphabetHolder);
@@ -328,7 +347,8 @@ int main() {
 							}
 						}
 
-						if (stateIsSelected) { // Check to see if user wants to delete a state
+						if (stateIsSelected) 
+						{ // Check to see if user wants to delete a state
 							dfa.DeleteState(selectedState);
 							UpdateAlphabetDisplay(dfa, alphabetHolder);
 							stateIsSelected = false;
@@ -338,32 +358,40 @@ int main() {
 				}
 
 				// Check if user is trying to change the state direction
-				if (transitionIsSelected  && !userLoadingFileMode) {
+				if (transitionIsSelected  && !userLoadingFileMode) 
+				{
 					bool changed = ChangeTransitionDirection(dfa, e); 
 
-					if (changed) {
+					if (changed) 
+					{
 						saved = false;
 					}
 				}
 
-				if (e.key.code == sf::Keyboard::Tab) {
-					if (stateIsSelected && !userLoadingFileMode) {
+				if (e.key.code == sf::Keyboard::Tab) 
+				{
+					if (stateIsSelected && !userLoadingFileMode) 
+					{
 						dfa.ChangeStateAccepting(selectedState);
 						saved = false;
 						continue;
 					}
 				}
 
-				if (e.key.code == sf::Keyboard::Enter) {
+				if (e.key.code == sf::Keyboard::Enter) 
+				{
 
-					if (!userLoadingFileMode) {
+					if (!userLoadingFileMode) 
+					{
 						std::tuple<bool, int, std::string> isDfa = dfa.CheckIfDfa();
 
-						if (!std::get<0>(isDfa)) {
+						if (!std::get<0>(isDfa)) 
+						{
 							errorMessage.setString(std::get<2>(isDfa));
 							errorMode = true;
 						}
-						else {
+						else 
+						{
 							HandleInputStringValidation(textBoxEntries, inputStringHolder, inputString,
 								currentTextEntry, stringAcceptedState, dfa, stateIsSelected,
 								transitionIsSelected, font, window, textBoxHighlights, errorMode);
@@ -385,8 +413,10 @@ int main() {
 				}
 			}
 
-			if (e.type == sf::Event::TextEntered) {
-				if (textboxState && !userLoadingFileMode) {
+			if (e.type == sf::Event::TextEntered) 
+			{
+				if (textboxState && !userLoadingFileMode) 
+				{
 					HandleInputStringTextEditing(inputString,e, inputStringHolder, isTyping);
 					HandleTextBoxTypingHighlighter(inputStringHolder, highlightIndicator);
 					saved = false;
@@ -395,8 +425,10 @@ int main() {
 
 
 				// First, check for prevalent conditions
-				if (e.text.unicode == BACKSPACE) {
-					if (transitionIsSelected && !userLoadingFileMode) {
+				if (e.text.unicode == BACKSPACE) 
+				{
+					if (transitionIsSelected && !userLoadingFileMode) 
+					{
 						dfa.RemoveSymbolFromTransition();
 						UpdateAlphabetDisplay(dfa, alphabetHolder);
 						transitionIsSelected = false;
@@ -405,12 +437,15 @@ int main() {
 					}
 				}
 
-				if (stateIsSelected && e.text.unicode != TAB && !userLoadingFileMode) {
+				if (stateIsSelected && e.text.unicode != TAB && !userLoadingFileMode) 
+				{
 					HandleStateLabelInput(e, dfa, selectedState);
 					saved = false;
 					continue;
 				}
-				if (transitionIsSelected && !userLoadingFileMode) {
+
+				if (transitionIsSelected && !userLoadingFileMode) 
+				{
 					HandleTransitionSymbolInput(e, dfa);
 					UpdateAlphabetDisplay(dfa, alphabetHolder);
 					saved = false;
@@ -420,24 +455,30 @@ int main() {
 			}
 
 			// On Mouse Click Release
-			if (e.type == sf::Event::MouseButtonReleased) {
+			if (e.type == sf::Event::MouseButtonReleased) 
+			{
 				
 				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
 
 				// Check if load/save button was clicked
 				
-				if (!userLoadingFileMode) {
-					if (stateMovingMode) {
+				if (!userLoadingFileMode) 
+				{
+					if (stateMovingMode) 
+					{
 						stateMovingMode = false;
 					}
 
-					if (stringAcceptedState) { // first clear the accepted state
+					// first clear the accepted state
+					if (stringAcceptedState) 
+					{
 						dfa.SetAllStatesDefaultColor();
 						stringAcceptedState = false;
 					}
 
 					// Check whether the user clicked in the text box
-					if (textBox.getGlobalBounds().contains(mousePos)) {
+					if (textBox.getGlobalBounds().contains(mousePos)) 
+					{
 						transitionIsSelected = false;
 						stateIsSelected = false;
 						selectedState = -1;
@@ -447,12 +488,14 @@ int main() {
 						continue;
 					}
 
-					if (automaticStateLabelsCheckBox.getGlobalBounds().contains((sf::Vector2f)mousePos)) {
+					if (automaticStateLabelsCheckBox.getGlobalBounds().contains((sf::Vector2f)mousePos)) 
+					{
 						SwitchAutomaticStateLabelling(automaticStateLabelGeneration, automaticStateLabelCount);
 					}
 
 
-					if (dfa.SelectStateTransition(mousePos) != -2) { // We have clicked on a transition
+					if (dfa.SelectStateTransition(mousePos) != -2) 
+					{ // We have clicked on a transition
 						transitionIsSelected = true;
 						stateIsSelected = false;
 						textboxState = false;
@@ -461,57 +504,70 @@ int main() {
 
 						continue;
 					}
-					else {
+					else 
+					{
 						transitionIsSelected = false;
 						textboxState = false;
 					}
 
 					int tempSelected = dfa.GetSelectedStateId(mousePos);
-					if (tempSelected != -2) {
-						// if a different state was selected
-						if (stateIsSelected && selectedState != -1) {
 
-							if (shiftHeldDown) { // Add a new transition
+					if (tempSelected != -2) 
+					{
+						// if a different state was selected
+						if (stateIsSelected && selectedState != -1) 
+						{
+
+							if (shiftHeldDown) 
+							{ // Add a new transition
 
 								bool result = dfa.AddNewTransition(
 									selectedState, tempSelected,
 									transitionIdCounter, font);
 
-								if (result) {
+								if (result) 
+								{
 									transitionIdCounter++;
 								}
 								selectedState = tempSelected;
 							}
-							else {
+							else 
+							{
 								selectedState = tempSelected;
 							}
 
-							if (selectedState >= 0) {
+							if (selectedState >= 0) 
+							{
 								dfa.SetSelectedState(selectedState);
 							}
 
 							saved = false;
 							textboxState = false; // Exit textbox
 						}
-						else { // First time selecting state
+						else 
+						{ // First time selecting state
 							selectedState = tempSelected;
 							stateIsSelected = true;
 							textboxState = false;
 							dfa.DeSelectTransition();
-							if (selectedState >= 0) {
+							if (selectedState >= 0) 
+							{
 								dfa.SetSelectedState(selectedState);
 							}
 						}
 					}
-					else {
+					else 
+					{
 						if (canPlace) {
-							if (automaticStateLabelGeneration) {
+							if (automaticStateLabelGeneration) 
+							{
 								std::cout << GetMousePosition(window).x << " " << GetMousePosition(window).y << std::endl;
 								dfa.AddNewState("q" + std::to_string(automaticStateLabelCount), mousePos, font, stateCounter);
 								automaticStateLabelCount += 1;
 								dfa.StateToString(stateCounter);
 							}
-							else {
+							else 
+							{
 								dfa.AddNewState("", mousePos, font, stateCounter);
 							}
 
@@ -535,21 +591,25 @@ int main() {
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 			// Handle movement of state
 
-			if (!userLoadingFileMode) {
-				if (hoveredOverStateId != -1 && !shiftHeldDown && !stateMovingMode) {
+			if (!userLoadingFileMode) 
+			{
+				if (hoveredOverStateId != -1 && !shiftHeldDown && !stateMovingMode) 
+				{
 					selectedState = hoveredOverStateId;
 					stateIsSelected = true;
 					textboxState = false;
 					dfa.DeSelectTransition();
 
-					if (selectedState >= 0) {
+					if (selectedState >= 0) 
+					{
 						dfa.SetSelectedState(selectedState);
 					}
 					saved = false;
 				}
 
 				if (stateIsSelected && mouseOverState
-					&& hoveredOverStateId != -1 && hoveredOverStateId == selectedState && !shiftHeldDown) {
+					&& hoveredOverStateId != -1 && hoveredOverStateId == selectedState && !shiftHeldDown) 
+				{
 
 					stateMovingMode = true;
 
@@ -561,14 +621,17 @@ int main() {
 		}
 
 		// Blinking highlighter
-		if (cursorTimer.getElapsedTime().asSeconds() > TEXT_HIGHLIGHTER_CHANGE_SPEED) {
+		if (cursorTimer.getElapsedTime().asSeconds() > TEXT_HIGHLIGHTER_CHANGE_SPEED) 
+		{
 			cursorIndicator = !cursorIndicator;
 			cursorTimer.restart();
 		}
 
 		// Exiting typing
-		if (isTyping) {
-			if (typingTimer.getElapsedTime().asSeconds() > TYPING_EXITED_CD) {
+		if (isTyping) 
+		{
+			if (typingTimer.getElapsedTime().asSeconds() > TYPING_EXITED_CD) 
+			{
 				isTyping = false;
 				typingTimer.restart();
 			}
@@ -578,10 +641,12 @@ int main() {
 		window.clear(DEFAULT_BG_COLOR);
 
 		// --------- draw on the screen ---------
-		if (isTyping && mouseOverTextbox) {
+		if (isTyping && mouseOverTextbox) 
+		{
 			window.draw(highlightIndicator);
 		}
-		if (mouseOverTextbox && !isTyping) {
+		if (mouseOverTextbox && !isTyping) 
+		{
 			if (cursorIndicator) {
 				window.draw(highlightIndicator);
 			}
@@ -600,7 +665,8 @@ int main() {
 
 		window.draw(automaticStateLabelsCheckBox);
 
-		if (automaticStateLabelGeneration) {
+		if (automaticStateLabelGeneration) 
+		{
 			window.draw(automaticStateLabelsCheckBoxChecked);
 		}
 
@@ -608,12 +674,14 @@ int main() {
 		window.draw(errorMessageLabel);
 		window.draw(errorIndicator);
 
-		if (errorMode) {
+		if (errorMode)
+		{
 			window.draw(errorMessage);
 		}
 ;
 
-		if (mouseOverlayMode && canPlace && !mouseOverState && !mouseOverTransition && !mouseOverButton) {
+		if (mouseOverlayMode && canPlace && !mouseOverState && !mouseOverTransition && !mouseOverButton) 
+		{
 			window.draw(statePlacementIndicator);
 		}
 
@@ -625,32 +693,38 @@ int main() {
 
 void TryLoadFont(sf::Font& font, std::string path)
 {
-	if (!font.loadFromFile(path)) {
+	if (!font.loadFromFile(path)) 
+	{
 		std::cout << "Error loading the font file" << std::endl;
 		system("pause");
 	}
 }
 
-void TryLoadImage(sf::Image& image, std::string path) {
-	if (!image.loadFromFile(path)) {
+void TryLoadImage(sf::Image& image, std::string path) 
+{
+	if (!image.loadFromFile(path)) 
+	{
 		std::cout << "Error loading the image file at path: " + path << std::endl;
 		system("pause");
 	}
 }
 
-void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState) {
+void HandleStateLabelInput(sf::Event& e, DFA& dfa, int selectedState) 
+{
 	if (e.text.unicode != '\b' && e.text.unicode != '\r' &&
 		e.key.code != sf::Keyboard::Left && e.key.code != sf::Keyboard::Right && e.text.unicode != 36
 		&& e.key.code != sf::Keyboard::Escape && e.key.code != sf::Keyboard::Tab)
 	{
 		dfa.ChangeStateLabelText(e, selectedState);
 	}
-	else if (e.text.unicode == '\b') {
+	else if (e.text.unicode == '\b') 
+	{
 		dfa.DeleteStateLabelCharacter(selectedState);
 	}
 }
 
-void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa) {
+void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa) 
+{
 	if (e.text.unicode != '\b' && e.text.unicode != '\r' &&
 		e.key.code != sf::Keyboard::Left && e.key.code != sf::Keyboard::Right && e.text.unicode != 36
 		&& e.key.code != sf::Keyboard::Escape && e.key.code != '~' && e.key.code != sf::Keyboard::Tab)
@@ -659,16 +733,19 @@ void HandleTransitionSymbolInput(sf::Event& e, DFA& dfa) {
 	}
 }
 
-void SwitchAutomaticStateLabelling(bool& automaticStateLabeling, int& automaticStateLabelCounter) {
+void SwitchAutomaticStateLabelling(bool& automaticStateLabeling, int& automaticStateLabelCounter) 
+{
 	automaticStateLabeling = !automaticStateLabeling;
 	automaticStateLabelCounter = 0;
 }
 
-void RotateRectangle(sf::ConvexShape& rect, float angle) {
+void RotateRectangle(sf::ConvexShape& rect, float angle) 
+{
 
 	// Works by rotating the corners of the given shape by working
 	// around the center of the shape. Thus it rotates itself around its center
-	for (int i = 0; i < rect.getPointCount(); i++) {
+	for (int i = 0; i < rect.getPointCount(); i++) 
+	{
 		float pointX = rect.getPoint(i).x;
 		float pointY = rect.getPoint(i).y;
 
@@ -690,20 +767,24 @@ float dot_product(const sf::Vector2f& lhs, const sf::Vector2f& rhs)
 	return lhs.x * rhs.x + lhs.y + rhs.y;
 }
 
-bool DeleteTransition(sf::Event& e, DFA& dfa) {
+bool DeleteTransition(sf::Event& e, DFA& dfa) 
+{
 	dfa.DeleteSelectedTransition();
 	return true;
 }
 
-void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder, bool& isTyping) {
+void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Text& inputStringHolder, bool& isTyping) 
+{
 	if (e.type == sf::Event::TextEntered && e.text.unicode != '\b' && e.text.unicode != '\r' &&
 		e.key.code != sf::Keyboard::Left && e.key.code != sf::Keyboard::Right && e.text.unicode != 36
 		&& e.key.code != sf::Keyboard::Escape && e.key.code != '~' && e.text.unicode != '\t')
 	{
 		inputString.push_back(e.text.unicode);
 	}
-	else if (e.text.unicode == '\b'){
-		if (inputString.size() > 0) {
+	else if (e.text.unicode == '\b')
+	{
+		if (inputString.size() > 0) 
+		{
 			inputString.pop_back();
 		}
 	}
@@ -711,19 +792,26 @@ void HandleInputStringTextEditing(std::string& inputString, sf::Event& e, sf::Te
 	isTyping = true;
 }
 
-void HandleTextBoxTypingHighlighter(sf::Text& inputStringHolder, sf::RectangleShape& typingIndicator) {
-	if (inputStringHolder.getString().getSize() > 0) {
+void HandleTextBoxTypingHighlighter(sf::Text& inputStringHolder, sf::RectangleShape& typingIndicator) 
+{
+	if (inputStringHolder.getString().getSize() > 0) 
+	{
 		sf::Vector2f position = inputStringHolder.findCharacterPos(inputStringHolder.getString().getSize() - 1);
 		typingIndicator.setPosition(sf::Vector2f(position.x + typingIndicator.getSize().x, position.y + inputStringHolder.getCharacterSize() / 4));
 	}
-	else {
-		typingIndicator.setPosition(sf::Vector2f(inputStringHolder.getPosition().x, inputStringHolder.getPosition().y + inputStringHolder.getCharacterSize() / 4));
+	else 
+	{
+		typingIndicator.setPosition(sf::Vector2f(
+			inputStringHolder.getPosition().x,
+			inputStringHolder.getPosition().y + inputStringHolder.getCharacterSize() / 4));
 	}
 }
 
 void DrawAllTextBoxEntriesAndHighlights(std::vector<sf::Text>& textBoxEntries, std::vector<sf::RectangleShape>& hightlights,
-	sf::RenderWindow& window) {
-	for (int i = 0; i < textBoxEntries.size(); i++) { // should be parallel
+	sf::RenderWindow& window) 
+{
+	for (int i = 0; i < textBoxEntries.size(); i++) // should be parallel
+	{ 
 		window.draw(textBoxEntries[i]);
 		window.draw(hightlights[i]);
 	}
@@ -732,13 +820,15 @@ void DrawAllTextBoxEntriesAndHighlights(std::vector<sf::Text>& textBoxEntries, s
 void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text& inputStringHolder,
 	std::string& inputString, int& currentTextBoxEntry, bool& stringAcceptedState,
 	DFA& dfa, bool& stateIsSelected, bool& transitionIsSelected, sf::Font& font
-	, sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights, bool& errorMode) {
+	, sf::RenderWindow& window, std::vector<sf::RectangleShape>& highlights, bool& errorMode) 
+{
 	// Both inputString and the text are not necessary, but easier to distinguish them like this
 
 	// First, run a sanity check and see if it satiesfies DFA conditions
 	// Explicit check, this is also done in the function below,
 	// but has to be replaced
-	if (dfa.GetStates().size() == 0) {
+	if (dfa.GetStates().size() == 0) 
+	{
 		return;
 	}
 
@@ -749,7 +839,8 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 	sf::Color semiTransparentColorRed(255, 0, 0, 128);
 	sf::Color semiTransparentColorGreen(0, 255, 0, 128);
 
-	if (inputString.size() <= 0) {
+	if (inputString.size() <= 0) 
+	{
 		return; // nothing to validate
 	}
 
@@ -776,29 +867,35 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 
 	// !TODO!, this should be a pair of boolean values, as this can break
 	// check CheckIfStringAccepted returns
-	if (result) {
+	if (result) 
+	{
 		stringAcceptedState = true;
 		errorMode = false;
 
 		highlight.setFillColor(semiTransparentColorGreen);
 		highlight.setFillColor(semiTransparentColorGreen);
 
-		if (stateIsSelected) {
+		if (stateIsSelected) 
+		{
 			dfa.DeSelectState();
 		}
-		if (transitionIsSelected) {
+		if (transitionIsSelected) 
+		{
 			dfa.DeSelectTransition();
 		}
 
 	}
-	else {
+	else 
+	{
 		stringAcceptedState = true;
 		highlight.setFillColor(semiTransparentColorRed);
 
-		if (stateIsSelected) {
+		if (stateIsSelected) 
+		{
 			dfa.DeSelectState();
 		}
-		if (transitionIsSelected) {
+		if (transitionIsSelected) 
+		{
 			dfa.DeSelectTransition();
 		}
 
@@ -808,13 +905,16 @@ void HandleInputStringValidation(std::vector<sf::Text>& textBoxEntries, sf::Text
 
 }
 
-void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder) {
+void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder) 
+{
 	std::string alphabetString = "Alphabet: ";
 
-	for (int i = 0; i < dfa.GetAlphabet().size(); i++) {
+	for (int i = 0; i < dfa.GetAlphabet().size(); i++) 
+	{
 		alphabetString.push_back(dfa.GetAlphabet()[i]);
 
-		if (i != dfa.GetAlphabet().size() - 1) { // not the last element
+		if (i != dfa.GetAlphabet().size() - 1) // not the last element
+		{ 
 			alphabetString.push_back(',');
 		}
 	}
@@ -823,16 +923,20 @@ void UpdateAlphabetDisplay(DFA& dfa, sf::Text& alphabetHolder) {
 
 void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,bool& mouseOverButton, 
 	int& hoveredOverStateId, int& highlightedState, sf::RenderWindow& window, bool stateMovingMode,
-	Button& saveFileBtn, Button& loadFileBtn) {
+	Button& saveFileBtn, Button& loadFileBtn) 
+{
 	
-	if (stateMovingMode) {
+	if (stateMovingMode) 
+	{
 		return;
 	}
 
-	if (saveFileBtn.IsMouseOverButton() || loadFileBtn.IsMouseOverButton()) {
+	if (saveFileBtn.IsMouseOverButton() || loadFileBtn.IsMouseOverButton()) 
+	{
 		mouseOverButton = true;
 	}
-	else {
+	else 
+	{
 		mouseOverButton = false;
 	}
 
@@ -841,21 +945,26 @@ void HandleMouseHover(DFA& dfa, bool& mouseOverState, bool& mouseOverTransition,
 	mouseOverTransition = false;
 	hoveredOverStateId = -1;
 
-	for (int i = 0; i < dfa.GetStates().size(); i++) {
-		if (dfa.GetStates()[i].GetStateCircle().getGlobalBounds().contains((sf::Vector2f)mousePosition)) {
+	for (int i = 0; i < dfa.GetStates().size(); i++) 
+	{
+		if (dfa.GetStates()[i].GetStateCircle().getGlobalBounds().contains((sf::Vector2f)mousePosition)) 
+		{
 			mouseOverState = true;  // Set to true if mouse is over any state
 			hoveredOverStateId = dfa.GetStates()[i].GetStateId();
 			break;  // No need to check further once we find a state under the mouse
 		}
-		if (dfa.CheckStateTransitionCollision((sf::Vector2f)mousePosition) == 0) {
+		if (dfa.CheckStateTransitionCollision((sf::Vector2f)mousePosition) == 0)
+		{
 			mouseOverTransition = true;
 			break;
 		}
 	}
 }
 
-bool ChangeTransitionDirection(DFA& dfa, sf::Event& e) {
-	switch (e.key.code) {
+bool ChangeTransitionDirection(DFA& dfa, sf::Event& e) 
+{
+	switch (e.key.code) 
+	{
 		case sf::Keyboard::Right:
 			dfa.ChangeStateTransitionDirection(RIGHT);
 			return true;
@@ -872,21 +981,55 @@ bool ChangeTransitionDirection(DFA& dfa, sf::Event& e) {
 	return false;
 }
 
-sf::Vector2f GetMousePosition(sf::RenderWindow& window) {
+sf::Vector2f GetMousePosition(sf::RenderWindow& window) 
+{
 	sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
 	return window.mapPixelToCoords(mousePosition);
 }
 
-void HandleButtonPresses(Button& saveFileButton, Button& loadFileButton, bool& saved) {
-	if (saveFileButton.GetIsPressed()) {
-		if (saved) {
+void HandleButtonPresses(Button& saveFileButton, Button& loadFileButton, bool& saved)
+{
+	if (saveFileButton.GetIsPressed()) 
+	{
+		if (saved) 
+		{
 			return;
 		}
 	}
 }
 
+void SaveDfaToFile(DfaFile& file, DFA& dfa, bool& automaticStateLabels, int& automaticStateLabelCount,
+	int& stateCounter, int& transitionCounter, std::string filename) 
+{
+	nlohmann::json data;
+
+	data["filename"] = filename;
+	data["automaticStateLabels"] = automaticStateLabels;
+	data["automaticStateLabelCount"] = automaticStateLabelCount;
+	data["stateCounter"] = stateCounter;
+	data["transitionCounter"] = transitionCounter;
+
+	nlohmann::json inputStrings = {};
+	
+	for (int i = 0; i < dfa.GetInputStrings().size(); i++) 
+	{
+		inputStrings.push_back(dfa.GetInputStrings()[i]);
+	}
+	
+	data["inputStrings"] = inputStrings;
+
+	nlohmann::json states = {};
+
+
+	data["inputStrings"] = { true, "Hello", 3.1415 };
+	data["Empty Array"] = nlohmann::json::array_t();
+	data["Object With Items"] = nlohmann::json::object_t({ {"Key", "Value"}, {"Day", true} });
+	data["Empty Object"] = nlohmann::json::object_t();
+}
+
 DFA LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticStateLabelCount, int& stateCounter,
-	int& transitionCounter, sf::Font& font) {
+	int& transitionCounter, sf::Font& font) 
+{
 	
 	DFA newDfa;
 
@@ -898,18 +1041,21 @@ DFA LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticSta
 	
 
 	// First, add all of the states
-	for (int i = 0; i < file.GetStates().size(); i++) {
-		
+	for (int i = 0; i < file.GetStates().size(); i++) 
+	{
 		newDfa.AddNewState(file.GetStates()[i].label, file.GetStates()[i].statePosition, font, file.GetStates()[i].stateId);
 
-		if (file.GetStates()[i].isAccepting) {
+		if (file.GetStates()[i].isAccepting) 
+		{
 			newDfa.ChangeStateAccepting(file.GetStates()[i].stateId);
 		}
 	}
 
 	// Secondly, iterate over all states again and add all of their transitions
-	for (int i = 0; i < file.GetStates().size(); i++) {
-		for (int k = 0; k < file.GetStates()[i].transitionObjects.size(); k++) {
+	for (int i = 0; i < file.GetStates().size(); i++) 
+	{
+		for (int k = 0; k < file.GetStates()[i].transitionObjects.size(); k++) 
+		{
 
 			/*
 				Self loops are automatically handle
@@ -926,7 +1072,8 @@ DFA LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticSta
 				Add all of the symbols to all of the transitions
 				This also handles the global transitions dictionary in the DFA class
 			*/
-			for (int s = 0; s < file.GetStates()[i].transitionObjects[k].symbols.size(); s++) {
+			for (int s = 0; s < file.GetStates()[i].transitionObjects[k].symbols.size(); s++) 
+			{
 				newDfa.SetTransitionSymbol(
 					file.GetStates()[i].transitionObjects[k].symbols[s],
 					file.GetStates()[i].stateId,

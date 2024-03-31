@@ -716,3 +716,8 @@ void DFA::StateToString(int stateId) {
 	std::cout << "State center: {x:" << states[stateIndex].GetStateCenter().x << ", y: " << states[stateIndex].GetStateCenter().y << " }" << std::endl;
 	std::cout << "State position: {x:" << states[stateIndex].GetStatePosition().x << ", y: " << states[stateIndex].GetStatePosition().y << " }" << std::endl;
 }
+
+std::vector<std::string>& DFA::GetInputStrings() 
+{
+	return inputStrings;
+}

@@ -1,14 +1,16 @@
 #pragma once
 #include "line.hpp"
 
-enum TransitionDirection {
+enum TransitionDirection 
+{
 	TOP = 1,
 	BOTTOM = 2,
 	LEFT = 3,
 	RIGHT = 4
 };
 
-class StateTransition {
+class StateTransition 
+{
 	private: 
 		// For regular state transitions
 		sfLine mainArrow;
