@@ -31,6 +31,7 @@
 #include <string>
 #include "SFML/Graphics.hpp"
 #include <iostream>
+#include <fstream>
 #include "../hpp/dfa.hpp"
 #include "../hpp/line.hpp"
 #include "../hpp/scalehandler.hpp"
@@ -65,6 +66,8 @@ void HandleTextBoxTypingHighlighter(sf::Text& inputStringHolder, sf::RectangleSh
 void HandleButtonPresses(Button& saveFileButton, Button& loadFileButton, bool& saved);
 DFA LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticStateLabelCount, int& stateCounter,
 	int& transitionCounter, sf::Font& font);
+void SaveDfaToFile(DfaFile& file, DFA& dfa, bool& automaticStateLabels, int& automaticStateLabelCount,
+	int& stateCounter, int& transitionCounter, std::string filename);
 
 int main() 
 {
@@ -300,6 +303,9 @@ int main()
 
 			if (saveFileBtn.GetIsPressed()) 
 			{
+				SaveDfaToFile(file, dfa, automaticStateLabelGeneration,
+					automaticStateLabelCount, stateCounter, transitionCounter,
+					"filestructure.json");
 				if (saved) 
 				{
 					continue;
@@ -998,6 +1004,12 @@ void HandleButtonPresses(Button& saveFileButton, Button& loadFileButton, bool& s
 	}
 }
 
+/*
+	Writing all of the needed data to a json using nlohmann
+	This can be prettified/done in a much more efficient way,
+	as nlohmann supports assigning data structures directly into json (without having to iterate for example).
+	However, there are plans to do further aggregation
+*/
 void SaveDfaToFile(DfaFile& file, DFA& dfa, bool& automaticStateLabels, int& automaticStateLabelCount,
 	int& stateCounter, int& transitionCounter, std::string filename) 
 {
@@ -1009,22 +1021,135 @@ void SaveDfaToFile(DfaFile& file, DFA& dfa, bool& automaticStateLabels, int& aut
 	data["stateCounter"] = stateCounter;
 	data["transitionCounter"] = transitionCounter;
 
-	nlohmann::json inputStrings = {};
-	
-	for (int i = 0; i < dfa.GetInputStrings().size(); i++) 
-	{
-		inputStrings.push_back(dfa.GetInputStrings()[i]);
+	if (dfa.GetInputStrings().size() == 0) {
+		data["inputStrings"] = nlohmann::json::array();
 	}
-	
-	data["inputStrings"] = inputStrings;
+	else {
+		nlohmann::json inputStrings = {};
+
+		for (int i = 0; i < dfa.GetInputStrings().size(); i++)
+		{
+			inputStrings.push_back(dfa.GetInputStrings()[i]);
+		}
+
+		data["inputStrings"] = inputStrings;
+	}
 
 	nlohmann::json states = {};
 
+	for (int i = 0; i < dfa.GetStates().size(); i++) 
+	{
 
-	data["inputStrings"] = { true, "Hello", 3.1415 };
-	data["Empty Array"] = nlohmann::json::array_t();
-	data["Object With Items"] = nlohmann::json::object_t({ {"Key", "Value"}, {"Day", true} });
-	data["Empty Object"] = nlohmann::json::object_t();
+		nlohmann::json state;
+		state["label"] = dfa.GetStates()[i].GetStateLabel();
+		state["stateId"] = dfa.GetStates()[i].GetStateId();
+
+		if (dfa.GetStates()[i].GetTransitionObjects().size() == 0) 
+		{
+			state["transitionObjects"] = nlohmann::json::array();
+		}
+		else 
+		{
+			nlohmann::json transitionObjectsJson = {};
+
+			std::vector<StateTransition> transitionObjects = dfa.GetStates()[i].GetTransitionObjects();
+
+			for (int k = 0; k < transitionObjects.size(); k++)
+			{
+				nlohmann::json transitionObj;
+				transitionObj["id"] = transitionObjects.at(k).GetTransitionId();
+				transitionObj["transitionTo"] = transitionObjects.at(k).GetTransitionTo();
+				transitionObj["transitionFrom"] = transitionObjects.at(k).GetTransitionId();
+				transitionObj["isAssigned"] = transitionObjects.at(k).GetIsAssigned();
+				transitionObj["isSelfLoop"] = transitionObjects.at(k).GetIsSelfLoop();
+
+				nlohmann::json symbols = {};
+
+				for (int symbol : transitionObjects.at(k).GetTransitionSymbols())
+				{
+					symbols.push_back(symbol);
+				}
+
+				transitionObj["symbols"] = symbols;
+
+				transitionObjectsJson.push_back(transitionObj);
+			}
+
+			state["transitionObjects"] = transitionObjectsJson;
+		}
+
+		if (dfa.GetStates()[i].GetTransitions().size() == 0) 
+		{
+			json j_object_empty(json::value_t::object);
+			state["transitions"] = j_object_empty;
+		}
+		else 
+		{
+			std::map<char, int> transitions = dfa.GetStates()[i].GetTransitions();
+
+			json transitionMap = {};
+
+			for (auto pair = transitions.begin(); pair != dfa.GetStates()[i].GetTransitions().end(); ++pair)
+			{
+				json transitionMapPair = {(int)pair->first, pair->second};
+				transitionMap.push_back(transitionMapPair);
+			}
+		}
+
+		if (dfa.GetStates()[i].GetIncomingTransitions().size() == 0)
+		{
+			state["incomingTransitions"] = json::array();
+		}
+		else 
+		{
+			nlohmann::json incomingTransitions = {};
+
+			for (int trans : dfa.GetStates()[i].GetIncomingTransitions())
+			{
+				incomingTransitions.push_back(
+					trans
+				);
+			}
+
+			state["incomingTransitions"] = incomingTransitions;
+
+		}
+
+		if (dfa.GetStates()[i].GetOutgoingTransitions().size() == 0) 
+		{
+			state["outgoingTransitions"] = json::array();
+		}
+		else 
+		{
+			nlohmann::json outgoingTransitions = {};
+
+			for (int trans : dfa.GetStates()[i].GetOutgoingTransitions()) 
+			{
+				outgoingTransitions.push_back(trans);
+			}
+
+			state["outgoingTransitions"] = outgoingTransitions;
+		}
+
+
+		state["isAccepting"] = dfa.GetStates()[i].GetIsAccepting();
+		state["isStarting"] = dfa.GetStates()[i].GetIsStarting();
+
+		sf::Vector2f statePos = dfa.GetStates()[i].GetStatePosition();
+		json statePosJson = {statePos.x, statePos.y};
+		state["statePosition"] = statePosJson;
+		
+		sf::Vector2f stateCenter = dfa.GetStates()[i].GetStateCenter();
+		json stateCenterJson = { stateCenter.x, stateCenter.y };
+		state["stateCenter"] = stateCenterJson;
+		
+		states.push_back(state);
+	}
+	
+	data["states"] = states;
+
+	std::ofstream jsonFile(filename);
+	jsonFile << std::setw(4) << data << std::endl;
 }
 
 DFA LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticStateLabelCount, int& stateCounter,
@@ -1079,8 +1204,6 @@ DFA LoadDfaFromFile(DfaFile& file, bool& automaticStateLabels, int& automaticSta
 					file.GetStates()[i].stateId,
 					file.GetStates()[i].transitionObjects[k].id);
 			}
-
-
 		}
 	}
 

@@ -8,7 +8,8 @@
 
 using json = nlohmann::json;
 
-DfaFile FileSystem::LoadFile(std::string path) {
+DfaFile FileSystem::LoadFile(std::string path) 
+{
 	try
 	{
 		std::ifstream file(path);
@@ -38,23 +39,28 @@ DfaFile FileSystem::LoadFile(std::string path) {
 	}
 }
 
-void FileSystem::SaveLoadedFile() {
-	if (!fileIsLoaded) {
+void FileSystem::SaveLoadedFile() 
+{
+	if (!fileIsLoaded) 
+	{
 		std::cout << "No file to save";
 		return;
 	}
 
-	if (fileIsSaved) {
+	if (fileIsSaved) 
+	{
 		std::cout << "File already saved";
 		return;
 	}
 }
 
-void FileSystem::SaveNewFile() {
+void FileSystem::SaveNewFile() 
+{
 
 }
 
-FileSystem::FileSystem() {
+FileSystem::FileSystem() 
+{
 
 }
 
@@ -65,7 +71,8 @@ std::vector<StateDto> FileSystem::LoadStateDtoObjects(json& data)
 
 	std::cout << states.size();
 
-	for (auto& state : states) {
+	for (auto& state : states) 
+	{
 
 		StateDto stateObj;
 
@@ -76,12 +83,22 @@ std::vector<StateDto> FileSystem::LoadStateDtoObjects(json& data)
 		stateObj.transitionObjects = transObjects;
 
 		auto transitionsJson = state["transitions"];
-		std::map<char, int> transitions;
-		for (auto it = transitionsJson.begin(); it != transitionsJson.end(); ++it) {
-			transitions.insert({it.key()[0], it.value()});
-		}
 
-		stateObj.transitions = transitions;
+		if (transitionsJson.size() == 0) 
+		{
+			stateObj.transitions = std::map<char, int>();
+		}
+		else 
+		{
+			std::map<char, int> transitions;
+			for (auto it = transitionsJson.begin(); it != transitionsJson.end(); ++it)
+			{
+				int value = it.key()[0];
+				transitions.insert({ value, it.value() });
+			}
+
+			stateObj.transitions = transitions;
+		}
 
 		stateObj.incomingTransitions = state["incomingTransitions"].get<std::vector<int>>();
 		stateObj.outgoingTransitions = state["outgoingTransitions"].get<std::vector<int>>();
@@ -89,14 +106,17 @@ std::vector<StateDto> FileSystem::LoadStateDtoObjects(json& data)
 		stateObj.isStarting = state["isStarting"];
 
 		auto statePosition = state["statePosition"];
-		float statePosX = statePosition["x"];
-		float statePosY = statePosition["y"];
+
+		std::cout << statePosition.dump();
+
+		float statePosX = statePosition[0];
+		float statePosY = statePosition[1];
 
 		stateObj.statePosition = sf::Vector2f(statePosX, statePosY);
 
 		auto stateCenter = state["stateCenter"];
-		float stateCenterX = stateCenter["x"];
-		float stateCenterY = stateCenter["y"];
+		float stateCenterX = stateCenter[0];
+		float stateCenterY = stateCenter[1];
 
 		stateObj.stateCenter = sf::Vector2f(stateCenterX, stateCenterY);
 
@@ -106,9 +126,10 @@ std::vector<StateDto> FileSystem::LoadStateDtoObjects(json& data)
 	return loadedStates;
 }
 
-void FileSystem::LoadStateTransitionDtoObjects(json& data, std::vector<TransitionObjectDto>& transObjects) {
-
-	for (const auto& transition : data) {
+void FileSystem::LoadStateTransitionDtoObjects(json& data, std::vector<TransitionObjectDto>& transObjects) 
+{
+	for (const auto& transition : data) 
+	{
 
 		TransitionObjectDto transitionObj;
 		transitionObj.id = transition["id"];
@@ -116,10 +137,11 @@ void FileSystem::LoadStateTransitionDtoObjects(json& data, std::vector<Transitio
 		transitionObj.transitionFrom = transition["transitionFrom"];
 		transitionObj.isAssigned = transition["isAssigned"];
 		transitionObj.isSelfLoop = transition["isSelfLoop"];
-		std::vector<std::string> symbols = transition["symbols"].get<std::vector<std::string>>();
+		std::vector<int> symbols = transition["symbols"].get<std::vector<int>>();
 
-		for (int i = 0; i < symbols.size(); i++) {
-			transitionObj.symbols.push_back(symbols[i][0]);
+		for (int i = 0; i < symbols.size(); i++)
+		{
+			transitionObj.symbols.push_back((char)symbols[i]);
 		}
 
 		transObjects.push_back(transitionObj);
