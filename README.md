@@ -31,3 +31,7 @@ Incorrect string screen:
 
 DFEdit also features a simple JSON file system. Currently, it can only save one DFA at a time (work in progress), but this will be changed in the near future to support multiple files and an elaborate file select system.
 
+Known current issues:
+- Saving causes the problem to lag for a very long time/crash
+- Issues with selecting and de-selecting states
+
