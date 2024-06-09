@@ -16,6 +16,10 @@ DfaFile FileSystem::LoadFile(std::string path)
 
 		json data = json::parse(file);
 
+		if (data.size() == 0) {
+			return DfaFile();
+		}
+
 		// First, get all of the variables
 
 		std::string filename = data["filename"];

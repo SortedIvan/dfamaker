@@ -66,7 +66,9 @@ void DFA::AddNewState(std::string label, sf::Vector2f position, sf::Font& font, 
 	this->states.push_back(state);
 }
 
-void DFA::SetAlphabet(std::vector<char> alphabet) {
+
+void DFA::SetAlphabet(std::vector<char> alphabet) 
+{
 
 }
 

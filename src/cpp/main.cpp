@@ -71,14 +71,13 @@ void SaveDfaToFile(DfaFile& file, DFA& dfa, bool& automaticStateLabels, int& aut
 
 int main() 
 {
-
 	/*
 		Titlebar && Close prevent the screen from being resized by default
 		The application is not yet optimized for resizing
 	*/
 	sf::RenderWindow window(
 		sf::VideoMode(SCREEN_X_SIZE, SCREEN_Y_SIZE),
-		"Dfa Generator",
+		"DFEdit",
 		sf::Style::Titlebar | sf::Style::Close);
 
 	window.setFramerateLimit(TARGET_FPS);
@@ -197,7 +196,7 @@ int main()
 	automaticStateLabelsCheckBoxChecked.setPosition(sf::Vector2f(errorIndicator.getPosition().x + errorIndicator.getSize().x + 37.5f, errorIndicator.getPosition().y + 2.5f));
 	automaticStateLabelsText.setPosition(sf::Vector2f(errorIndicator.getPosition().x + errorIndicator.getSize().x + 75.f, errorIndicator.getPosition().y));
 
-	/*
+	/*e
 		Button declarations
 		save & file, size is calculated with respect to the checkbox
 	*/
@@ -293,6 +292,8 @@ int main()
 		}
 
 		// <------------End-Mouse-Overlay-Handling----------------------->
+
+
 
 		while (window.pollEvent(e)) 
 		{
@@ -463,7 +464,7 @@ int main()
 			// On Mouse Click Release
 			if (e.type == sf::Event::MouseButtonReleased) 
 			{
-				
+
 				sf::Vector2f mousePos = (sf::Vector2f)GetMousePosition(window);
 
 				// Check if load/save button was clicked
@@ -1065,12 +1066,7 @@ void SaveDfaToFile(DfaFile& file, DFA& dfa, bool& automaticStateLabels, int& aut
 
 				nlohmann::json symbols = {};
 
-				for (int symbol : transitionObjects.at(k).GetTransitionSymbols())
-				{
-					symbols.push_back(symbol);
-				}
-
-				transitionObj["symbols"] = symbols;
+				transitionObj["symbols"] = transitionObjects.at(k).GetTransitionSymbols();
 
 				transitionObjectsJson.push_back(transitionObj);
 			}
@@ -1089,7 +1085,7 @@ void SaveDfaToFile(DfaFile& file, DFA& dfa, bool& automaticStateLabels, int& aut
 
 			json transitionMap = {};
 
-			for (auto pair = transitions.begin(); pair != dfa.GetStates()[i].GetTransitions().end(); ++pair)
+			for (auto pair = transitions.begin(); pair != transitions.end(); ++pair)
 			{
 				json transitionMapPair = {(int)pair->first, pair->second};
 				transitionMap.push_back(transitionMapPair);
