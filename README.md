@@ -2,7 +2,7 @@
 ![dfaicon (1) (1)](https://github.com/SortedIvan/dfamaker/assets/62967263/d0a6e452-dd01-4db1-bb89-396badfcae0d)
 
 <h1> DFEdit </h1>
-DFEdit is a desktop tool for creating and testing deterministic finite automaton machines. 
+DFEdit is a desktop tool for creating and testing deterministic finite automaton machines!
 It is an interactive graphical tool that lets you edit, validate and save your DFA's in a JSON format. 
 The graphical interface allows for fast edits and the moving of states and state arrows.
 Additionally, it comes with an error checker, which indicates whether a DFA is deterministic, labeled correctly, etc.
